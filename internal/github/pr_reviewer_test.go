@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"testing"
 
-	"github.com/modu-ai/moai-adk/internal/core/quality"
+	"github.com/AngeleyesTrue/ae-adk/internal/core/quality"
 )
 
 // mockQualityGate implements quality.Gate for testing.

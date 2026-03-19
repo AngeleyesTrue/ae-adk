@@ -116,8 +116,8 @@ func TestIntegration_TmuxDetectorToSessionManager(t *testing.T) {
 	cfg := &SessionConfig{
 		Name: "detector-integration",
 		Panes: []PaneConfig{
-			{SpecID: "SPEC-ISSUE-10", Command: "moai run SPEC-ISSUE-10"},
-			{SpecID: "SPEC-ISSUE-20", Command: "moai run SPEC-ISSUE-20"},
+			{SpecID: "SPEC-ISSUE-10", Command: "ae run SPEC-ISSUE-10"},
+			{SpecID: "SPEC-ISSUE-20", Command: "ae run SPEC-ISSUE-20"},
 		},
 		MaxVisible: 3,
 	}
@@ -167,12 +167,12 @@ func TestIntegration_TmuxDetectorToSessionManager(t *testing.T) {
 	foundSpecCommand := false
 	for _, call := range allCalls {
 		for _, arg := range call {
-			if strings.Contains(arg, "moai run SPEC-ISSUE-10") {
+			if strings.Contains(arg, "ae run SPEC-ISSUE-10") {
 				foundSpecCommand = true
 			}
 		}
 	}
 	if !foundSpecCommand {
-		t.Error("send-keys should contain SPEC command 'moai run SPEC-ISSUE-10'")
+		t.Error("send-keys should contain SPEC command 'ae run SPEC-ISSUE-10'")
 	}
 }

@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/modu-ai/moai-adk/internal/core/git"
-	"github.com/modu-ai/moai-adk/internal/core/quality"
+	"github.com/AngeleyesTrue/ae-adk/internal/core/git"
+	"github.com/AngeleyesTrue/ae-adk/internal/core/quality"
 )
 
 // specIDPattern validates the expected SPEC-ISSUE-{number} format.

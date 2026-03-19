@@ -71,7 +71,7 @@ func TestRender_DefaultMode(t *testing.T) {
 		t.Errorf("default mode should contain untracked count, got %q", got)
 	}
 	if !strings.Contains(got, "🗿 v1.14.5") {
-		t.Errorf("default mode should contain MoAI version with 🗿 emoji, got %q", got)
+		t.Errorf("default mode should contain AE version with 🗿 emoji, got %q", got)
 	}
 	if !strings.Contains(got, "🔀 main") {
 		t.Errorf("default mode should contain branch with emoji, got %q", got)
@@ -100,7 +100,7 @@ func TestRender_VerboseMode_MultiLine(t *testing.T) {
 
 	lines := strings.Split(got, "\n")
 
-	// v3 full L1: Model, Claude version, MoAI version (no prefix)
+	// v3 full L1: Model, Claude version, AE version (no prefix)
 	if !strings.Contains(lines[0], "🤖 Sonnet 4") {
 		t.Errorf("full line 1 should contain model, got %q", lines[0])
 	}
@@ -108,7 +108,7 @@ func TestRender_VerboseMode_MultiLine(t *testing.T) {
 		t.Errorf("full line 1 should contain Claude version, got %q", lines[0])
 	}
 	if !strings.Contains(lines[0], "🗿 v1.2.0") {
-		t.Errorf("full line 1 should contain MoAI version, got %q", lines[0])
+		t.Errorf("full line 1 should contain AE version, got %q", lines[0])
 	}
 	// v3 does not render cost (REQ-V3-TIME-005)
 	if strings.Contains(got, "$") {
@@ -179,7 +179,7 @@ func TestRender_MinimalMode_OutputStyle(t *testing.T) {
 	data := &StatusData{
 		Metrics:     MetricsData{Model: "Sonnet 4", Available: true},
 		Memory:      MemoryData{TokensUsed: 50000, TokenBudget: 200000, Available: true},
-		OutputStyle: "MoAI",
+		OutputStyle: "AE",
 	}
 
 	got := r.Render(data, ModeMinimal)
@@ -243,7 +243,7 @@ func TestRender_EmptyMemory(t *testing.T) {
 func TestRender_NilData(t *testing.T) {
 	r := newTestRenderer()
 	got := r.Render(nil, ModeDefault)
-	if got != "MoAI" {
+	if got != "AE" {
 		t.Errorf("nil data should return fallback, got %q", got)
 	}
 }
@@ -509,7 +509,7 @@ func TestRender_SegmentFiltering(t *testing.T) {
 		Memory:            MemoryData{TokensUsed: 50000, TokenBudget: 200000, Available: true},
 		Metrics:           MetricsData{Model: "Opus 4.5", Available: true},
 		Directory:         "ae-adk-go",
-		OutputStyle:       "MoAI",
+		OutputStyle:       "AE",
 		ClaudeCodeVersion: "1.0.80",
 		Version:           VersionData{Current: "2.3.1", Available: true},
 	}
@@ -523,21 +523,21 @@ func TestRender_SegmentFiltering(t *testing.T) {
 		{
 			name:          "nil config shows all segments",
 			segmentConfig: nil,
-			wantContain:   []string{"🤖 Opus 4.5", "🔋", "💬 MoAI", "📁 ae-adk-go", "📊", "🔅 v1.0.80", "🗿 v2.3.1", "🔀 main"},
+			wantContain:   []string{"🤖 Opus 4.5", "🔋", "💬 AE", "📁 ae-adk-go", "📊", "🔅 v1.0.80", "🗿 v2.3.1", "🔀 main"},
 		},
 		{
 			name:          "empty config shows all segments",
 			segmentConfig: map[string]bool{},
-			wantContain:   []string{"🤖 Opus 4.5", "🔋", "💬 MoAI", "📁 ae-adk-go", "📊", "🔅 v1.0.80", "🗿 v2.3.1", "🔀 main"},
+			wantContain:   []string{"🤖 Opus 4.5", "🔋", "💬 AE", "📁 ae-adk-go", "📊", "🔅 v1.0.80", "🗿 v2.3.1", "🔀 main"},
 		},
 		{
 			name: "model disabled hides model",
 			segmentConfig: map[string]bool{
 				SegmentModel: false, SegmentContext: true, SegmentOutputStyle: true,
 				SegmentDirectory: true, SegmentGitStatus: true, SegmentClaudeVersion: true,
-				SegmentMoaiVersion: true, SegmentGitBranch: true,
+				SegmentAEVersion: true, SegmentGitBranch: true,
 			},
-			wantContain:    []string{"🔋", "💬 MoAI", "📁 ae-adk-go"},
+			wantContain:    []string{"🔋", "💬 AE", "📁 ae-adk-go"},
 			wantNotContain: []string{"🤖"},
 		},
 		{
@@ -545,20 +545,20 @@ func TestRender_SegmentFiltering(t *testing.T) {
 			segmentConfig: map[string]bool{
 				SegmentModel: true, SegmentContext: true, SegmentOutputStyle: false,
 				SegmentDirectory: false, SegmentGitStatus: true, SegmentClaudeVersion: false,
-				SegmentMoaiVersion: false, SegmentGitBranch: true,
+				SegmentAEVersion: false, SegmentGitBranch: true,
 			},
 			wantContain:    []string{"🤖 Opus 4.5", "🔋", "📊", "🔀 main"},
 			wantNotContain: []string{"💬", "📁", "🔅", "🗿"},
 		},
 		{
-			name: "all segments disabled returns MoAI fallback",
+			name: "all segments disabled returns AE fallback",
 			segmentConfig: map[string]bool{
 				SegmentModel: false, SegmentContext: false, SegmentOutputStyle: false,
 				SegmentDirectory: false, SegmentGitStatus: false, SegmentClaudeVersion: false,
-				SegmentMoaiVersion: false, SegmentGitBranch: false,
+				SegmentAEVersion: false, SegmentGitBranch: false,
 				SegmentUsage5H: false, SegmentUsage7D: false, SegmentSessionTime: false,
 			},
-			wantContain: []string{"MoAI"},
+			wantContain: []string{"AE"},
 		},
 		{
 			name: "unknown segment key defaults to enabled",
@@ -566,17 +566,17 @@ func TestRender_SegmentFiltering(t *testing.T) {
 				"unknown_segment": false,
 				SegmentModel:      true,
 			},
-			wantContain: []string{"🤖 Opus 4.5", "🔋", "💬 MoAI", "📁 ae-adk-go"},
+			wantContain: []string{"🤖 Opus 4.5", "🔋", "💬 AE", "📁 ae-adk-go"},
 		},
 		{
 			name: "only context disabled",
 			segmentConfig: map[string]bool{
 				SegmentModel: true, SegmentContext: false, SegmentOutputStyle: true,
 				SegmentDirectory: true, SegmentGitStatus: true, SegmentClaudeVersion: true,
-				SegmentMoaiVersion: true, SegmentGitBranch: true,
+				SegmentAEVersion: true, SegmentGitBranch: true,
 				SegmentUsage5H: false, SegmentUsage7D: false,
 			},
-			wantContain:    []string{"🤖 Opus 4.5", "💬 MoAI", "📁 ae-adk-go", "🔀 main"},
+			wantContain:    []string{"🤖 Opus 4.5", "💬 AE", "📁 ae-adk-go", "🔀 main"},
 			wantNotContain: []string{"CW:"},
 		},
 	}
@@ -747,7 +747,7 @@ func TestRenderDefaultV3_ThreeLines(t *testing.T) {
 			Untracked: 1,
 			Available: true,
 		},
-		OutputStyle: "MoAI",
+		OutputStyle: "AE",
 		Task:        TaskData{Active: true, Command: "run", SpecID: "SPEC-SLV3-001", Stage: "improve"},
 		Usage: &UsageResult{
 			Usage5H: &UsageData{UsedTokens: 45000, LimitTokens: 100000, Percentage: 45},
@@ -762,13 +762,13 @@ func TestRenderDefaultV3_ThreeLines(t *testing.T) {
 		t.Errorf("default mode must be 3 lines, got: %d lines\noutput: %q", len(lines), got)
 	}
 	// Output style must be merged into L1
-	if !strings.Contains(lines[0], "💬 MoAI") {
+	if !strings.Contains(lines[0], "💬 AE") {
 		t.Errorf("default L1 must contain output style, got: %q", lines[0])
 	}
 }
 
 func TestRenderDefaultV3_Line1(t *testing.T) {
-	// default L1: model, Claude version, MoAI version, session time
+	// default L1: model, Claude version, AE version, session time
 	r := newTestRenderer()
 	data := &StatusData{
 		Metrics:           MetricsData{Model: "Opus 4.6", Available: true, SessionDurationMS: 9240000}, // 2h 34m
@@ -790,7 +790,7 @@ func TestRenderDefaultV3_Line1(t *testing.T) {
 		t.Errorf("default L1 must contain Claude version, got: %q", l1)
 	}
 	if !strings.Contains(l1, "🗿 v2.8.0") {
-		t.Errorf("default L1 must contain MoAI version, got: %q", l1)
+		t.Errorf("default L1 must contain AE version, got: %q", l1)
 	}
 	// Session time (9240000ms = 154min = 2h 34m)
 	if !strings.Contains(l1, "⏳") {
@@ -880,7 +880,7 @@ func TestRenderDefaultV3_StyleInL1(t *testing.T) {
 	data := &StatusData{
 		Metrics:     MetricsData{Model: "Opus 4.6", Available: true},
 		Memory:      MemoryData{TokensUsed: 88000, TokenBudget: 200000, Available: true},
-		OutputStyle: "MoAI",
+		OutputStyle: "AE",
 		Task:        TaskData{Active: true, Command: "run", SpecID: "SPEC-SLV3-001", Stage: "improve"},
 		Directory:   "ae-adk-go",
 		Git:         GitStatusData{Branch: "main", Available: true},
@@ -895,7 +895,7 @@ func TestRenderDefaultV3_StyleInL1(t *testing.T) {
 	}
 
 	// Output style must be merged into L1
-	if !strings.Contains(lines[0], "💬 MoAI") {
+	if !strings.Contains(lines[0], "💬 AE") {
 		t.Errorf("default L1 must contain output style, got: %q", lines[0])
 	}
 	// Task (📋) is no longer displayed
@@ -924,7 +924,7 @@ func TestRenderFullV3_FiveLines(t *testing.T) {
 			Untracked: 1,
 			Available: true,
 		},
-		OutputStyle: "MoAI",
+		OutputStyle: "AE",
 		Task:        TaskData{Active: true, Command: "run", SpecID: "SPEC-SLV3-001", Stage: "improve"},
 		Usage: &UsageResult{
 			Usage5H: &UsageData{UsedTokens: 45000, LimitTokens: 100000, Percentage: 45},
@@ -939,13 +939,13 @@ func TestRenderFullV3_FiveLines(t *testing.T) {
 		t.Errorf("full mode must be 5 lines, got: %d lines\noutput:\n%s", len(lines), got)
 	}
 	// Output style must be merged into L1
-	if !strings.Contains(lines[0], "💬 MoAI") {
+	if !strings.Contains(lines[0], "💬 AE") {
 		t.Errorf("full L1 must contain output style, got: %q", lines[0])
 	}
 }
 
 func TestRenderFullV3_Line1_WithPrefixes(t *testing.T) {
-	// full L1: model, Claude version with "Claude" prefix, MoAI version with "MoAI" prefix, session time
+	// full L1: model, Claude version with "Claude" prefix, AE version with "AE" prefix, session time
 	r := newTestRenderer()
 	data := &StatusData{
 		Metrics:           MetricsData{Model: "Opus 4.6", Available: true, SessionDurationMS: 9240000},
@@ -1072,7 +1072,7 @@ func TestRenderFullV3_StyleInL1(t *testing.T) {
 	data := &StatusData{
 		Metrics:     MetricsData{Model: "Opus 4.6", Available: true},
 		Memory:      MemoryData{TokensUsed: 88000, TokenBudget: 200000, Available: true},
-		OutputStyle: "MoAI",
+		OutputStyle: "AE",
 		Task:        TaskData{Active: true, Command: "run", SpecID: "SPEC-SLV3-001", Stage: "improve"},
 		Directory:   "ae-adk-go",
 		Git:         GitStatusData{Branch: "main", Available: true},
@@ -1091,7 +1091,7 @@ func TestRenderFullV3_StyleInL1(t *testing.T) {
 	}
 
 	// Output style must be merged into L1
-	if !strings.Contains(lines[0], "💬 MoAI") {
+	if !strings.Contains(lines[0], "💬 AE") {
 		t.Errorf("full L1 must contain output style, got: %q", lines[0])
 	}
 }
@@ -1165,16 +1165,16 @@ func TestRender_ModeRouting(t *testing.T) {
 	}{
 		{ModeDefault, 1, 4},
 		{ModeFull, 1, 6},
-		{ModeCompact, 1, 4},  // deprecated → default
-		{ModeMinimal, 1, 4},  // deprecated → default
-		{ModeVerbose, 1, 6},  // deprecated → full
+		{ModeCompact, 1, 4}, // deprecated → default
+		{ModeMinimal, 1, 4}, // deprecated → default
+		{ModeVerbose, 1, 6}, // deprecated → full
 	}
 
 	for _, tt := range tests {
 		t.Run(string(tt.mode), func(t *testing.T) {
 			got := r.Render(data, tt.mode)
-			if got == "" || got == "MoAI" {
-				// With data present, output should be actual render not MoAI fallback
+			if got == "" || got == "AE" {
+				// With data present, output should be actual render not AE fallback
 				return
 			}
 			lines := strings.Split(got, "\n")

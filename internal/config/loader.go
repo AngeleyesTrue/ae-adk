@@ -23,7 +23,7 @@ func NewLoader() *Loader {
 	return &Loader{}
 }
 
-// Load reads all configuration section files from the given .moai directory
+// Load reads all configuration section files from the given .ae directory
 // and returns a merged Config with defaults applied for missing fields.
 // Missing files use default values. Invalid YAML files are skipped with a warning.
 func (l *Loader) Load(configDir string) (*Config, error) {

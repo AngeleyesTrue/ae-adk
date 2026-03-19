@@ -6,7 +6,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-// MoAI ASCII art banner
+// AE ASCII art banner
 const aeBanner = `
 ███╗   ███╗          █████╗ ██╗       █████╗ ██████╗ ██╗  ██╗
 ████╗ ████║ ██████╗ ██╔══██╗██║      ██╔══██╗██╔══██╗██║ ██╔╝
@@ -16,8 +16,8 @@ const aeBanner = `
 ╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝      ╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝
 `
 
-// PrintBanner displays the MoAI ASCII art banner with version information.
-// The banner uses MoAI's adaptive brand color (#C45A3C light, #DA7756 dark)
+// PrintBanner displays the AE ASCII art banner with version information.
+// The banner uses AE's adaptive brand color (#C45A3C light, #DA7756 dark)
 // and includes the provided version string. If version is empty, it displays "unknown".
 func PrintBanner(version string) {
 	// Create a style with terra cotta color (adaptive for light/dark terminals)
@@ -28,7 +28,7 @@ func PrintBanner(version string) {
 	fmt.Println(bannerStyle.Render(aeBanner))
 
 	// Print description
-	fmt.Println(dimStyle.Render("  Modu-AI's Agentic Development Kit w/ SuperAgent MoAI"))
+	fmt.Println(dimStyle.Render("  AngeleyesTrue's Agentic Development Kit w/ SuperAgent AE"))
 	fmt.Println()
 
 	// Print version

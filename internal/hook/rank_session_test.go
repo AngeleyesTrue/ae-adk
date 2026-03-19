@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/modu-ai/moai-adk/internal/rank"
+	"github.com/AngeleyesTrue/ae-adk/internal/rank"
 )
 
 // --- anonymizePath tests ---

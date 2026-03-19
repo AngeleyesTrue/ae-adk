@@ -33,7 +33,7 @@ type checker struct {
 
 // NewChecker creates a Checker that queries the given API URL.
 // The apiURL should be the base URL for the releases endpoint
-// (e.g., "https://api.github.com/repos/modu-ai/ae-adk/releases/latest").
+// (e.g., "https://api.github.com/repos/AngeleyesTrue/ae-adk/releases/latest").
 // For testing, pass the httptest.Server URL directly.
 func NewChecker(apiURL string, client *http.Client) Checker {
 	if client == nil {

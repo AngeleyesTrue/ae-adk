@@ -79,9 +79,9 @@ func TestRuleManager_FindRulesConfig(t *testing.T) {
 		}
 	})
 
-	t.Run("finds config in .claude/skills/moai-tool-ast-grep/rules", func(t *testing.T) {
+	t.Run("finds config in .claude/skills/ae-tool-ast-grep/rules", func(t *testing.T) {
 		tmpDir := t.TempDir()
-		rulesDir := filepath.Join(tmpDir, ".claude", "skills", "moai-tool-ast-grep", "rules")
+		rulesDir := filepath.Join(tmpDir, ".claude", "skills", "ae-tool-ast-grep", "rules")
 		if err := os.MkdirAll(rulesDir, 0755); err != nil {
 			t.Fatalf("failed to create rules dir: %v", err)
 		}

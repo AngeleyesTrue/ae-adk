@@ -11,7 +11,7 @@ const (
 	// MCPJSON is the MCP server configuration file.
 	MCPJSON = ".mcp.json"
 
-	// ManifestJSON is the MoAI manifest file that tracks deployed templates.
+	// ManifestJSON is the AE manifest file that tracks deployed templates.
 	ManifestJSON = "manifest.json"
 
 	// ClaudeMD is the main Claude Code execution directive file.

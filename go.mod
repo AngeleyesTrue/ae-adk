@@ -1,4 +1,4 @@
-module github.com/modu-ai/moai-adk
+module github.com/AngeleyesTrue/ae-adk
 
 go 1.26
 

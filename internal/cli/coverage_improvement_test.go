@@ -15,13 +15,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/modu-ai/moai-adk/internal/cli/wizard"
-	"github.com/modu-ai/moai-adk/internal/cli/worktree"
-	"github.com/modu-ai/moai-adk/internal/config"
-	"github.com/modu-ai/moai-adk/internal/hook"
-	"github.com/modu-ai/moai-adk/internal/template"
-	"github.com/modu-ai/moai-adk/internal/update"
-	"github.com/modu-ai/moai-adk/pkg/version"
+	"github.com/AngeleyesTrue/ae-adk/internal/cli/wizard"
+	"github.com/AngeleyesTrue/ae-adk/internal/cli/worktree"
+	"github.com/AngeleyesTrue/ae-adk/internal/config"
+	"github.com/AngeleyesTrue/ae-adk/internal/hook"
+	"github.com/AngeleyesTrue/ae-adk/internal/template"
+	"github.com/AngeleyesTrue/ae-adk/internal/update"
+	"github.com/AngeleyesTrue/ae-adk/pkg/version"
 	"github.com/spf13/cobra"
 )
 
@@ -622,7 +622,7 @@ func TestBuildAutoUpdateFunc_SuccessfulUpdate(t *testing.T) {
 // cleanupAeWorktrees — cc.go:146 (previously 15%)
 // =============================================================================
 
-func TestCleanupMoaiWorktrees_NotGitRepo(t *testing.T) {
+func TestCleanupAEWorktrees_NotGitRepo(t *testing.T) {
 	tmpDir := t.TempDir()
 	// No .git directory
 	result := cleanupAeWorktrees(tmpDir)
@@ -631,7 +631,7 @@ func TestCleanupMoaiWorktrees_NotGitRepo(t *testing.T) {
 	}
 }
 
-func TestCleanupMoaiWorktrees_GitRepoNoWorktrees(t *testing.T) {
+func TestCleanupAEWorktrees_GitRepoNoWorktrees(t *testing.T) {
 	tmpDir := t.TempDir()
 	// Create a .git directory but no actual git repo - runGitCommand will fail
 	if err := os.MkdirAll(filepath.Join(tmpDir, ".git"), 0o755); err != nil {
@@ -1251,12 +1251,12 @@ func TestResolveConventionName_EnvVar(t *testing.T) {
 // TestIsEnforceOnPushEnabled_* removed - exists in hook_pre_push_test.go
 
 // =============================================================================
-// backupMoaiConfig — update.go:977 (previously 66.7%)
+// backupAEConfig — update.go:977 (previously 66.7%)
 // =============================================================================
 
-// TestBackupMoaiConfig_NoConfigDir removed - exists in update_test.go
+// TestBackupAEConfig_NoConfigDir removed - exists in update_test.go
 
-func TestBackupMoaiConfig_WithConfigFiles(t *testing.T) {
+func TestBackupAEConfig_WithConfigFiles(t *testing.T) {
 	tmpDir := t.TempDir()
 	configDir := filepath.Join(tmpDir, ".ae", "config")
 	sectionsDir := filepath.Join(configDir, "sections")
@@ -1272,9 +1272,9 @@ func TestBackupMoaiConfig_WithConfigFiles(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	backupDir, err := backupMoaiConfig(tmpDir)
+	backupDir, err := backupAEConfig(tmpDir)
 	if err != nil {
-		t.Fatalf("backupMoaiConfig error: %v", err)
+		t.Fatalf("backupAEConfig error: %v", err)
 	}
 	if backupDir == "" {
 		t.Fatal("backup dir should not be empty")
@@ -1289,15 +1289,15 @@ func TestBackupMoaiConfig_WithConfigFiles(t *testing.T) {
 	}
 }
 
-// TestBackupMoaiConfig_ConfigPathIsFile removed - exists in update_fileops_test.go
+// TestBackupAEConfig_ConfigPathIsFile removed - exists in update_fileops_test.go
 
 // =============================================================================
-// cleanMoaiManagedPaths — update.go:1160 (previously 67.6%)
+// cleanAEManagedPaths — update.go:1160 (previously 67.6%)
 // =============================================================================
 
-// TestCleanMoaiManagedPaths_EmptyProject removed - exists in coverage_fixes_test.go
+// TestCleanAEManagedPaths_EmptyProject removed - exists in coverage_fixes_test.go
 
-func TestCleanMoaiManagedPaths_WithExistingPaths(t *testing.T) {
+func TestCleanAEManagedPaths_WithExistingPaths(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Create some paths that should be cleaned
@@ -1320,9 +1320,9 @@ func TestCleanMoaiManagedPaths_WithExistingPaths(t *testing.T) {
 	}
 
 	var buf bytes.Buffer
-	err := cleanMoaiManagedPaths(tmpDir, &buf)
+	err := cleanAEManagedPaths(tmpDir, &buf)
 	if err != nil {
-		t.Fatalf("cleanMoaiManagedPaths error: %v", err)
+		t.Fatalf("cleanAEManagedPaths error: %v", err)
 	}
 
 	// Verify cleaned paths are removed
@@ -1334,10 +1334,10 @@ func TestCleanMoaiManagedPaths_WithExistingPaths(t *testing.T) {
 }
 
 // =============================================================================
-// restoreMoaiConfig — update.go:1322 (previously 73.3%)
+// restoreAEConfig — update.go:1322 (previously 73.3%)
 // =============================================================================
 
-func TestRestoreMoaiConfig_WithSectionsBackup(t *testing.T) {
+func TestRestoreAEConfig_WithSectionsBackup(t *testing.T) {
 	tmpDir := t.TempDir()
 	configDir := filepath.Join(tmpDir, ".ae", "config", "sections")
 	if err := os.MkdirAll(configDir, 0o755); err != nil {
@@ -1361,9 +1361,9 @@ func TestRestoreMoaiConfig_WithSectionsBackup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err := restoreMoaiConfig(tmpDir, backupDir)
+	err := restoreAEConfig(tmpDir, backupDir)
 	if err != nil {
-		t.Fatalf("restoreMoaiConfig error: %v", err)
+		t.Fatalf("restoreAEConfig error: %v", err)
 	}
 
 	// Verify user's config was merged
@@ -1377,7 +1377,7 @@ func TestRestoreMoaiConfig_WithSectionsBackup(t *testing.T) {
 	}
 }
 
-func TestRestoreMoaiConfig_LegacyBackup(t *testing.T) {
+func TestRestoreAEConfig_LegacyBackup(t *testing.T) {
 	tmpDir := t.TempDir()
 	configDir := filepath.Join(tmpDir, ".ae", "config")
 	if err := os.MkdirAll(configDir, 0o755); err != nil {
@@ -1393,17 +1393,17 @@ func TestRestoreMoaiConfig_LegacyBackup(t *testing.T) {
 	}
 
 	// Should fallback to legacy restore
-	err := restoreMoaiConfig(tmpDir, backupDir)
+	err := restoreAEConfig(tmpDir, backupDir)
 	if err != nil {
-		t.Fatalf("restoreMoaiConfig legacy error: %v", err)
+		t.Fatalf("restoreAEConfig legacy error: %v", err)
 	}
 }
 
 // =============================================================================
-// restoreMoaiConfigLegacy — update.go:1411 (previously 71.4%)
+// restoreAEConfigLegacy — update.go:1411 (previously 71.4%)
 // =============================================================================
 
-// TestRestoreMoaiConfigLegacy_SkipsMetadata removed - exists in update_fileops_test.go
+// TestRestoreAEConfigLegacy_SkipsMetadata removed - exists in update_fileops_test.go
 
 // =============================================================================
 // runCC — complete path testing (cc.go:35)
@@ -1414,7 +1414,7 @@ func TestRunCC_SuccessfulExecution(t *testing.T) {
 	t.Setenv("AE_TEST_GLM_KEY", "tok")
 
 	tmpDir := t.TempDir()
-	// Create .moai directory so findProjectRoot works
+	// Create .ae directory so findProjectRoot works
 	if err := os.MkdirAll(filepath.Join(tmpDir, ".ae"), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -1527,7 +1527,7 @@ func TestNewRankSyncCmd_NotLoggedIn(t *testing.T) {
 // isTestEnvironment — glm.go:651 (previously 83.3%)
 // =============================================================================
 
-func TestIsTestEnvironment_WithMoaiTestMode(t *testing.T) {
+func TestIsTestEnvironment_WithAETestMode(t *testing.T) {
 	t.Setenv("AE_TEST_MODE", "1")
 	if !isTestEnvironment() {
 		t.Error("should detect test mode from AE_TEST_MODE env")
@@ -1737,7 +1737,7 @@ func TestCleanupOldBackups_NoBackupDir(t *testing.T) {
 
 func TestCleanupOldBackups_ExceedsKeepCount(t *testing.T) {
 	tmpDir := t.TempDir()
-	backupDir := filepath.Join(tmpDir, ".moai-backups")
+	backupDir := filepath.Join(tmpDir, ".ae-backups")
 	if err := os.MkdirAll(backupDir, 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -2196,9 +2196,11 @@ func TestNewRankSyncCmd_LoggedInNoTranscripts(t *testing.T) {
 	origDeps := deps
 	defer func() { deps = origDeps }()
 
-	// Point HOME to a temp dir so no transcripts are found
+	// Point HOME to a temp dir so no transcripts are found.
+	// On Windows, USERPROFILE is used instead of HOME for home directory resolution.
 	tmpHome := t.TempDir()
 	t.Setenv("HOME", tmpHome)
+	t.Setenv("USERPROFILE", tmpHome)
 
 	// EnsureRank needs a valid credential store with API key to initialize RankClient
 	deps = &Dependencies{
@@ -2215,6 +2217,7 @@ func TestNewRankSyncCmd_LoggedInNoTranscripts(t *testing.T) {
 	}
 
 	cmd := newRankSyncCmd()
+	cmd.SetContext(context.Background())
 	var buf bytes.Buffer
 	cmd.SetOut(&buf)
 	cmd.SetErr(&buf)
@@ -2259,7 +2262,7 @@ func TestRunUpdate_ShellEnvMode(t *testing.T) {
 // findProjectRoot — more paths
 func TestFindProjectRoot_FromNestedDir(t *testing.T) {
 	tmpDir := t.TempDir()
-	// Create .moai marker at root
+	// Create .ae marker at root
 	if err := os.MkdirAll(filepath.Join(tmpDir, ".ae"), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -2383,10 +2386,10 @@ func TestCheckGit_VerboseWithGit(t *testing.T) {
 	}
 }
 
-// runCC — test with no .moai project root returns error
+// runCC — test with no .ae project root returns error
 func TestRunCC_NoProjectRoot(t *testing.T) {
 	tmpDir := t.TempDir()
-	// No .moai directory
+	// No .ae directory
 
 	oldWd, _ := os.Getwd()
 	if err := os.Chdir(tmpDir); err != nil {
@@ -2413,10 +2416,10 @@ func TestRunCC_NoProjectRoot(t *testing.T) {
 	}
 }
 
-// runCC — test with valid .moai project
+// runCC — test with valid .ae project
 func TestRunCC_WithProjectRoot(t *testing.T) {
 	tmpDir := t.TempDir()
-	// Create .moai directory so findProjectRoot works
+	// Create .ae directory so findProjectRoot works
 	if err := os.MkdirAll(filepath.Join(tmpDir, ".ae"), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -2552,7 +2555,7 @@ func TestLoadGLMConfig_WithConfig(t *testing.T) {
 // TestLoadGLMConfig_FallbackDefaults already exists in glm_new_test.go
 
 // cleanupAeWorktrees — test with a real (but minimal) git repo
-func TestCleanupMoaiWorktrees_RealGitRepo(t *testing.T) {
+func TestCleanupAEWorktrees_RealGitRepo(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Initialize a real git repo
@@ -2611,7 +2614,7 @@ func TestExecCommand_Failure(t *testing.T) {
 // runCG — exercises the CG hybrid mode code path
 func TestRunCG_NoProjectRoot(t *testing.T) {
 	tmpDir := t.TempDir()
-	// No .moai directory
+	// No .ae directory
 
 	oldWd, _ := os.Getwd()
 	if err := os.Chdir(tmpDir); err != nil {
@@ -2638,7 +2641,7 @@ func TestRunCG_NoProjectRoot(t *testing.T) {
 
 func TestRunCG_NoAPIKey(t *testing.T) {
 	tmpDir := t.TempDir()
-	// Create .moai directory
+	// Create .ae directory
 	if err := os.MkdirAll(filepath.Join(tmpDir, ".ae", "config", "sections"), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -2676,8 +2679,8 @@ func TestRunCG_NoAPIKey(t *testing.T) {
 	}
 }
 
-// backupMoaiConfig — test backup with sections directory
-func TestBackupMoaiConfig_WithSections(t *testing.T) {
+// backupAEConfig — test backup with sections directory
+func TestBackupAEConfig_WithSections(t *testing.T) {
 	tmpDir := t.TempDir()
 	sectionsDir := filepath.Join(tmpDir, ".ae", "config", "sections")
 	if err := os.MkdirAll(sectionsDir, 0o755); err != nil {
@@ -2690,9 +2693,9 @@ func TestBackupMoaiConfig_WithSections(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	backupPath, err := backupMoaiConfig(tmpDir)
+	backupPath, err := backupAEConfig(tmpDir)
 	if err != nil {
-		t.Fatalf("backupMoaiConfig error: %v", err)
+		t.Fatalf("backupAEConfig error: %v", err)
 	}
 	if backupPath == "" {
 		t.Fatal("expected non-empty backup path")
@@ -2718,10 +2721,10 @@ func TestBackupMoaiConfig_WithSections(t *testing.T) {
 	}
 }
 
-// TestBackupMoaiConfig_NoConfigDir already exists in update_test.go
+// TestBackupAEConfig_NoConfigDir already exists in update_test.go
 
-// cleanMoaiManagedPaths — test with actual file structure
-func TestCleanMoaiManagedPaths_WithFiles(t *testing.T) {
+// cleanAEManagedPaths — test with actual file structure
+func TestCleanAEManagedPaths_WithFiles(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Create directories and files that would be cleaned
@@ -2745,9 +2748,9 @@ func TestCleanMoaiManagedPaths_WithFiles(t *testing.T) {
 	}
 
 	var buf bytes.Buffer
-	err := cleanMoaiManagedPaths(tmpDir, &buf)
+	err := cleanAEManagedPaths(tmpDir, &buf)
 	if err != nil {
-		t.Fatalf("cleanMoaiManagedPaths error: %v", err)
+		t.Fatalf("cleanAEManagedPaths error: %v", err)
 	}
 
 	// Verify settings.json was removed
@@ -2755,21 +2758,21 @@ func TestCleanMoaiManagedPaths_WithFiles(t *testing.T) {
 		t.Error("settings.json should have been removed")
 	}
 
-	// Verify moai config dir was removed
+	// Verify ae config dir was removed
 	configDir := filepath.Join(tmpDir, ".ae", "config")
 	if _, err := os.Stat(configDir); !os.IsNotExist(err) {
 		t.Error(".ae/config should have been removed")
 	}
 }
 
-func TestCleanMoaiManagedPaths_EmptyProject2(t *testing.T) {
+func TestCleanAEManagedPaths_EmptyProject2(t *testing.T) {
 	tmpDir := t.TempDir()
-	// No .claude or .moai directories exist
+	// No .claude or .ae directories exist
 
 	var buf bytes.Buffer
-	err := cleanMoaiManagedPaths(tmpDir, &buf)
+	err := cleanAEManagedPaths(tmpDir, &buf)
 	if err != nil {
-		t.Fatalf("cleanMoaiManagedPaths error: %v", err)
+		t.Fatalf("cleanAEManagedPaths error: %v", err)
 	}
 
 	// Should not error when directories don't exist
@@ -2936,8 +2939,8 @@ func TestEnsureSettingsLocalJSON_ExistingFile(t *testing.T) {
 	}
 }
 
-// restoreMoaiConfig — test 2-way merge
-func TestRestoreMoaiConfig_2WayMerge(t *testing.T) {
+// restoreAEConfig — test 2-way merge
+func TestRestoreAEConfig_2WayMerge(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Create project config dir with template data
@@ -2961,9 +2964,9 @@ func TestRestoreMoaiConfig_2WayMerge(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err := restoreMoaiConfig(tmpDir, backupDir)
+	err := restoreAEConfig(tmpDir, backupDir)
 	if err != nil {
-		t.Fatalf("restoreMoaiConfig error: %v", err)
+		t.Fatalf("restoreAEConfig error: %v", err)
 	}
 
 	// Verify merged result
@@ -2979,8 +2982,8 @@ func TestRestoreMoaiConfig_2WayMerge(t *testing.T) {
 	}
 }
 
-// restoreMoaiConfig — test legacy fallback
-func TestRestoreMoaiConfig_LegacyFallback(t *testing.T) {
+// restoreAEConfig — test legacy fallback
+func TestRestoreAEConfig_LegacyFallback(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Create project config dir
@@ -2997,14 +3000,14 @@ func TestRestoreMoaiConfig_LegacyFallback(t *testing.T) {
 	}
 
 	// Should fall through to legacy path
-	err := restoreMoaiConfig(tmpDir, backupDir)
+	err := restoreAEConfig(tmpDir, backupDir)
 	if err != nil {
-		t.Fatalf("restoreMoaiConfig legacy error: %v", err)
+		t.Fatalf("restoreAEConfig legacy error: %v", err)
 	}
 }
 
-// restoreMoaiConfig — test 3-way merge with template defaults
-func TestRestoreMoaiConfig_3WayMerge(t *testing.T) {
+// restoreAEConfig — test 3-way merge with template defaults
+func TestRestoreAEConfig_3WayMerge(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Create project config dir with new template data
@@ -3038,9 +3041,9 @@ func TestRestoreMoaiConfig_3WayMerge(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err := restoreMoaiConfig(tmpDir, backupDir)
+	err := restoreAEConfig(tmpDir, backupDir)
 	if err != nil {
-		t.Fatalf("restoreMoaiConfig 3-way error: %v", err)
+		t.Fatalf("restoreAEConfig 3-way error: %v", err)
 	}
 
 	// Verify result file exists
@@ -3095,7 +3098,7 @@ func TestGetProjectConfigVersion_WithVersion(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	systemYAML := "moai:\n  template_version: \"2.5.0\"\n"
+	systemYAML := "ae:\n  template_version: \"2.5.0\"\n"
 	if err := os.WriteFile(filepath.Join(sectionsDir, "system.yaml"), []byte(systemYAML), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -3116,7 +3119,7 @@ func TestGetProjectConfigVersion_EmptyVersion(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	systemYAML := "moai:\n  name: test\n"
+	systemYAML := "ae:\n  name: test\n"
 	if err := os.WriteFile(filepath.Join(sectionsDir, "system.yaml"), []byte(systemYAML), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -3141,7 +3144,7 @@ func TestRunTemplateSyncWithProgress_VersionMatch(t *testing.T) {
 	}
 
 	currentVer := version.GetVersion()
-	systemYAML := fmt.Sprintf("moai:\n  template_version: %q\n", currentVer)
+	systemYAML := fmt.Sprintf("ae:\n  template_version: %q\n", currentVer)
 	if err := os.WriteFile(filepath.Join(sectionsDir, "system.yaml"), []byte(systemYAML), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -3449,8 +3452,8 @@ func TestCheckClaudeConfig_WithConfigVerbose(t *testing.T) {
 	}
 }
 
-// checkMoAIConfig — test with and without config
-func TestCheckMoAIConfig_NoConfig2(t *testing.T) {
+// checkAEConfig — test with and without config
+func TestCheckAEConfig_NoConfig2(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	oldWd, _ := os.Getwd()
@@ -3459,14 +3462,14 @@ func TestCheckMoAIConfig_NoConfig2(t *testing.T) {
 	}
 	t.Cleanup(func() { _ = os.Chdir(oldWd) })
 
-	check := checkMoAIConfig(false)
-	// No .moai directory
+	check := checkAEConfig(false)
+	// No .ae directory
 	if check.Status == CheckOK {
-		t.Log("checkMoAIConfig returned OK without .moai dir")
+		t.Log("checkAEConfig returned OK without .ae dir")
 	}
 }
 
-func TestCheckMoAIConfig_WithConfigVerbose(t *testing.T) {
+func TestCheckAEConfig_WithConfigVerbose(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Create .ae/config/sections/ with at least one yaml file
@@ -3474,7 +3477,7 @@ func TestCheckMoAIConfig_WithConfigVerbose(t *testing.T) {
 	if err := os.MkdirAll(sectionsDir, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(sectionsDir, "system.yaml"), []byte("moai:\n  version: 1.0.0\n"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(sectionsDir, "system.yaml"), []byte("ae:\n  version: 1.0.0\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -3484,7 +3487,7 @@ func TestCheckMoAIConfig_WithConfigVerbose(t *testing.T) {
 	}
 	t.Cleanup(func() { _ = os.Chdir(oldWd) })
 
-	check := checkMoAIConfig(true)
+	check := checkAEConfig(true)
 	if check.Message == "" {
 		t.Error("expected non-empty message")
 	}
@@ -3538,8 +3541,8 @@ func TestRunDoctor_ExportToFile(t *testing.T) {
 	}
 
 	content := string(data)
-	if !strings.Contains(content, "MoAI Version") {
-		t.Errorf("export file should contain MoAI Version check, got: %s", content)
+	if !strings.Contains(content, "AE Version") {
+		t.Errorf("export file should contain AE Version check, got: %s", content)
 	}
 
 	output := buf.String()
@@ -3673,7 +3676,7 @@ func TestCleanupOldBackups_NoBackups(t *testing.T) {
 
 func TestCleanupOldBackups_WithExcess(t *testing.T) {
 	tmpDir := t.TempDir()
-	backupDir := filepath.Join(tmpDir, ".moai-backups")
+	backupDir := filepath.Join(tmpDir, ".ae-backups")
 
 	// Create 5 backup directories
 	for i := 0; i < 5; i++ {
@@ -3780,8 +3783,8 @@ func TestRunTemplateSyncWithReporter_VersionMatch(t *testing.T) {
 	}
 
 	currentVersion := version.GetVersion()
-	// getProjectConfigVersion reads from moai.template_version, not system.template_version
-	systemYAML := fmt.Sprintf("moai:\n  template_version: %s\n", currentVersion)
+	// getProjectConfigVersion reads from ae.template_version, not system.template_version
+	systemYAML := fmt.Sprintf("ae:\n  template_version: %s\n", currentVersion)
 	if err := os.WriteFile(filepath.Join(sectionsDir, "system.yaml"), []byte(systemYAML), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -3877,7 +3880,7 @@ func TestRunTemplateSyncWithReporter_ForceFlag(t *testing.T) {
 	}
 
 	currentVersion := version.GetVersion()
-	systemYAML := fmt.Sprintf("moai:\n  template_version: %s\n", currentVersion)
+	systemYAML := fmt.Sprintf("ae:\n  template_version: %s\n", currentVersion)
 	if err := os.WriteFile(filepath.Join(sectionsDir, "system.yaml"), []byte(systemYAML), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -3919,9 +3922,9 @@ func TestRunTemplateSyncWithReporter_ForceFlag(t *testing.T) {
 	}
 }
 
-// --- cleanMoaiManagedPaths: with existing files ---
+// --- cleanAEManagedPaths: with existing files ---
 
-func TestCleanMoaiManagedPaths_WithExistingFiles(t *testing.T) {
+func TestCleanAEManagedPaths_WithExistingFiles(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Create managed paths that should be cleaned
@@ -3945,7 +3948,7 @@ func TestCleanMoaiManagedPaths_WithExistingFiles(t *testing.T) {
 	}
 
 	// Also create a glob-matching skill
-	skillPath := filepath.Join(tmpDir, ".claude", "skills", "moai-test-skill.md")
+	skillPath := filepath.Join(tmpDir, ".claude", "skills", "ae-test-skill.md")
 	if err := os.MkdirAll(filepath.Dir(skillPath), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -3954,7 +3957,7 @@ func TestCleanMoaiManagedPaths_WithExistingFiles(t *testing.T) {
 	}
 
 	var buf bytes.Buffer
-	err := cleanMoaiManagedPaths(tmpDir, &buf)
+	err := cleanAEManagedPaths(tmpDir, &buf)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -4340,7 +4343,7 @@ func TestRemoveWorktree_NonGitDir(t *testing.T) {
 
 // --- cleanupAeWorktrees: with worker worktrees in output ---
 
-func TestCleanupMoaiWorktrees_NonGitRepo(t *testing.T) {
+func TestCleanupAEWorktrees_NonGitRepo(t *testing.T) {
 	tmpDir := t.TempDir()
 	// No .git directory - should return empty
 	result := cleanupAeWorktrees(tmpDir)
@@ -4354,7 +4357,7 @@ func TestCleanupMoaiWorktrees_NonGitRepo(t *testing.T) {
 func TestRunDoctor_WithFixFlag(t *testing.T) {
 	tmpDir := t.TempDir()
 
-	// Don't create .moai or .claude dirs so checks will fail/warn
+	// Don't create .ae or .claude dirs so checks will fail/warn
 	origDir, _ := os.Getwd()
 	if err := os.Chdir(tmpDir); err != nil {
 		t.Fatal(err)
@@ -4393,7 +4396,7 @@ func TestRunDoctor_WithFixFlag(t *testing.T) {
 func TestRunDoctor_VerboseMode(t *testing.T) {
 	tmpDir := t.TempDir()
 
-	// Create .moai and .claude dirs for full check coverage
+	// Create .ae and .claude dirs for full check coverage
 	if err := os.MkdirAll(filepath.Join(tmpDir, ".ae", "config", "sections"), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -4445,7 +4448,7 @@ func TestRunDoctor_FilterCheck(t *testing.T) {
 	cmd.Flags().Bool("fix", false, "")
 	cmd.Flags().String("export", "", "")
 	cmd.Flags().String("check", "", "")
-	_ = cmd.Flags().Set("check", "MoAI Version")
+	_ = cmd.Flags().Set("check", "AE Version")
 
 	var buf bytes.Buffer
 	cmd.SetOut(&buf)
@@ -4544,9 +4547,9 @@ func TestWorktreePersistentPreRunE_WithDeps(t *testing.T) {
 	}
 }
 
-// --- restoreMoaiConfigLegacy: with merge ---
+// --- restoreAEConfigLegacy: with merge ---
 
-func TestRestoreMoaiConfigLegacy_WithMerge(t *testing.T) {
+func TestRestoreAEConfigLegacy_WithMerge(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Create backup dir with a YAML file
@@ -4578,7 +4581,7 @@ func TestRestoreMoaiConfigLegacy_WithMerge(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err := restoreMoaiConfigLegacy(tmpDir, backupDir, configDir)
+	err := restoreAEConfigLegacy(tmpDir, backupDir, configDir)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -4595,9 +4598,9 @@ func TestRestoreMoaiConfigLegacy_WithMerge(t *testing.T) {
 	}
 }
 
-// --- restoreMoaiConfigLegacy: backup file for non-existent target ---
+// --- restoreAEConfigLegacy: backup file for non-existent target ---
 
-func TestRestoreMoaiConfigLegacy_NewFile(t *testing.T) {
+func TestRestoreAEConfigLegacy_NewFile(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	backupDir := filepath.Join(tmpDir, "backup")
@@ -4613,7 +4616,7 @@ func TestRestoreMoaiConfigLegacy_NewFile(t *testing.T) {
 	configDir := filepath.Join(tmpDir, "config")
 	// Don't create config/sections - let the function create it
 
-	err := restoreMoaiConfigLegacy(tmpDir, backupDir, configDir)
+	err := restoreAEConfigLegacy(tmpDir, backupDir, configDir)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -4746,9 +4749,9 @@ func TestGetGLMEnvPath_WithHOME(t *testing.T) {
 	}
 }
 
-// --- backupMoaiConfig: with sections including subdirectories ---
+// --- backupAEConfig: with sections including subdirectories ---
 
-func TestBackupMoaiConfig_WithSubdirs(t *testing.T) {
+func TestBackupAEConfig_WithSubdirs(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Create config with nested structure
@@ -4765,7 +4768,7 @@ func TestBackupMoaiConfig_WithSubdirs(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	backupPath, err := backupMoaiConfig(tmpDir)
+	backupPath, err := backupAEConfig(tmpDir)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -5060,7 +5063,7 @@ func TestBuildAutoUpdateFunc_DevVersion(t *testing.T) {
 
 // --- ensureGlobalSettingsEnv: with existing settings ---
 
-func TestEnsureGlobalSettingsEnv_CleansMoaiKeys(t *testing.T) {
+func TestEnsureGlobalSettingsEnv_CleansAEKeys(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("HOME", tmpDir)
 
@@ -5069,7 +5072,7 @@ func TestEnsureGlobalSettingsEnv_CleansMoaiKeys(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Create settings.json with moai-managed keys
+	// Create settings.json with ae-managed keys
 	settings := map[string]any{
 		"env": map[string]any{
 			"PATH":                                 "/some/path",
@@ -5750,9 +5753,9 @@ func TestApplyWizardConfig_WithGitHubUserAndToken(t *testing.T) {
 	}
 }
 
-// --- restoreMoaiConfig: 3-way merge with fallback ---
+// --- restoreAEConfig: 3-way merge with fallback ---
 
-func TestRestoreMoaiConfig_3WayMergeFallbackTo2Way(t *testing.T) {
+func TestRestoreAEConfig_3WayMergeFallbackTo2Way(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Set up project config with sections
@@ -5790,7 +5793,7 @@ func TestRestoreMoaiConfig_3WayMergeFallbackTo2Way(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err := restoreMoaiConfig(tmpDir, backupDir)
+	err := restoreAEConfig(tmpDir, backupDir)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -5806,7 +5809,7 @@ func TestRestoreMoaiConfig_3WayMergeFallbackTo2Way(t *testing.T) {
 	}
 }
 
-func TestRestoreMoaiConfig_CustomSectionNotInTemplate(t *testing.T) {
+func TestRestoreAEConfig_CustomSectionNotInTemplate(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Set up project config dir (empty - no target file for custom config)
@@ -5827,7 +5830,7 @@ func TestRestoreMoaiConfig_CustomSectionNotInTemplate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err := restoreMoaiConfig(tmpDir, backupDir)
+	err := restoreAEConfig(tmpDir, backupDir)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -5842,7 +5845,7 @@ func TestRestoreMoaiConfig_CustomSectionNotInTemplate(t *testing.T) {
 	}
 }
 
-func TestRestoreMoaiConfig_SkipsNonYAML(t *testing.T) {
+func TestRestoreAEConfig_SkipsNonYAML(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	configDir := filepath.Join(tmpDir, ".ae", "config", "sections")
@@ -5861,7 +5864,7 @@ func TestRestoreMoaiConfig_SkipsNonYAML(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err := restoreMoaiConfig(tmpDir, backupDir)
+	err := restoreAEConfig(tmpDir, backupDir)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -5872,9 +5875,9 @@ func TestRestoreMoaiConfig_SkipsNonYAML(t *testing.T) {
 	}
 }
 
-// --- backupMoaiConfig: error paths ---
+// --- backupAEConfig: error paths ---
 
-func TestBackupMoaiConfig_StatError(t *testing.T) {
+func TestBackupAEConfig_StatError(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Create config dir as a file instead of directory to trigger error
@@ -5886,7 +5889,7 @@ func TestBackupMoaiConfig_StatError(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err := backupMoaiConfig(tmpDir)
+	_, err := backupAEConfig(tmpDir)
 	if err == nil {
 		t.Fatal("expected error for non-directory config path")
 	}
@@ -5895,21 +5898,21 @@ func TestBackupMoaiConfig_StatError(t *testing.T) {
 	}
 }
 
-// --- cleanMoaiManagedPaths: more branch coverage ---
+// --- cleanAEManagedPaths: more branch coverage ---
 
-func TestCleanMoaiManagedPaths_WithGlobMatches(t *testing.T) {
+func TestCleanAEManagedPaths_WithGlobMatches(t *testing.T) {
 	tmpDir := t.TempDir()
 
-	// Create files matching the glob pattern "moai*" in skills dir
+	// Create files matching the glob pattern "ae*" in skills dir
 	skillsDir := filepath.Join(tmpDir, ".claude", "skills")
 	if err := os.MkdirAll(skillsDir, 0o755); err != nil {
 		t.Fatal(err)
 	}
 	// Create ae-related dirs that match glob
-	if err := os.MkdirAll(filepath.Join(skillsDir, "moai-test"), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Join(skillsDir, "ae-test"), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(skillsDir, "moai-test", "skill.md"), []byte("test"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(skillsDir, "ae-test", "skill.md"), []byte("test"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -5934,7 +5937,7 @@ func TestCleanMoaiManagedPaths_WithGlobMatches(t *testing.T) {
 	}
 
 	var buf bytes.Buffer
-	err := cleanMoaiManagedPaths(tmpDir, &buf)
+	err := cleanAEManagedPaths(tmpDir, &buf)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -5945,17 +5948,17 @@ func TestCleanMoaiManagedPaths_WithGlobMatches(t *testing.T) {
 	}
 
 	// Verify glob matches were removed
-	if _, statErr := os.Stat(filepath.Join(skillsDir, "moai-test")); statErr == nil {
-		t.Error("expected moai-test skill dir to be removed by glob")
+	if _, statErr := os.Stat(filepath.Join(skillsDir, "ae-test")); statErr == nil {
+		t.Error("expected ae-test skill dir to be removed by glob")
 	}
 }
 
-func TestCleanMoaiManagedPaths_NonExistentPaths(t *testing.T) {
+func TestCleanAEManagedPaths_NonExistentPaths(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Don't create any paths - they should all be "not found"
 	var buf bytes.Buffer
-	err := cleanMoaiManagedPaths(tmpDir, &buf)
+	err := cleanAEManagedPaths(tmpDir, &buf)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -5985,7 +5988,7 @@ func TestEnableTeamMode_NoAPIKey(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Create .moai dir in project to make it findable
+	// Create .ae dir in project to make it findable
 	projectDir := filepath.Join(tmpDir, "project")
 	if err := os.MkdirAll(filepath.Join(projectDir, ".ae"), 0o755); err != nil {
 		t.Fatal(err)
@@ -6111,9 +6114,9 @@ func TestMergeYAML3Way_UserModified(t *testing.T) {
 }
 
 func TestMergeYAML3Way_SystemFieldAlwaysNew(t *testing.T) {
-	newData := []byte("moai:\n  template_version: 2.0.0\n  setting: new\n")
-	oldData := []byte("moai:\n  template_version: 1.0.0\n  setting: old\n")
-	baseData := []byte("moai:\n  template_version: 1.0.0\n  setting: original\n")
+	newData := []byte("ae:\n  template_version: 2.0.0\n  setting: new\n")
+	oldData := []byte("ae:\n  template_version: 1.0.0\n  setting: old\n")
+	baseData := []byte("ae:\n  template_version: 1.0.0\n  setting: original\n")
 
 	merged, err := mergeYAML3Way(newData, oldData, baseData)
 	if err != nil {
@@ -6438,9 +6441,9 @@ func TestDetermineStrategy_AllTypes(t *testing.T) {
 	}
 }
 
-// --- restoreMoaiConfigLegacy: skip template-defaults ---
+// --- restoreAEConfigLegacy: skip template-defaults ---
 
-func TestRestoreMoaiConfigLegacy_SkipsTemplateDefaults(t *testing.T) {
+func TestRestoreAEConfigLegacy_SkipsTemplateDefaults(t *testing.T) {
 	tmpDir := t.TempDir()
 	configDir := filepath.Join(tmpDir, ".ae", "config")
 	if err := os.MkdirAll(configDir, 0o755); err != nil {
@@ -6468,7 +6471,7 @@ func TestRestoreMoaiConfigLegacy_SkipsTemplateDefaults(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err := restoreMoaiConfigLegacy(tmpDir, backupDir, configDir)
+	err := restoreAEConfigLegacy(tmpDir, backupDir, configDir)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -6903,9 +6906,9 @@ func TestDeployGlobalRankHookScript_Phase6(t *testing.T) {
 	}
 }
 
-// --- backupMoaiConfig ---
+// --- backupAEConfig ---
 
-func TestBackupMoaiConfig_WithSections_Phase6(t *testing.T) {
+func TestBackupAEConfig_WithSections_Phase6(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Create config directory with sections
@@ -6923,13 +6926,13 @@ func TestBackupMoaiConfig_WithSections_Phase6(t *testing.T) {
 	}
 
 	// Also create a top-level config file
-	if err := os.WriteFile(filepath.Join(tmpDir, ".ae", "config", "config.yaml"), []byte("moai:\n  version: 1.0.0\n"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(tmpDir, ".ae", "config", "config.yaml"), []byte("ae:\n  version: 1.0.0\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 
-	backupDir, err := backupMoaiConfig(tmpDir)
+	backupDir, err := backupAEConfig(tmpDir)
 	if err != nil {
-		t.Fatalf("backupMoaiConfig error: %v", err)
+		t.Fatalf("backupAEConfig error: %v", err)
 	}
 
 	if backupDir == "" {
@@ -6952,7 +6955,7 @@ func TestBackupMoaiConfig_WithSections_Phase6(t *testing.T) {
 	}
 }
 
-func TestBackupMoaiConfig_NotADirectory(t *testing.T) {
+func TestBackupAEConfig_NotADirectory(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Create a file where config directory should be
@@ -6964,7 +6967,7 @@ func TestBackupMoaiConfig_NotADirectory(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err := backupMoaiConfig(tmpDir)
+	_, err := backupAEConfig(tmpDir)
 	if err == nil {
 		t.Error("expected error when config is not a directory")
 	}
@@ -6973,10 +6976,10 @@ func TestBackupMoaiConfig_NotADirectory(t *testing.T) {
 	}
 }
 
-func TestBackupMoaiConfig_NoConfigDir_Phase6(t *testing.T) {
+func TestBackupAEConfig_NoConfigDir_Phase6(t *testing.T) {
 	tmpDir := t.TempDir()
 
-	dir, err := backupMoaiConfig(tmpDir)
+	dir, err := backupAEConfig(tmpDir)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -6985,9 +6988,9 @@ func TestBackupMoaiConfig_NoConfigDir_Phase6(t *testing.T) {
 	}
 }
 
-// --- cleanMoaiManagedPaths ---
+// --- cleanAEManagedPaths ---
 
-func TestCleanMoaiManagedPaths_WithGlobAndDirs(t *testing.T) {
+func TestCleanAEManagedPaths_WithGlobAndDirs(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Create some managed paths
@@ -7015,17 +7018,17 @@ func TestCleanMoaiManagedPaths_WithGlobAndDirs(t *testing.T) {
 
 	// Create glob-matching skill directories
 	skillsDir := filepath.Join(tmpDir, ".claude", "skills")
-	if err := os.MkdirAll(filepath.Join(skillsDir, "moai-test"), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Join(skillsDir, "ae-test"), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.MkdirAll(filepath.Join(skillsDir, "moai-other"), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Join(skillsDir, "ae-other"), 0o755); err != nil {
 		t.Fatal(err)
 	}
 
 	var buf bytes.Buffer
-	err := cleanMoaiManagedPaths(tmpDir, &buf)
+	err := cleanAEManagedPaths(tmpDir, &buf)
 	if err != nil {
-		t.Fatalf("cleanMoaiManagedPaths error: %v", err)
+		t.Fatalf("cleanAEManagedPaths error: %v", err)
 	}
 
 	// Verify paths were removed
@@ -7042,11 +7045,11 @@ func TestCleanMoaiManagedPaths_WithGlobAndDirs(t *testing.T) {
 	}
 }
 
-func TestCleanMoaiManagedPaths_AllPathsMissing(t *testing.T) {
+func TestCleanAEManagedPaths_AllPathsMissing(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	var buf bytes.Buffer
-	err := cleanMoaiManagedPaths(tmpDir, &buf)
+	err := cleanAEManagedPaths(tmpDir, &buf)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -7091,9 +7094,9 @@ func TestSaveTemplateDefaults(t *testing.T) {
 	}
 }
 
-// --- restoreMoaiConfigLegacy ---
+// --- restoreAEConfigLegacy ---
 
-func TestRestoreMoaiConfigLegacy_TargetNotExist(t *testing.T) {
+func TestRestoreAEConfigLegacy_TargetNotExist(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Setup backup with a file
@@ -7111,7 +7114,7 @@ func TestRestoreMoaiConfigLegacy_TargetNotExist(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err := restoreMoaiConfigLegacy(tmpDir, backupDir, configDir)
+	err := restoreAEConfigLegacy(tmpDir, backupDir, configDir)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -7126,7 +7129,7 @@ func TestRestoreMoaiConfigLegacy_TargetNotExist(t *testing.T) {
 	}
 }
 
-func TestRestoreMoaiConfigLegacy_SkipsMetadataAndTemplateDefaults(t *testing.T) {
+func TestRestoreAEConfigLegacy_SkipsMetadataAndTemplateDefaults(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	backupDir := filepath.Join(tmpDir, "backup")
@@ -7152,7 +7155,7 @@ func TestRestoreMoaiConfigLegacy_SkipsMetadataAndTemplateDefaults(t *testing.T) 
 		t.Fatal(err)
 	}
 
-	err := restoreMoaiConfigLegacy(tmpDir, backupDir, configDir)
+	err := restoreAEConfigLegacy(tmpDir, backupDir, configDir)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -7168,7 +7171,7 @@ func TestRestoreMoaiConfigLegacy_SkipsMetadataAndTemplateDefaults(t *testing.T) 
 	}
 }
 
-func TestRestoreMoaiConfigLegacy_MergeWithExistingTarget(t *testing.T) {
+func TestRestoreAEConfigLegacy_MergeWithExistingTarget(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	backupDir := filepath.Join(tmpDir, "backup")
@@ -7188,7 +7191,7 @@ func TestRestoreMoaiConfigLegacy_MergeWithExistingTarget(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err := restoreMoaiConfigLegacy(tmpDir, backupDir, configDir)
+	err := restoreAEConfigLegacy(tmpDir, backupDir, configDir)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -7227,7 +7230,7 @@ func TestRunDoctor_VerboseAndDetail(t *testing.T) {
 }
 
 func TestRunDoctor_FixMode(t *testing.T) {
-	// Create a temp dir without .moai to trigger failures
+	// Create a temp dir without .ae to trigger failures
 	tmpDir := t.TempDir()
 	origDir, _ := os.Getwd()
 	defer func() { _ = os.Chdir(origDir) }()
@@ -7356,7 +7359,7 @@ func TestResetTeamModeForCC_NoConfig(t *testing.T) {
 
 // --- cleanupAeWorktrees ---
 
-func TestCleanupMoaiWorktrees_NoGitRepo(t *testing.T) {
+func TestCleanupAEWorktrees_NoGitRepo(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	msg := cleanupAeWorktrees(tmpDir)
@@ -7445,8 +7448,8 @@ func TestRemoveGLMEnv_NonexistentPath(t *testing.T) {
 
 func TestCleanupOldBackups_PrunesOldBackups(t *testing.T) {
 	tmpDir := t.TempDir()
-	// cleanup_old_backups uses defs.BackupsDir = ".moai-backups"
-	backupBaseDir := filepath.Join(tmpDir, ".moai-backups")
+	// cleanup_old_backups uses defs.BackupsDir = ".ae-backups"
+	backupBaseDir := filepath.Join(tmpDir, ".ae-backups")
 
 	// Create 5 backup directories with different timestamps.
 	// Format must match YYYYMMDD_HHMMSS (underscore, 15 chars total).
@@ -7855,7 +7858,7 @@ func TestGetGLMAPIKey_FromFile(t *testing.T) {
 
 // --- isTestEnvironment ---
 
-func TestIsTestEnvironment_MoaiTestModeEnv(t *testing.T) {
+func TestIsTestEnvironment_AETestModeEnv(t *testing.T) {
 	t.Setenv("AE_TEST_MODE", "1")
 	if !isTestEnvironment() {
 		t.Error("expected true with AE_TEST_MODE=1")
@@ -7867,7 +7870,7 @@ func TestIsTestEnvironment_MoaiTestModeEnv(t *testing.T) {
 func TestFindProjectRoot_Phase6(t *testing.T) {
 	tmpDir := t.TempDir()
 
-	// Create .moai directory
+	// Create .ae directory
 	if err := os.MkdirAll(filepath.Join(tmpDir, ".ae"), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -7888,7 +7891,7 @@ func TestFindProjectRoot_Phase6(t *testing.T) {
 	}
 }
 
-func TestFindProjectRoot_NoMoaiDir(t *testing.T) {
+func TestFindProjectRoot_NoAEDir(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	origDir, _ := os.Getwd()

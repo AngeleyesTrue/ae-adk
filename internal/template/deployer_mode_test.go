@@ -9,7 +9,7 @@ import (
 	"testing"
 	"testing/fstest"
 
-	"github.com/modu-ai/moai-adk/internal/manifest"
+	"github.com/AngeleyesTrue/ae-adk/internal/manifest"
 )
 
 // TestNewDeployerWithMode verifies the basic constructor creates a working deployer.
@@ -79,11 +79,11 @@ func TestModeAwareDeployer_Deploy(t *testing.T) {
 	t.Run("successful_deployment", func(t *testing.T) {
 		root, mgr := setupDeployProject(t)
 		fs := fstest.MapFS{
-			".claude/agents/moai/backend.md": &fstest.MapFile{
+			".claude/agents/ae/backend.md": &fstest.MapFile{
 				Data: []byte("# Backend Agent"),
 			},
 			"CLAUDE.md": &fstest.MapFile{
-				Data: []byte("# MoAI Execution Directive"),
+				Data: []byte("# AE Execution Directive"),
 			},
 		}
 		d := NewDeployerWithMode(fs, "", "")
@@ -95,7 +95,7 @@ func TestModeAwareDeployer_Deploy(t *testing.T) {
 
 		// Verify files exist on disk
 		expectedFiles := []string{
-			".claude/agents/moai/backend.md",
+			".claude/agents/ae/backend.md",
 			"CLAUDE.md",
 		}
 		for _, f := range expectedFiles {
@@ -435,7 +435,7 @@ func TestModeAwareDeployer_Deploy(t *testing.T) {
 
 	t.Run("file_content_matches", func(t *testing.T) {
 		root, mgr := setupDeployProject(t)
-		expectedContent := []byte("# MoAI Execution Directive v2")
+		expectedContent := []byte("# AE Execution Directive v2")
 		fs := fstest.MapFS{
 			"CLAUDE.md": &fstest.MapFile{Data: expectedContent},
 		}
@@ -457,11 +457,11 @@ func TestModeAwareDeployer_Deploy(t *testing.T) {
 	t.Run("deploys_to_project_root", func(t *testing.T) {
 		root, mgr := setupDeployProject(t)
 		fs := fstest.MapFS{
-			".claude/agents/moai/expert-backend.md": &fstest.MapFile{
+			".claude/agents/ae/expert-backend.md": &fstest.MapFile{
 				Data: []byte("# Expert Backend Agent"),
 			},
-			".claude/skills/moai/SKILL.md": &fstest.MapFile{
-				Data: []byte("# MoAI Core Skill"),
+			".claude/skills/ae/SKILL.md": &fstest.MapFile{
+				Data: []byte("# AE Core Skill"),
 			},
 		}
 		tmplCtx := NewTemplateContext(
@@ -476,8 +476,8 @@ func TestModeAwareDeployer_Deploy(t *testing.T) {
 
 		// Verify files are in project root subdirectories
 		expectedFiles := []string{
-			".claude/agents/moai/expert-backend.md",
-			".claude/skills/moai/SKILL.md",
+			".claude/agents/ae/expert-backend.md",
+			".claude/skills/ae/SKILL.md",
 		}
 		for _, f := range expectedFiles {
 			absPath := filepath.Join(root, f)
@@ -534,7 +534,7 @@ func TestModeAwareDeployer_ExtractTemplate(t *testing.T) {
 	t.Run("existing_template", func(t *testing.T) {
 		fs := fstest.MapFS{
 			"CLAUDE.md": &fstest.MapFile{
-				Data: []byte("# MoAI Directive"),
+				Data: []byte("# AE Directive"),
 			},
 		}
 		d := NewDeployerWithMode(fs, "", "")
@@ -543,20 +543,20 @@ func TestModeAwareDeployer_ExtractTemplate(t *testing.T) {
 		if err != nil {
 			t.Fatalf("ExtractTemplate error: %v", err)
 		}
-		if string(data) != "# MoAI Directive" {
-			t.Errorf("content = %q, want %q", string(data), "# MoAI Directive")
+		if string(data) != "# AE Directive" {
+			t.Errorf("content = %q, want %q", string(data), "# AE Directive")
 		}
 	})
 
 	t.Run("nested_template", func(t *testing.T) {
 		fs := fstest.MapFS{
-			".claude/agents/moai/backend.md": &fstest.MapFile{
+			".claude/agents/ae/backend.md": &fstest.MapFile{
 				Data: []byte("# Backend"),
 			},
 		}
 		d := NewDeployerWithMode(fs, "", "")
 
-		data, err := d.ExtractTemplate(".claude/agents/moai/backend.md")
+		data, err := d.ExtractTemplate(".claude/agents/ae/backend.md")
 		if err != nil {
 			t.Fatalf("ExtractTemplate error: %v", err)
 		}
@@ -589,11 +589,11 @@ func TestModeAwareDeployer_ListTemplates(t *testing.T) {
 			".claude/settings.json": &fstest.MapFile{
 				Data: []byte(`{"hooks":{}}`),
 			},
-			".claude/agents/moai/backend.md": &fstest.MapFile{
+			".claude/agents/ae/backend.md": &fstest.MapFile{
 				Data: []byte("# Backend"),
 			},
 			"CLAUDE.md": &fstest.MapFile{
-				Data: []byte("# MoAI"),
+				Data: []byte("# AE"),
 			},
 		}
 		d := NewDeployerWithMode(fs, "", "")
@@ -604,9 +604,9 @@ func TestModeAwareDeployer_ListTemplates(t *testing.T) {
 		}
 
 		expected := map[string]bool{
-			".claude/settings.json":          true,
-			".claude/agents/moai/backend.md": true,
-			"CLAUDE.md":                      true,
+			".claude/settings.json":        true,
+			".claude/agents/ae/backend.md": true,
+			"CLAUDE.md":                    true,
 		}
 		for _, item := range list {
 			if !expected[item] {

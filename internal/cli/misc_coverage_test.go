@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/modu-ai/moai-adk/internal/hook"
+	"github.com/AngeleyesTrue/ae-adk/internal/hook"
 )
 
 // --- endsWith / endsWithAny tests ---

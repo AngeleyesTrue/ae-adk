@@ -8,7 +8,7 @@ import (
 	"testing"
 	"testing/fstest"
 
-	"github.com/modu-ai/moai-adk/internal/manifest"
+	"github.com/AngeleyesTrue/ae-adk/internal/manifest"
 )
 
 func TestValidModelPolicies(t *testing.T) {

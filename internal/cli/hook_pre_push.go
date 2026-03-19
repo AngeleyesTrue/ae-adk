@@ -7,7 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/modu-ai/moai-adk/internal/git/convention"
+	"github.com/AngeleyesTrue/ae-adk/internal/git/convention"
 )
 
 func init() {

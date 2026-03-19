@@ -3,8 +3,8 @@ package template
 import (
 	"testing"
 
-	"github.com/modu-ai/moai-adk/internal/config"
-	"github.com/modu-ai/moai-adk/pkg/models"
+	"github.com/AngeleyesTrue/ae-adk/internal/config"
+	"github.com/AngeleyesTrue/ae-adk/pkg/models"
 )
 
 func TestNewTemplateContext_Defaults(t *testing.T) {

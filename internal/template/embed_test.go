@@ -159,8 +159,8 @@ func TestEmbeddedTemplates_CLAUDEmd(t *testing.T) {
 	if len(content) < 5000 {
 		t.Errorf("CLAUDE.md should be at least 5000 characters, got %d", len(content))
 	}
-	if !strings.Contains(content, "MoAI Execution Directive") {
-		t.Error("CLAUDE.md should contain 'MoAI Execution Directive'")
+	if !strings.Contains(content, "AE Execution Directive") {
+		t.Error("CLAUDE.md should contain 'AE Execution Directive'")
 	}
 }
 
@@ -194,7 +194,7 @@ func TestEmbeddedTemplates_Gitignore(t *testing.T) {
 	}
 
 	if !strings.Contains(string(data), ".ae") {
-		t.Error(".gitignore should contain .moai pattern")
+		t.Error(".gitignore should contain .ae pattern")
 	}
 }
 
@@ -261,9 +261,9 @@ func TestEmbeddedTemplates_NoPythonHooks(t *testing.T) {
 		if d.IsDir() {
 			return nil
 		}
-		// Allow Go hook wrapper templates in .claude/hooks/moai/
+		// Allow Go hook wrapper templates in .claude/hooks/ae/
 		// Exclude Python hooks and any other .claude/hooks/ files
-		if strings.HasPrefix(path, ".claude/hooks/") && !strings.HasPrefix(path, ".claude/hooks/moai/") {
+		if strings.HasPrefix(path, ".claude/hooks/") && !strings.HasPrefix(path, ".claude/hooks/ae/") {
 			t.Errorf("found hooks file that should be excluded: %s", path)
 		}
 		if strings.HasSuffix(path, ".py") {

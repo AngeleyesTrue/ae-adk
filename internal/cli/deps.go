@@ -13,19 +13,19 @@ import (
 	"strings"
 	"time"
 
-	"github.com/modu-ai/moai-adk/internal/astgrep"
-	"github.com/modu-ai/moai-adk/internal/config"
-	"github.com/modu-ai/moai-adk/internal/core/git"
-	"github.com/modu-ai/moai-adk/internal/git/ops"
-	"github.com/modu-ai/moai-adk/internal/hook"
-	"github.com/modu-ai/moai-adk/internal/hook/security"
-	"github.com/modu-ai/moai-adk/internal/loop"
-	lsphook "github.com/modu-ai/moai-adk/internal/lsp/hook"
-	"github.com/modu-ai/moai-adk/internal/ralph"
-	"github.com/modu-ai/moai-adk/internal/rank"
-	"github.com/modu-ai/moai-adk/internal/resilience"
-	"github.com/modu-ai/moai-adk/internal/update"
-	"github.com/modu-ai/moai-adk/pkg/version"
+	"github.com/AngeleyesTrue/ae-adk/internal/astgrep"
+	"github.com/AngeleyesTrue/ae-adk/internal/config"
+	"github.com/AngeleyesTrue/ae-adk/internal/core/git"
+	"github.com/AngeleyesTrue/ae-adk/internal/git/ops"
+	"github.com/AngeleyesTrue/ae-adk/internal/hook"
+	"github.com/AngeleyesTrue/ae-adk/internal/hook/security"
+	"github.com/AngeleyesTrue/ae-adk/internal/loop"
+	lsphook "github.com/AngeleyesTrue/ae-adk/internal/lsp/hook"
+	"github.com/AngeleyesTrue/ae-adk/internal/ralph"
+	"github.com/AngeleyesTrue/ae-adk/internal/rank"
+	"github.com/AngeleyesTrue/ae-adk/internal/resilience"
+	"github.com/AngeleyesTrue/ae-adk/internal/update"
+	"github.com/AngeleyesTrue/ae-adk/pkg/version"
 )
 
 // Dependencies holds all domain-level services used by CLI commands.
@@ -220,10 +220,10 @@ func (d *Dependencies) EnsureUpdate() error {
 
 		if isDevVersion {
 			// Dev/RC version: use ae-go-v2 branch releases (tagged with go-v prefix)
-			apiURL = "https://api.github.com/repos/modu-ai/ae-adk/releases"
+			apiURL = "https://api.github.com/repos/AngeleyesTrue/ae-adk/releases"
 		} else {
 			// Production version: use main branch releases
-			apiURL = "https://api.github.com/repos/modu-ai/ae-adk/releases/latest"
+			apiURL = "https://api.github.com/repos/AngeleyesTrue/ae-adk/releases/latest"
 		}
 	}
 

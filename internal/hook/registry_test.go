@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/modu-ai/moai-adk/internal/config"
+	"github.com/AngeleyesTrue/ae-adk/internal/config"
 )
 
 // mockHandler is a test helper that implements the Handler interface.

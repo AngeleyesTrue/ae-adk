@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/modu-ai/moai-adk/internal/foundation"
+	"github.com/AngeleyesTrue/ae-adk/internal/foundation"
 )
 
 // Compile-time interface compliance check.

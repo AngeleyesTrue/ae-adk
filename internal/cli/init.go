@@ -13,13 +13,13 @@ import (
 	"github.com/mattn/go-isatty"
 	"github.com/spf13/cobra"
 
-	"github.com/modu-ai/moai-adk/internal/cli/wizard"
-	"github.com/modu-ai/moai-adk/internal/core/project"
-	"github.com/modu-ai/moai-adk/internal/foundation"
-	"github.com/modu-ai/moai-adk/internal/manifest"
-	"github.com/modu-ai/moai-adk/internal/profile"
-	"github.com/modu-ai/moai-adk/internal/template"
-	"github.com/modu-ai/moai-adk/pkg/version"
+	"github.com/AngeleyesTrue/ae-adk/internal/cli/wizard"
+	"github.com/AngeleyesTrue/ae-adk/internal/core/project"
+	"github.com/AngeleyesTrue/ae-adk/internal/foundation"
+	"github.com/AngeleyesTrue/ae-adk/internal/manifest"
+	"github.com/AngeleyesTrue/ae-adk/internal/profile"
+	"github.com/AngeleyesTrue/ae-adk/internal/template"
+	"github.com/AngeleyesTrue/ae-adk/pkg/version"
 )
 
 var initCmd = &cobra.Command{
@@ -34,8 +34,8 @@ Usage patterns:
   ae init                  Initialize in current directory (same as "ae init .")
 
 Examples:
-  ae init my-app           Creates ./my-app/ and initializes MoAI inside
-  ae init .                Initializes MoAI in the current directory
+  ae init my-app           Creates ./my-app/ and initializes AE inside
+  ae init .                Initializes AE in the current directory
   ae init --mode tdd       Initialize with specific development mode (default: tdd)`,
 	Args:    cobra.MaximumNArgs(1),
 	PreRunE: validateInitFlags,

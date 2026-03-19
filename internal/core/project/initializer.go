@@ -13,11 +13,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/modu-ai/moai-adk/internal/defs"
-	"github.com/modu-ai/moai-adk/internal/manifest"
-	"github.com/modu-ai/moai-adk/internal/shell"
-	"github.com/modu-ai/moai-adk/internal/template"
-	"github.com/modu-ai/moai-adk/pkg/version"
+	"github.com/AngeleyesTrue/ae-adk/internal/defs"
+	"github.com/AngeleyesTrue/ae-adk/internal/manifest"
+	"github.com/AngeleyesTrue/ae-adk/internal/shell"
+	"github.com/AngeleyesTrue/ae-adk/internal/template"
+	"github.com/AngeleyesTrue/ae-adk/pkg/version"
 )
 
 // InitOptions configures the project initialization.
@@ -399,7 +399,7 @@ func (i *projectInitializer) generateConfigsFallback(opts InitOptions, result *I
 	result.CreatedFiles = append(result.CreatedFiles, filepath.Join(defs.AEDir, defs.SectionsSubdir, defs.GitStrategyYAML))
 
 	// system.yaml
-	systemContent := fmt.Sprintf(`moai:
+	systemContent := fmt.Sprintf(`ae:
   version: %q
   template_version: %q
   update_check_frequency: daily
@@ -453,7 +453,7 @@ func (i *projectInitializer) createClaudeMD(opts InitOptions, result *InitResult
 // buildClaudeMDContent generates CLAUDE.md content from options.
 func buildClaudeMDContent(opts InitOptions) string {
 	var b strings.Builder
-	b.WriteString("# MoAI Execution Directive\n\n")
+	b.WriteString("# AE Execution Directive\n\n")
 	fmt.Fprintf(&b, "Project: %s\n", opts.ProjectName)
 	fmt.Fprintf(&b, "Language: %s\n", opts.Language)
 	if opts.Framework != "" && opts.Framework != "none" {
@@ -465,7 +465,7 @@ func buildClaudeMDContent(opts InitOptions) string {
 	b.WriteString("## Quick Start\n\n")
 	b.WriteString("- Run `ae doctor` to check project health\n")
 	b.WriteString("- Run `ae status` to view project status\n")
-	b.WriteString("- Run `moai plan \"description\"` to create a SPEC\n")
+	b.WriteString("- Run `ae plan \"description\"` to create a SPEC\n")
 	return b.String()
 }
 

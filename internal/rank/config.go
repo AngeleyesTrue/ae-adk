@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/modu-ai/moai-adk/internal/defs"
+	"github.com/AngeleyesTrue/ae-adk/internal/defs"
 )
 
 // Credentials holds the user's authentication credentials.

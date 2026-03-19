@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/modu-ai/moai-adk/internal/foundation"
-	"github.com/modu-ai/moai-adk/internal/manifest"
+	"github.com/AngeleyesTrue/ae-adk/internal/foundation"
+	"github.com/AngeleyesTrue/ae-adk/internal/manifest"
 )
 
 func TestPhaseExecutor_Execute_NonInteractive(t *testing.T) {

@@ -9,9 +9,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/modu-ai/moai-adk/internal/config"
-	"github.com/modu-ai/moai-adk/internal/defs"
-	"github.com/modu-ai/moai-adk/internal/tmux"
+	"github.com/AngeleyesTrue/ae-adk/internal/config"
+	"github.com/AngeleyesTrue/ae-adk/internal/defs"
+	"github.com/AngeleyesTrue/ae-adk/internal/tmux"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )
@@ -784,7 +784,7 @@ func isTestEnvironment() bool {
 	return false
 }
 
-// findProjectRoot finds the project root by looking for .moai directory.
+// findProjectRoot finds the project root by looking for .ae directory.
 // It skips the user's home directory to prevent treating ~/.ae/ (global cache)
 // as a project root. The home directory's .ae/ is for global state only
 // (credentials, cache, releases), not a project.

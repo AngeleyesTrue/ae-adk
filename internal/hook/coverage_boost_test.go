@@ -20,7 +20,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/modu-ai/moai-adk/internal/rank"
+	"github.com/AngeleyesTrue/ae-adk/internal/rank"
 )
 
 // --- protocol.go: WriteOutput nil output branch ---
@@ -581,7 +581,7 @@ func TestLogTaskMetrics_MkdirAllFails(t *testing.T) {
 	if err := os.MkdirAll(aeDir, 0o755); err != nil {
 		t.Fatalf("setup: %v", err)
 	}
-	// Make .moai directory read-only so subdirectory "logs" cannot be created.
+	// Make .ae directory read-only so subdirectory "logs" cannot be created.
 	if err := os.Chmod(aeDir, 0o555); err != nil {
 		t.Fatalf("chmod: %v", err)
 	}
@@ -704,7 +704,7 @@ func TestPostToolHandler_Handle_TaskTool_ValidMetrics(t *testing.T) {
 	tmpDir := t.TempDir()
 	// Pre-create .ae/ so resolveProjectRoot accepts tmpDir as a AE project root.
 	if err := os.MkdirAll(filepath.Join(tmpDir, ".ae"), 0o755); err != nil {
-		t.Fatalf("pre-create .moai: %v", err)
+		t.Fatalf("pre-create .ae: %v", err)
 	}
 	input := &HookInput{
 		SessionID:    "sess-task-valid",
@@ -791,13 +791,13 @@ func TestLoadBaselineCounts_InvalidJSON(t *testing.T) {
 	t.Parallel()
 
 	tmpDir := t.TempDir()
-	moaiStateDir := filepath.Join(tmpDir, ".ae", "state")
-	if err := os.MkdirAll(moaiStateDir, 0o755); err != nil {
+	aeStateDir := filepath.Join(tmpDir, ".ae", "state")
+	if err := os.MkdirAll(aeStateDir, 0o755); err != nil {
 		t.Fatalf("setup: %v", err)
 	}
 
 	// Write invalid JSON to the baseline file.
-	baselineFile := filepath.Join(moaiStateDir, "diagnostics-baseline.json")
+	baselineFile := filepath.Join(aeStateDir, "diagnostics-baseline.json")
 	if err := os.WriteFile(baselineFile, []byte("{invalid json"), 0o644); err != nil {
 		t.Fatalf("write baseline: %v", err)
 	}
@@ -812,8 +812,8 @@ func TestLoadBaselineCounts_ValidJSON(t *testing.T) {
 	t.Parallel()
 
 	tmpDir := t.TempDir()
-	moaiStateDir := filepath.Join(tmpDir, ".ae", "state")
-	if err := os.MkdirAll(moaiStateDir, 0o755); err != nil {
+	aeStateDir := filepath.Join(tmpDir, ".ae", "state")
+	if err := os.MkdirAll(aeStateDir, 0o755); err != nil {
 		t.Fatalf("setup: %v", err)
 	}
 
@@ -830,7 +830,7 @@ func TestLoadBaselineCounts_ValidJSON(t *testing.T) {
 			}
 		}
 	}`
-	baselineFile := filepath.Join(moaiStateDir, "diagnostics-baseline.json")
+	baselineFile := filepath.Join(aeStateDir, "diagnostics-baseline.json")
 	if err := os.WriteFile(baselineFile, []byte(baselineJSON), 0o644); err != nil {
 		t.Fatalf("write baseline: %v", err)
 	}

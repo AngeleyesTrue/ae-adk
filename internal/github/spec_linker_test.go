@@ -312,7 +312,7 @@ func TestSpecLinker_Save_ReadOnlyDir(t *testing.T) {
 		t.Fatalf("NewSpecLinker: %v", err)
 	}
 
-	// Make the .moai directory read-only
+	// Make the .ae directory read-only
 	aeDir := filepath.Join(dir, ".ae")
 	if err := os.MkdirAll(aeDir, 0o755); err != nil {
 		t.Fatalf("mkdir: %v", err)

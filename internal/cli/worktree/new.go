@@ -106,7 +106,7 @@ func isSpecID(name string) bool {
 }
 
 // GenerateTmuxSessionName implements R5.1: tmux session name generation pattern.
-// SPEC-WORKTREE-002 requirement: moai-{ProjectName}-{SPEC-ID}
+// SPEC-WORKTREE-002 requirement: ae-{ProjectName}-{SPEC-ID}
 //
 // @MX:NOTE: SPEC-WORKTREE-002 R5.1 implementation - tmux session name pattern
 // @MX:SPEC: SPEC-WORKTREE-002
@@ -116,14 +116,14 @@ func isSpecID(name string) bool {
 //   - specID: the SPEC identifier (e.g., "SPEC-WORKTREE-002")
 //
 // Returns:
-//   - the tmux session name (e.g., "moai-ae-adk-go-SPEC-WORKTREE-002")
+//   - the tmux session name (e.g., "ae-ae-adk-go-SPEC-WORKTREE-002")
 //
 // Example:
 //
 //	sessionName := GenerateTmuxSessionName("ae-adk-go", "SPEC-WORKTREE-002")
-//	fmt.Println(sessionName) // Output: moai-ae-adk-go-SPEC-WORKTREE-002
+//	fmt.Println(sessionName) // Output: ae-ae-adk-go-SPEC-WORKTREE-002
 func GenerateTmuxSessionName(projectName, specID string) string {
-	return fmt.Sprintf("moai-%s-%s", projectName, specID)
+	return fmt.Sprintf("ae-%s-%s", projectName, specID)
 }
 
 // ShouldAutoMerge implements R3: default auto-merge behavior.

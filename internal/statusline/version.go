@@ -8,11 +8,11 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/modu-ai/moai-adk/internal/defs"
+	"github.com/AngeleyesTrue/ae-adk/internal/defs"
 	"gopkg.in/yaml.v3"
 )
 
-// VersionCollector reads the MoAI version from the config file and
+// VersionCollector reads the AE version from the config file and
 // compares it against the running binary version to detect when
 // templates need syncing via `ae update`.
 type VersionCollector struct {
@@ -22,23 +22,23 @@ type VersionCollector struct {
 }
 
 // VersionConfig represents the structure of .ae/config/sections/system.yaml
-// for parsing version fields. It reads moai.template_version first
-// (updated by ae update) and falls back to moai.version (set during init).
+// for parsing version fields. It reads ae.template_version first
+// (updated by ae update) and falls back to ae.version (set during init).
 type VersionConfig struct {
-	Moai struct {
+	AE struct {
 		Version         string `yaml:"version"`
 		TemplateVersion string `yaml:"template_version"`
 	} `yaml:"ae"`
 }
 
-// effectiveVersion returns moai.template_version if set, otherwise
-// moai.version. This ensures the statusline reflects the version updated
+// effectiveVersion returns ae.template_version if set, otherwise
+// ae.version. This ensures the statusline reflects the version updated
 // by `ae update` rather than the original initialization version.
 func (c *VersionConfig) effectiveVersion() string {
-	if c.Moai.TemplateVersion != "" {
-		return c.Moai.TemplateVersion
+	if c.AE.TemplateVersion != "" {
+		return c.AE.TemplateVersion
 	}
-	return c.Moai.Version
+	return c.AE.Version
 }
 
 // NewVersionCollector creates a VersionCollector that reads the template

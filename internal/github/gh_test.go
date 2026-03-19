@@ -71,7 +71,7 @@ func TestExtractPRNumber(t *testing.T) {
 	}{
 		{
 			name:  "standard github URL",
-			input: "https://github.com/modu-ai/moai-adk/pull/456",
+			input: "https://github.com/AngeleyesTrue/ae-adk/pull/456",
 			want:  456,
 		},
 		{

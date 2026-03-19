@@ -7,7 +7,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/modu-ai/moai-adk/pkg/models"
+	"github.com/AngeleyesTrue/ae-adk/pkg/models"
 )
 
 // setupManagerTestDir creates a project root with .ae/config/sections and
@@ -608,7 +608,7 @@ func TestConfigManagerEnvOverrideConfigDir(t *testing.T) {
 	t.Setenv("AE_CONFIG_DIR", customDir)
 
 	m := NewConfigManager()
-	// Use a different project root that does NOT have .moai dir
+	// Use a different project root that does NOT have .ae dir
 	projectRoot := t.TempDir()
 	cfg, err := m.Load(projectRoot)
 	if err != nil {
@@ -727,7 +727,7 @@ func TestConfigManagerConcurrentReadWrite(t *testing.T) {
 func TestConfigManagerSaveCreatesDirectory(t *testing.T) {
 	t.Parallel()
 
-	// Create a minimal project root without .moai directory
+	// Create a minimal project root without .ae directory
 	root := t.TempDir()
 	m := NewConfigManager()
 

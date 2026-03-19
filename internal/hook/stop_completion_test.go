@@ -31,13 +31,13 @@ func TestStopHandler_CompletionMarkers_TableDriven(t *testing.T) {
 		{
 			name:       "DONE marker detected",
 			markers:    defaultCompletionMarkers,
-			toolOutput: json.RawMessage(`"task complete <moai>DONE</moai>"`),
+			toolOutput: json.RawMessage(`"task complete <ae>DONE</ae>"`),
 			wantAllow:  true,
 		},
 		{
 			name:       "COMPLETE marker detected",
 			markers:    defaultCompletionMarkers,
-			toolOutput: json.RawMessage(`"<moai>COMPLETE</moai>"`),
+			toolOutput: json.RawMessage(`"<ae>COMPLETE</ae>"`),
 			wantAllow:  true,
 		},
 		{
@@ -61,13 +61,13 @@ func TestStopHandler_CompletionMarkers_TableDriven(t *testing.T) {
 		{
 			name:       "detection skipped when marker list is empty slice",
 			markers:    []string{},
-			toolOutput: json.RawMessage(`"<moai>DONE</moai>"`),
+			toolOutput: json.RawMessage(`"<ae>DONE</ae>"`),
 			wantAllow:  true,
 		},
 		{
 			name:       "detection skipped when marker list is nil",
 			markers:    nil,
-			toolOutput: json.RawMessage(`"<moai>DONE</moai>"`),
+			toolOutput: json.RawMessage(`"<ae>DONE</ae>"`),
 			wantAllow:  true,
 		},
 	}
@@ -124,11 +124,11 @@ func TestStopHandler_DefaultMarkers_AreSet(t *testing.T) {
 		markerSet[m] = true
 	}
 
-	if !markerSet["<moai>DONE</moai>"] {
-		t.Error("default markers do not include <moai>DONE</moai>")
+	if !markerSet["<ae>DONE</ae>"] {
+		t.Error("default markers do not include <ae>DONE</ae>")
 	}
-	if !markerSet["<moai>COMPLETE</moai>"] {
-		t.Error("default markers do not include <moai>COMPLETE</moai>")
+	if !markerSet["<ae>COMPLETE</ae>"] {
+		t.Error("default markers do not include <ae>COMPLETE</ae>")
 	}
 }
 
@@ -143,7 +143,7 @@ func TestStopHandler_StopHookActive_SkipsMarkerCheck(t *testing.T) {
 		SessionID:      "sess-active",
 		CWD:            "/tmp",
 		StopHookActive: true,
-		ToolOutput:     json.RawMessage(`"<moai>DONE</moai>"`),
+		ToolOutput:     json.RawMessage(`"<ae>DONE</ae>"`),
 	}
 
 	got, err := h.Handle(ctx, input)

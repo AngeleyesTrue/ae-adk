@@ -12,8 +12,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/modu-ai/moai-adk/internal/foundation"
-	"github.com/modu-ai/moai-adk/pkg/models"
+	"github.com/AngeleyesTrue/ae-adk/internal/foundation"
+	"github.com/AngeleyesTrue/ae-adk/pkg/models"
 )
 
 // Language represents a detected programming language with confidence scoring.
@@ -83,7 +83,7 @@ var configFileLanguageMap = map[string]string{
 // skipDirs lists directories to skip during filesystem walks.
 var skipDirs = map[string]bool{
 	".git":         true,
-	".ae":        true,
+	".ae":          true,
 	".claude":      true,
 	"node_modules": true,
 	"vendor":       true,

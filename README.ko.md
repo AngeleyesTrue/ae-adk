@@ -108,7 +108,7 @@ AE-ADK는 **하네스 엔지니어링(Harness Engineering)** 패러다임을 구
 #### macOS / Linux / WSL
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/modu-ai/ae-adk/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/AngeleyesTrue/ae-adk/main/install.sh | bash
 ```
 
 #### Windows (PowerShell 7.x+)
@@ -116,7 +116,7 @@ curl -fsSL https://raw.githubusercontent.com/modu-ai/ae-adk/main/install.sh | ba
 > **권장**: 최상의 경험을 위해 WSL에서 위의 Linux 설치 명령어를 사용하세요.
 
 ```powershell
-irm https://raw.githubusercontent.com/modu-ai/ae-adk/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/AngeleyesTrue/ae-adk/main/install.ps1 | iex
 ```
 
 > [Git for Windows](https://gitforwindows.org/)가 먼저 설치되어 있어야 합니다.

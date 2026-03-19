@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/modu-ai/moai-adk/internal/resilience"
+	"github.com/AngeleyesTrue/ae-adk/internal/resilience"
 )
 
 // Package-level compiled regexps to avoid repeated compilation.

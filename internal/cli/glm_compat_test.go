@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/modu-ai/moai-adk/internal/config"
+	"github.com/AngeleyesTrue/ae-adk/internal/config"
 )
 
 // setupGLMTestConfig creates a ConfigManager loaded from a temp directory

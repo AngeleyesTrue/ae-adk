@@ -7,7 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/modu-ai/moai-adk/pkg/version"
+	"github.com/AngeleyesTrue/ae-adk/pkg/version"
 )
 
 var statusCmd = &cobra.Command{

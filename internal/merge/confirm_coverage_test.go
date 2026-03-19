@@ -344,18 +344,18 @@ func TestTruncatePath_SkillsPath(t *testing.T) {
 	}{
 		{
 			name:     "skills with remaining path",
-			path:     ".claude/skills/moai-backend/reference.md",
-			contains: "skills/moai-backend/reference.md",
+			path:     ".claude/skills/ae-backend/reference.md",
+			contains: "skills/ae-backend/reference.md",
 		},
 		{
 			name:     "skills without remaining",
-			path:     ".claude/skills/moai-backend",
-			contains: "skills/moai-backend",
+			path:     ".claude/skills/ae-backend",
+			contains: "skills/ae-backend",
 		},
 		{
 			name:     "agents with remaining path",
-			path:     ".claude/agents/moai/expert-backend.md",
-			contains: "agents/moai/expert-backend.md",
+			path:     ".claude/agents/ae/expert-backend.md",
+			contains: "agents/ae/expert-backend.md",
 		},
 		{
 			name:     "agents without remaining",
@@ -364,13 +364,13 @@ func TestTruncatePath_SkillsPath(t *testing.T) {
 		},
 		{
 			name:     "rules path",
-			path:     ".claude/rules/moai/core/constitution.md",
-			contains: "rules/moai/core/constitution.md",
+			path:     ".claude/rules/ae/core/constitution.md",
+			contains: "rules/ae/core/constitution.md",
 		},
 		{
 			name:     "commands path",
-			path:     ".claude/commands/moai/plan.md",
-			contains: "commands/moai/plan.md",
+			path:     ".claude/commands/ae/plan.md",
+			contains: "commands/ae/plan.md",
 		},
 	}
 

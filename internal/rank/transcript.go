@@ -1,4 +1,4 @@
-// Package rank provides transcript parsing for MoAI Rank session submission.
+// Package rank provides transcript parsing for AE Rank session submission.
 package rank
 
 import (

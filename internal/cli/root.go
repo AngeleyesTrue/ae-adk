@@ -6,15 +6,15 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/modu-ai/moai-adk/internal/cli/worktree"
-	"github.com/modu-ai/moai-adk/pkg/version"
+	"github.com/AngeleyesTrue/ae-adk/internal/cli/worktree"
+	"github.com/AngeleyesTrue/ae-adk/pkg/version"
 )
 
 var rootCmd = &cobra.Command{
 	Use:   "ae",
 	Short: "AE-ADK: Agentic Development Kit for Claude Code",
 	Long: `AE-ADK (Go Edition) is a high-performance development toolkit
-that serves as the runtime backbone for the MoAI framework within Claude Code.
+that serves as the runtime backbone for the AE framework within Claude Code.
 
 It provides CLI tooling, configuration management, LSP integration,
 Git operations, quality gates, and autonomous development loop capabilities.
@@ -27,8 +27,8 @@ Use 'ae cc', 'ae cg', or 'ae glm' to launch Claude Code.`,
 	},
 }
 
-// @MX:ANCHOR: [AUTO] Execute is the main entry point for the moai CLI
-// @MX:REASON: [AUTO] fan_in=3, called from cmd/moai/main.go, root_test.go, integration_test.go
+// @MX:ANCHOR: [AUTO] Execute is the main entry point for the ae CLI
+// @MX:REASON: [AUTO] fan_in=3, called from cmd/ae/main.go, root_test.go, integration_test.go
 // Execute initializes dependencies and runs the root command.
 func Execute() error {
 	initConsole()

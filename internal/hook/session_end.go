@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/modu-ai/moai-adk/internal/hook/mx"
+	"github.com/AngeleyesTrue/ae-adk/internal/hook/mx"
 )
 
 // teamConfig is the minimal structure read from ~/.claude/teams/*/config.json.
@@ -388,12 +388,12 @@ func getCurrentTmuxSession(ctx context.Context) string {
 	return strings.TrimSpace(string(out))
 }
 
-// moaiTmuxSessionPrefix is the naming convention for tmux sessions created by
-// MoAI Agent Teams. Only sessions matching this prefix are eligible for cleanup.
-const moaiTmuxSessionPrefix = "moai-"
+// aeTmuxSessionPrefix is the naming convention for tmux sessions created by
+// AE Agent Teams. Only sessions matching this prefix are eligible for cleanup.
+const aeTmuxSessionPrefix = "ae-"
 
-// cleanupOrphanedTmuxSessions kills detached tmux sessions created by MoAI
-// Agent Teams (prefix "moai-"). User-created sessions are never touched.
+// cleanupOrphanedTmuxSessions kills detached tmux sessions created by AE
+// Agent Teams (prefix "ae-"). User-created sessions are never touched.
 // The cleanup is capped at 4 seconds to stay within the SessionEnd hook
 // timeout budget. If tmux is not installed or no sessions exist, the function
 // returns silently.
@@ -431,9 +431,9 @@ func cleanupOrphanedTmuxSessions(ctx context.Context) {
 			continue
 		}
 
-		// Only kill sessions created by MoAI (prefixed with "moai-").
+		// Only kill sessions created by AE (prefixed with "ae-").
 		// Never kill user-created tmux sessions.
-		if !strings.HasPrefix(name, moaiTmuxSessionPrefix) {
+		if !strings.HasPrefix(name, aeTmuxSessionPrefix) {
 			continue
 		}
 

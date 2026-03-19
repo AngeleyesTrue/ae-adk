@@ -297,17 +297,17 @@ func TestGLMEnvVarsToClean_ContainsExpectedVars(t *testing.T) {
 	}
 }
 
-// TestMoaiTmuxSessionPrefix verifies the naming convention constant used to
+// TestAETmuxSessionPrefix verifies the naming convention constant used to
 // filter tmux sessions during cleanup. Only sessions with this prefix are
 // eligible for orphan cleanup — user-created sessions are never touched.
-func TestMoaiTmuxSessionPrefix(t *testing.T) {
+func TestAETmuxSessionPrefix(t *testing.T) {
 	t.Parallel()
 
-	if moaiTmuxSessionPrefix == "" {
-		t.Fatal("moaiTmuxSessionPrefix must not be empty")
+	if aeTmuxSessionPrefix == "" {
+		t.Fatal("aeTmuxSessionPrefix must not be empty")
 	}
-	if moaiTmuxSessionPrefix != "moai-" {
-		t.Errorf("moaiTmuxSessionPrefix = %q, want %q", moaiTmuxSessionPrefix, "moai-")
+	if aeTmuxSessionPrefix != "ae-" {
+		t.Errorf("aeTmuxSessionPrefix = %q, want %q", aeTmuxSessionPrefix, "ae-")
 	}
 }
 
@@ -335,7 +335,7 @@ func TestCleanupGLMSettingsLocal(t *testing.T) {
 				"ANTHROPIC_DEFAULT_HAIKU_MODEL":  "glm-4.7-air",
 				"ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-4.7",
 				"ANTHROPIC_DEFAULT_OPUS_MODEL":   "glm-5",
-				"AE_BACKUP_AUTH_TOKEN":         "oauth-token-from-claude",
+				"AE_BACKUP_AUTH_TOKEN":           "oauth-token-from-claude",
 				"CLAUDE_CODE_TEAMMATE_DISPLAY":   "compact",
 			},
 			wantAuthToken:    "oauth-token-from-claude",
@@ -502,7 +502,7 @@ func TestSessionEndHandler_Handle_CleansGLMFromSettingsLocal(t *testing.T) {
 			"ANTHROPIC_DEFAULT_HAIKU_MODEL":  "glm-4.7-air",
 			"ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-4.7",
 			"ANTHROPIC_DEFAULT_OPUS_MODEL":   "glm-5",
-			"AE_BACKUP_AUTH_TOKEN":         "real-oauth-token",
+			"AE_BACKUP_AUTH_TOKEN":           "real-oauth-token",
 		},
 	}
 	data, err := json.Marshal(initial)
@@ -603,7 +603,7 @@ func TestSessionEndHandler_Handle_CWDFallbackToProjectDir(t *testing.T) {
 						"ANTHROPIC_DEFAULT_HAIKU_MODEL":  "glm-4.7-air",
 						"ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-4.7",
 						"ANTHROPIC_DEFAULT_OPUS_MODEL":   "glm-5",
-						"AE_BACKUP_AUTH_TOKEN":         "real-oauth",
+						"AE_BACKUP_AUTH_TOKEN":           "real-oauth",
 					},
 				}
 				data, err := json.Marshal(initial)
@@ -1026,7 +1026,7 @@ func TestCleanupBogusRootDir_IgnoresSymlink(t *testing.T) {
 	}
 	symlinkPath := filepath.Join(projectDir, "{}")
 	if err := os.Symlink(realDir, symlinkPath); err != nil {
-		t.Fatalf("setup: create symlink: %v", err)
+		t.Skipf("symlink creation requires elevated privileges on this platform: %v", err)
 	}
 
 	cleanupBogusRootDir(projectDir)

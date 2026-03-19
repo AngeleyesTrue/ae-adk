@@ -67,7 +67,7 @@ func TestRollback_Restore_Success(t *testing.T) {
 
 	dir := t.TempDir()
 	binaryPath := filepath.Join(dir, "ae")
-	backupPath := filepath.Join(dir, "moai.backup.123")
+	backupPath := filepath.Join(dir, "ae.backup.123")
 
 	// Write "corrupted" binary.
 	if err := os.WriteFile(binaryPath, []byte("corrupted"), 0o755); err != nil {
@@ -188,7 +188,7 @@ func TestRestoreOnWindows(t *testing.T) {
 	}
 
 	// Create a backup.
-	backupPath := filepath.Join(dir, "moai.backup")
+	backupPath := filepath.Join(dir, "ae.backup")
 	if err := os.WriteFile(backupPath, []byte("backup-binary"), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -228,7 +228,7 @@ func TestRestoreOnWindows_MissingCurrentBinary(t *testing.T) {
 	dir := t.TempDir()
 
 	binaryPath := filepath.Join(dir, "ae") // does NOT exist
-	backupPath := filepath.Join(dir, "moai.backup")
+	backupPath := filepath.Join(dir, "ae.backup")
 	if err := os.WriteFile(backupPath, []byte("backup-binary"), 0o755); err != nil {
 		t.Fatal(err)
 	}

@@ -18,19 +18,19 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/AngeleyesTrue/ae-adk/internal/cli/wizard"
+	"github.com/AngeleyesTrue/ae-adk/internal/core/project"
+	"github.com/AngeleyesTrue/ae-adk/internal/defs"
+	"github.com/AngeleyesTrue/ae-adk/internal/manifest"
+	"github.com/AngeleyesTrue/ae-adk/internal/merge"
+	"github.com/AngeleyesTrue/ae-adk/internal/profile"
+	"github.com/AngeleyesTrue/ae-adk/internal/shell"
+	"github.com/AngeleyesTrue/ae-adk/internal/statusline"
+	"github.com/AngeleyesTrue/ae-adk/internal/template"
+	"github.com/AngeleyesTrue/ae-adk/pkg/version"
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/mattn/go-isatty"
-	"github.com/modu-ai/moai-adk/internal/cli/wizard"
-	"github.com/modu-ai/moai-adk/internal/core/project"
-	"github.com/modu-ai/moai-adk/internal/defs"
-	"github.com/modu-ai/moai-adk/internal/manifest"
-	"github.com/modu-ai/moai-adk/internal/merge"
-	"github.com/modu-ai/moai-adk/internal/profile"
-	"github.com/modu-ai/moai-adk/internal/shell"
-	"github.com/modu-ai/moai-adk/internal/statusline"
-	"github.com/modu-ai/moai-adk/internal/template"
-	"github.com/modu-ai/moai-adk/pkg/version"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )
@@ -40,7 +40,7 @@ const (
 	maxConfigSize = 10 * 1024 * 1024 // 10MB
 )
 
-// CLI output styles for consistent MoAI-themed terminal output.
+// CLI output styles for consistent AE-themed terminal output.
 var (
 	cliSuccess = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#059669", Dark: "#10B981"})
 	cliWarn    = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#D97706", Dark: "#F59E0B"})
@@ -243,7 +243,7 @@ func shouldSkipBinaryUpdate(cmd *cobra.Command) bool {
 	return false
 }
 
-// runBinaryUpdateStep checks whether a newer moai binary is available and,
+// runBinaryUpdateStep checks whether a newer ae binary is available and,
 // if so, downloads and installs it. The caller should re-exec the process
 // when updated is true.
 //
@@ -294,7 +294,7 @@ func runBinaryUpdateStep(cmd *cobra.Command) (updated bool, err error) {
 }
 
 // reexecNewBinary replaces the current process with the newly installed
-// moai binary, preserving the original command-line arguments. It sets
+// ae binary, preserving the original command-line arguments. It sets
 // AE_SKIP_BINARY_UPDATE=1 to prevent the re-execed process from
 // attempting another binary update.
 //
@@ -469,7 +469,7 @@ func runTemplateSyncWithReporter(cmd *cobra.Command, reporter project.ProgressRe
 				// Always backup before update (even with --force)
 				// --force only skips version check, not backup/merge
 				_, _ = fmt.Fprintf(out, "  %s Backing up .ae/config...", symProgress())
-				configBackupPath, backupErr := backupMoaiConfig(projectRoot)
+				configBackupPath, backupErr := backupAEConfig(projectRoot)
 				if backupErr != nil {
 					_, _ = fmt.Fprintf(out, "\r  %s Backup failed: %v\n", symError(), backupErr)
 					return backupErr
@@ -484,9 +484,9 @@ func runTemplateSyncWithReporter(cmd *cobra.Command, reporter project.ProgressRe
 		},
 		{
 			name:    "Clean Managed Paths",
-			message: "Removing old MoAI-managed files",
+			message: "Removing old AE-managed files",
 			execute: func() error {
-				return cleanMoaiManagedPaths(projectRoot, out)
+				return cleanAEManagedPaths(projectRoot, out)
 			},
 		},
 		{
@@ -535,9 +535,9 @@ func runTemplateSyncWithReporter(cmd *cobra.Command, reporter project.ProgressRe
 	// collectMergeableFiles returns a list of files that should be merged
 	// using the 3-way merge engine during update.
 	// Note: .ae/config/sections/*.yaml files are already handled by
-	// restoreMoaiConfig with 3-way merge, so they are excluded here.
+	// restoreAEConfig with 3-way merge, so they are excluded here.
 	collectMergeableFiles := func(projectRoot string) []string {
-		// Fixed mergeable files at project root that are NOT handled by restoreMoaiConfig
+		// Fixed mergeable files at project root that are NOT handled by restoreAEConfig
 		return []string{
 			".mcp.json",
 			".claude/settings.json",
@@ -556,7 +556,7 @@ func runTemplateSyncWithReporter(cmd *cobra.Command, reporter project.ProgressRe
 		case "Backup":
 			_, _ = fmt.Fprintf(out, "  %s Backing up .ae/config...", symProgress())
 			var backupErr error
-			configBackupPath, backupErr = backupMoaiConfig(projectRoot)
+			configBackupPath, backupErr = backupAEConfig(projectRoot)
 			if backupErr != nil {
 				_, _ = fmt.Fprintf(out, "\r  %s Backup failed: %v\n", symError(), backupErr)
 				if reporter != nil {
@@ -592,7 +592,7 @@ func runTemplateSyncWithReporter(cmd *cobra.Command, reporter project.ProgressRe
 					reporter.StepStart("Restore Settings", "Restoring user settings")
 				}
 				_, _ = fmt.Fprintf(out, "  %s Restoring user settings...", symProgress())
-				if restoreErr := restoreMoaiConfig(projectRoot, configBackupPath); restoreErr != nil {
+				if restoreErr := restoreAEConfig(projectRoot, configBackupPath); restoreErr != nil {
 					_, _ = fmt.Fprintf(out, "\r  %s Restore failed: %v\n", symError(), restoreErr)
 					if reporter != nil {
 						reporter.StepError(restoreErr)
@@ -919,7 +919,7 @@ func determineChangeType(exists bool) string {
 // For each template, it checks if the file exists, classifies its risk level,
 // determines the appropriate merge strategy, and identifies the change type.
 //
-// Filters out moai* skills from the analysis since they are managed by AE-ADK
+// Filters out ae* skills from the analysis since they are managed by AE-ADK
 // and users typically don't need to see them in the merge confirmation UI.
 //
 // For .tmpl files, displays the rendered target path (without .tmpl extension)
@@ -933,8 +933,8 @@ func analyzeFiles(templates []string, projectRoot string) []merge.FileAnalysis {
 			displayPath = before
 		}
 
-		// Filter out MoAI-managed files - they are automatically installed
-		if isMoaiManaged(displayPath) {
+		// Filter out AE-managed files - they are automatically installed
+		if isAEManaged(displayPath) {
 			continue
 		}
 
@@ -960,19 +960,19 @@ func analyzeFiles(templates []string, projectRoot string) []merge.FileAnalysis {
 	return files
 }
 
-// isMoaiManaged returns true if the path is managed by AE-ADK and should be excluded from merge confirmation.
-// MoAI-managed paths include:
-//   - .claude/skills/moai-* and .claude/skills/moai/
-//   - .claude/rules/moai/
-//   - .claude/agents/moai/
-//   - .claude/commands/moai/
-//   - .claude/output-styles/moai/
+// isAEManaged returns true if the path is managed by AE-ADK and should be excluded from merge confirmation.
+// AE-managed paths include:
+//   - .claude/skills/ae-* and .claude/skills/ae/
+//   - .claude/rules/ae/
+//   - .claude/agents/ae/
+//   - .claude/commands/ae/
+//   - .claude/output-styles/ae/
 //   - .ae/config/ (entire directory)
 //
 // These paths are automatically deleted and reinstalled without user confirmation.
-func isMoaiManaged(path string) bool {
+func isAEManaged(path string) bool {
 	// Check .ae/config/ paths first
-	if strings.HasPrefix(path, ".ae/config/") || strings.HasPrefix(path, ".moai\\config\\") {
+	if strings.HasPrefix(path, ".ae/config/") || strings.HasPrefix(path, ".ae\\config\\") {
 		return true
 	}
 
@@ -989,10 +989,10 @@ func isMoaiManaged(path string) bool {
 	for i, part := range parts {
 		switch part {
 		case "skills", "rules", "agents", "commands", "output-styles", "hooks":
-			// Check if the next directory starts with "moai-"
+			// Check if the next directory starts with "ae-"
 			if i+1 < len(parts) {
 				itemName := parts[i+1]
-				return strings.HasPrefix(itemName, "moai-") || strings.HasPrefix(itemName, "ae")
+				return strings.HasPrefix(itemName, "ae-") || strings.HasPrefix(itemName, "ae")
 			}
 		}
 	}
@@ -1119,9 +1119,9 @@ func getProjectConfigVersion(projectRoot string) (string, error) {
 		return "", fmt.Errorf("read config file: %w", err)
 	}
 
-	// Parse YAML to extract moai.template_version
+	// Parse YAML to extract ae.template_version
 	var config struct {
-		Moai struct {
+		AE struct {
 			TemplateVersion string `yaml:"template_version"`
 		} `yaml:"ae"`
 	}
@@ -1131,18 +1131,18 @@ func getProjectConfigVersion(projectRoot string) (string, error) {
 	}
 
 	// If template_version is not set, return "0.0.0" to force update
-	if config.Moai.TemplateVersion == "" {
+	if config.AE.TemplateVersion == "" {
 		return "0.0.0", nil
 	}
 
-	return config.Moai.TemplateVersion, nil
+	return config.AE.TemplateVersion, nil
 }
 
-// backupMoaiConfig creates a backup of .ae/config/ directory.
-// Creates a timestamped backup under .moai-backups/YYYYMMDD_HHMMSS/ including
+// backupAEConfig creates a backup of .ae/config/ directory.
+// Creates a timestamped backup under .ae-backups/YYYYMMDD_HHMMSS/ including
 // all files (sections/*.yaml, etc.) for full restore capability.
 // Returns the backup directory path, or empty string if directory doesn't exist.
-func backupMoaiConfig(projectRoot string) (string, error) {
+func backupAEConfig(projectRoot string) (string, error) {
 	configDir := filepath.Join(projectRoot, defs.AEDir, defs.ConfigSubdir)
 
 	// Check if config directory exists
@@ -1321,11 +1321,11 @@ type BackupMetadata struct {
 	TemplateDefaultsDir string   `json:"template_defaults_dir,omitempty"`
 }
 
-// cleanMoaiManagedPaths removes MoAI-managed directories and files before template
+// cleanAEManagedPaths removes AE-managed directories and files before template
 // deployment. This ensures stale files are cleaned up during version upgrades.
 // The .ae/config/ directory is deleted entirely (backup was done by the Backup step).
 // Paths that do not exist are silently skipped.
-func cleanMoaiManagedPaths(projectRoot string, out io.Writer) error {
+func cleanAEManagedPaths(projectRoot string, out io.Writer) error {
 	type cleanTarget struct {
 		// displayPath is shown in progress messages (e.g., ".claude/settings.json")
 		displayPath string
@@ -1341,29 +1341,29 @@ func cleanMoaiManagedPaths(projectRoot string, out io.Writer) error {
 			fullPath:    filepath.Join(projectRoot, defs.ClaudeDir, defs.SettingsJSON),
 		},
 		{
-			displayPath: filepath.Join(defs.ClaudeDir, defs.CommandsMoaiSubdir),
-			fullPath:    filepath.Join(projectRoot, defs.ClaudeDir, defs.CommandsMoaiSubdir),
+			displayPath: filepath.Join(defs.ClaudeDir, defs.CommandsAESubdir),
+			fullPath:    filepath.Join(projectRoot, defs.ClaudeDir, defs.CommandsAESubdir),
 		},
 		{
-			displayPath: filepath.Join(defs.ClaudeDir, defs.AgentsMoaiSubdir),
-			fullPath:    filepath.Join(projectRoot, defs.ClaudeDir, defs.AgentsMoaiSubdir),
+			displayPath: filepath.Join(defs.ClaudeDir, defs.AgentsAESubdir),
+			fullPath:    filepath.Join(projectRoot, defs.ClaudeDir, defs.AgentsAESubdir),
 		},
 		{
-			displayPath: filepath.Join(defs.ClaudeDir, defs.SkillsSubdir, "moai*"),
-			fullPath:    filepath.Join(projectRoot, defs.ClaudeDir, defs.SkillsSubdir, "moai*"),
+			displayPath: filepath.Join(defs.ClaudeDir, defs.SkillsSubdir, "ae*"),
+			fullPath:    filepath.Join(projectRoot, defs.ClaudeDir, defs.SkillsSubdir, "ae*"),
 			isGlob:      true,
 		},
 		{
-			displayPath: filepath.Join(defs.ClaudeDir, defs.RulesMoaiSubdir),
-			fullPath:    filepath.Join(projectRoot, defs.ClaudeDir, defs.RulesMoaiSubdir),
+			displayPath: filepath.Join(defs.ClaudeDir, defs.RulesAESubdir),
+			fullPath:    filepath.Join(projectRoot, defs.ClaudeDir, defs.RulesAESubdir),
 		},
 		{
 			displayPath: filepath.Join(defs.ClaudeDir, defs.OutputStylesSubdir, "ae"),
 			fullPath:    filepath.Join(projectRoot, defs.ClaudeDir, defs.OutputStylesSubdir, "ae"),
 		},
 		{
-			displayPath: filepath.Join(defs.ClaudeDir, defs.HooksMoaiSubdir),
-			fullPath:    filepath.Join(projectRoot, defs.ClaudeDir, defs.HooksMoaiSubdir),
+			displayPath: filepath.Join(defs.ClaudeDir, defs.HooksAESubdir),
+			fullPath:    filepath.Join(projectRoot, defs.ClaudeDir, defs.HooksAESubdir),
 		},
 	}
 
@@ -1535,11 +1535,11 @@ func cleanup_old_backups(projectRoot string, keepCount int) int {
 	return deletedCount
 }
 
-// restoreMoaiConfig restores user settings from backup to new config files.
+// restoreAEConfig restores user settings from backup to new config files.
 // It performs a 3-way YAML merge using old template defaults as the base,
 // allowing it to distinguish user-modified values from unchanged defaults.
 // Falls back to 2-way merge when template defaults are not available.
-func restoreMoaiConfig(projectRoot, backupDir string) error {
+func restoreAEConfig(projectRoot, backupDir string) error {
 	configDir := filepath.Join(projectRoot, defs.AEDir, defs.ConfigSubdir)
 	templateDefaultsDir := filepath.Join(backupDir, ".template-defaults")
 
@@ -1553,7 +1553,7 @@ func restoreMoaiConfig(projectRoot, backupDir string) error {
 	sectionsBackupDir := filepath.Join(backupDir, "sections")
 	if info, err := os.Stat(sectionsBackupDir); err != nil || !info.IsDir() {
 		// No sections in backup, try walking from backup root
-		return restoreMoaiConfigLegacy(projectRoot, backupDir, configDir)
+		return restoreAEConfigLegacy(projectRoot, backupDir, configDir)
 	}
 
 	return filepath.Walk(sectionsBackupDir, func(backupPath string, info os.FileInfo, err error) error {
@@ -1626,9 +1626,9 @@ func restoreMoaiConfig(projectRoot, backupDir string) error {
 	})
 }
 
-// restoreMoaiConfigLegacy handles restore from legacy backup format
+// restoreAEConfigLegacy handles restore from legacy backup format
 // (pre-3-way merge) where files might be at the backup root level.
-func restoreMoaiConfigLegacy(projectRoot, backupDir, configDir string) error {
+func restoreAEConfigLegacy(projectRoot, backupDir, configDir string) error {
 	return filepath.Walk(backupDir, func(backupPath string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -2074,7 +2074,7 @@ func applyWizardConfig(projectRoot string, result *wizard.WizardResult) error {
 // allStatuslineSegments lists all supported statusline segment names in display order.
 var allStatuslineSegments = []string{
 	statusline.SegmentModel, statusline.SegmentContext, statusline.SegmentOutputStyle, statusline.SegmentDirectory,
-	statusline.SegmentGitStatus, statusline.SegmentClaudeVersion, statusline.SegmentMoaiVersion, statusline.SegmentGitBranch,
+	statusline.SegmentGitStatus, statusline.SegmentClaudeVersion, statusline.SegmentAEVersion, statusline.SegmentGitBranch,
 }
 
 // presetToSegments converts a statusline preset name and optional custom segment map
@@ -2161,9 +2161,9 @@ func updateSettingsLocalEnv(settingsPath, key, value string) error {
 	return nil
 }
 
-// ensureGlobalSettingsEnv cleans up moai-managed settings from ~/.claude/settings.json.
+// ensureGlobalSettingsEnv cleans up ae-managed settings from ~/.claude/settings.json.
 // All settings (env, permissions, teammateMode, hooks) are managed at the project level.
-// The global hooks directory (~/.claude/hooks/moai/) is also removed since hooks
+// The global hooks directory (~/.claude/hooks/ae/) is also removed since hooks
 // are only deployed to project-level directories via ae init.
 func ensureGlobalSettingsEnv() error {
 	homeDir, err := userHomeDir()
@@ -2199,13 +2199,13 @@ func ensureGlobalSettingsEnv() error {
 	// Clean up legacy hooks including orphaned scripts and deprecated Python hooks
 	needsUpdate = cleanLegacyHooks(existingSettings) || needsUpdate
 
-	// Clean up moai-managed settings that have been migrated to project level.
-	// Preserve any user-added custom env keys but remove moai-specific ones.
+	// Clean up ae-managed settings that have been migrated to project level.
+	// Preserve any user-added custom env keys but remove ae-specific ones.
 	// Note: CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS is kept as a default value (see below).
 	if envVal, exists := existingSettings["env"]; exists {
 		if envMap, ok := envVal.(map[string]any); ok {
-			moaiKeys := []string{"PATH", "ENABLE_TOOL_SEARCH"}
-			for _, key := range moaiKeys {
+			aeKeys := []string{"PATH", "ENABLE_TOOL_SEARCH"}
+			for _, key := range aeKeys {
 				if _, exists := envMap[key]; exists {
 					delete(envMap, key)
 					needsUpdate = true
@@ -2240,7 +2240,7 @@ func ensureGlobalSettingsEnv() error {
 		}
 	}
 
-	// Clean up moai-managed permissions if they only contain Task:*
+	// Clean up ae-managed permissions if they only contain Task:*
 	if permVal, exists := existingSettings["permissions"]; exists {
 		if permMap, ok := permVal.(map[string]any); ok {
 			if allowVal, exists := permMap["allow"]; exists {
@@ -2254,7 +2254,7 @@ func ensureGlobalSettingsEnv() error {
 		}
 	}
 
-	// Clean up moai-managed teammateMode
+	// Clean up ae-managed teammateMode
 	if mode, exists := existingSettings["teammateMode"]; exists {
 		if mode == "auto" {
 			delete(existingSettings, "teammateMode")
@@ -2284,7 +2284,7 @@ func ensureGlobalSettingsEnv() error {
 // Returns true if any cleanup was performed.
 func cleanLegacyHooks(settings map[string]any) bool {
 	// List of legacy hook patterns to remove.
-	// All moai handle-*.sh hooks belong in project-level settings, not global.
+	// All ae handle-*.sh hooks belong in project-level settings, not global.
 	legacyPatterns := []string{
 		"handle-session-end.sh",
 		"handle-session-start.sh",

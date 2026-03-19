@@ -27,15 +27,15 @@ func NewRuleManager() RuleManager {
 // 2. sgconfig.yaml in project root
 // 3. .ast-grep/sgconfig.yml
 // 4. .ast-grep/sgconfig.yaml
-// 5. .claude/skills/moai-tool-ast-grep/rules/sgconfig.yml
+// 5. .claude/skills/ae-tool-ast-grep/rules/sgconfig.yml
 func (rm *ruleManager) FindRulesConfig(projectDir string) string {
 	searchPaths := []string{
 		filepath.Join(projectDir, "sgconfig.yml"),
 		filepath.Join(projectDir, "sgconfig.yaml"),
 		filepath.Join(projectDir, ".ast-grep", "sgconfig.yml"),
 		filepath.Join(projectDir, ".ast-grep", "sgconfig.yaml"),
-		filepath.Join(projectDir, ".claude", "skills", "moai-tool-ast-grep", "rules", "sgconfig.yml"),
-		filepath.Join(projectDir, ".claude", "skills", "moai-tool-ast-grep", "rules", "sgconfig.yaml"),
+		filepath.Join(projectDir, ".claude", "skills", "ae-tool-ast-grep", "rules", "sgconfig.yml"),
+		filepath.Join(projectDir, ".claude", "skills", "ae-tool-ast-grep", "rules", "sgconfig.yaml"),
 	}
 
 	for _, path := range searchPaths {

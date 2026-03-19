@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	astgrep "github.com/modu-ai/moai-adk/internal/astgrep"
-	"github.com/modu-ai/moai-adk/internal/hook/mx"
-	lsphook "github.com/modu-ai/moai-adk/internal/lsp/hook"
+	astgrep "github.com/AngeleyesTrue/ae-adk/internal/astgrep"
+	"github.com/AngeleyesTrue/ae-adk/internal/hook/mx"
+	lsphook "github.com/AngeleyesTrue/ae-adk/internal/lsp/hook"
 )
 
 // FileAnalyzer is the interface for performing AST-based code scanning on a single file.

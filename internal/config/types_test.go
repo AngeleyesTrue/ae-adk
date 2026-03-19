@@ -3,7 +3,7 @@ package config
 import (
 	"testing"
 
-	"github.com/modu-ai/moai-adk/pkg/models"
+	"github.com/AngeleyesTrue/ae-adk/pkg/models"
 )
 
 func TestConfigStructCreation(t *testing.T) {
@@ -167,7 +167,7 @@ func TestGitStrategyConfigFields(t *testing.T) {
 
 	cfg := GitStrategyConfig{
 		AutoBranch:        true,
-		BranchPrefix:      "moai/",
+		BranchPrefix:      "ae/",
 		CommitStyle:       "conventional",
 		WorktreeRoot:      "/tmp/worktree",
 		Provider:          "gitlab",
@@ -176,8 +176,8 @@ func TestGitStrategyConfigFields(t *testing.T) {
 	if !cfg.AutoBranch {
 		t.Error("AutoBranch: expected true")
 	}
-	if cfg.BranchPrefix != "moai/" {
-		t.Errorf("BranchPrefix: got %q, want %q", cfg.BranchPrefix, "moai/")
+	if cfg.BranchPrefix != "ae/" {
+		t.Errorf("BranchPrefix: got %q, want %q", cfg.BranchPrefix, "ae/")
 	}
 	if cfg.CommitStyle != "conventional" {
 		t.Errorf("CommitStyle: got %q, want %q", cfg.CommitStyle, "conventional")

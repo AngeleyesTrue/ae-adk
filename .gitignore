@@ -207,6 +207,7 @@ dist-ssr/
 # User Custom Patterns (preserved by ae update)
 /ae
 /ae_test
+tests/
 /quality.test
 coverage.out
 *.test

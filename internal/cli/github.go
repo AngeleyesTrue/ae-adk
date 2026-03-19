@@ -11,8 +11,8 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
 
-	"github.com/modu-ai/moai-adk/internal/github"
-	"github.com/modu-ai/moai-adk/internal/workflow"
+	"github.com/AngeleyesTrue/ae-adk/internal/github"
+	"github.com/AngeleyesTrue/ae-adk/internal/workflow"
 )
 
 // GithubIssueParser is the issue parser used by github subcommands.
@@ -83,7 +83,7 @@ func newParseIssueCmd() *cobra.Command {
 Uses the gh CLI to fetch issue data from the current repository.
 
 Example:
-  moai github parse-issue 123`,
+  ae github parse-issue 123`,
 		Args: cobra.ExactArgs(1),
 		RunE: runParseIssue,
 	}
@@ -160,7 +160,7 @@ func newLinkSpecCmd() *cobra.Command {
 The mapping is stored in .ae/github-spec-registry.json.
 
 Example:
-  moai github link-spec 123 SPEC-ISSUE-123`,
+  ae github link-spec 123 SPEC-ISSUE-123`,
 		Args: cobra.ExactArgs(2),
 		RunE: runLinkSpec,
 	}

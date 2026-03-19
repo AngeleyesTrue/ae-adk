@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/modu-ai/moai-adk/internal/lsp"
+	"github.com/AngeleyesTrue/ae-adk/internal/lsp"
 )
 
 // mockLSPClient implements lsp.DiagnosticsProvider for testing.

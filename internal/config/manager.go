@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/modu-ai/moai-adk/internal/defs"
-	"github.com/modu-ai/moai-adk/pkg/models"
+	"github.com/AngeleyesTrue/ae-adk/internal/defs"
+	"github.com/AngeleyesTrue/ae-adk/pkg/models"
 	"gopkg.in/yaml.v3"
 )
 
@@ -379,7 +379,7 @@ func saveSection(dir, filename string, data any) error {
 // atomicWrite writes data to a file atomically using temp file + os.Rename.
 func atomicWrite(path string, data []byte) error {
 	dir := filepath.Dir(path)
-	tmp, err := os.CreateTemp(dir, ".moai-config-*.tmp")
+	tmp, err := os.CreateTemp(dir, ".ae-config-*.tmp")
 	if err != nil {
 		return fmt.Errorf("create temp file: %w", err)
 	}

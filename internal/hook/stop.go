@@ -9,8 +9,8 @@ import (
 // defaultCompletionMarkers is the list of default completion markers.
 // These are markers that Claude includes in output when a task is complete.
 var defaultCompletionMarkers = []string{
-	"<moai>DONE</moai>",
-	"<moai>COMPLETE</moai>",
+	"<ae>DONE</ae>",
+	"<ae>COMPLETE</ae>",
 }
 
 // stopHandler processes Stop events.

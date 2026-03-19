@@ -2,7 +2,7 @@
   "version": "2.1.0",
   "schema_updated": "2025-12-22",
   "config_version": "0.29.0",
-  "description": "Tab-based configuration schema for /moai:0-project with INITIALIZATION mode (Tab 0) and SETTINGS mode (Tabs 1-5) support",
+  "description": "Tab-based configuration schema for /ae:0-project with INITIALIZATION mode (Tab 0) and SETTINGS mode (Tabs 1-5) support",
   "total_settings": 60,
   "total_tabs": 6,
   "total_batches": 18,
@@ -163,7 +163,7 @@
               "required": true
             },
             {
-              "question": "What language should MoAI use in conversations? (current: {{language.conversation_language}})",
+              "question": "What language should AE use in conversations? (current: {{language.conversation_language}})",
               "header": "Conversation Language",
               "field": "language.conversation_language",
               "type": "select_single",
@@ -1194,18 +1194,18 @@
     {
       "id": "tab_5_system",
       "label": "Tab 5: System Settings",
-      "description": "Configure MoAI system settings (version check, cache). GitHub automation moved to Tab 3.",
+      "description": "Configure AE system settings (version check, cache). GitHub automation moved to Tab 3.",
       "priority": "OPTIONAL",
       "batches": [
         {
           "batch_id": "5.1",
-          "label": "MoAI System Settings",
+          "label": "AE System Settings",
           "conditional": false,
           "questions": [
             {
-              "question": "MoAI version check frequency? (current: {{moai.update_check_frequency}})",
+              "question": "AE version check frequency? (current: {{ae.update_check_frequency}})",
               "header": "Update Check",
-              "field": "moai.update_check_frequency",
+              "field": "ae.update_check_frequency",
               "type": "select_single",
               "multiSelect": false,
               "options": [
@@ -1225,13 +1225,13 @@
                   "value": "never"
                 }
               ],
-              "current_value_path": "moai.update_check_frequency",
+              "current_value_path": "ae.update_check_frequency",
               "required": true
             },
             {
-              "question": "Enable version checking? (current: {{moai.version_check.enabled}})",
+              "question": "Enable version checking? (current: {{ae.version_check.enabled}})",
               "header": "Version Check",
-              "field": "moai.version_check.enabled",
+              "field": "ae.version_check.enabled",
               "type": "select_single",
               "multiSelect": false,
               "options": [
@@ -1246,13 +1246,13 @@
                   "value": false
                 }
               ],
-              "current_value_path": "moai.version_check.enabled",
+              "current_value_path": "ae.version_check.enabled",
               "required": true
             },
             {
-              "question": "Version check cache TTL hours? (current: {{moai.version_check.cache_ttl_hours}})",
+              "question": "Version check cache TTL hours? (current: {{ae.version_check.cache_ttl_hours}})",
               "header": "Cache TTL",
-              "field": "moai.version_check.cache_ttl_hours",
+              "field": "ae.version_check.cache_ttl_hours",
               "type": "number_input",
               "multiSelect": false,
               "options": [
@@ -1267,7 +1267,7 @@
                   "value": "{{prompt_user}}"
                 }
               ],
-              "current_value_path": "moai.version_check.cache_ttl_hours",
+              "current_value_path": "ae.version_check.cache_ttl_hours",
               "required": true
             }
           ]
@@ -1404,7 +1404,7 @@
   },
   "implementation_notes": {
     "conditional_batches": "Batches in Tab 3 show/hide based on git_strategy.mode selection",
-    "atomic_updates": "All updates delegated to UnifiedConfigManager from moai-workflow-project skill",
+    "atomic_updates": "All updates delegated to UnifiedConfigManager from ae-workflow-project skill",
     "backup_rollback": "Manager handles backup/rollback internally, not in command",
     "validation_checkpoints": "Run validation after Tab 1, Tab 3, and before final update",
     "language_aware": "All user-facing questions use conversation_language, no emojis in AskUserQuestion"

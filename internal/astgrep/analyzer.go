@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/modu-ai/moai-adk/internal/foundation"
+	"github.com/AngeleyesTrue/ae-adk/internal/foundation"
 )
 
 // Timeouts for sg CLI operations.

@@ -1,5 +1,5 @@
 #!/bin/bash
-# MoAI-ADK Go Edition Installer
+# AE-ADK Go Edition Installer
 # This script detects your platform and downloads the appropriate binary
 
 set -e
@@ -71,7 +71,7 @@ detect_platform() {
 
 # Get latest Go edition version from GitHub
 get_latest_version() {
-    local version_url="https://api.github.com/repos/modu-ai/ae-adk/releases"
+    local version_url="https://api.github.com/repos/AngeleyesTrue/ae-adk/releases"
 
     if command -v curl &> /dev/null; then
         # Try go-v* tags first, then fall back to v* tags
@@ -87,7 +87,7 @@ get_latest_version() {
         print_error "Failed to fetch latest Go edition version from GitHub"
         print_info "No releases found. You can:"
         echo "  1. Install a specific version: $0 --version 2.0.0"
-        echo "  2. Install from source: go install github.com/modu-ai/ae-adk/cmd/ae@latest"
+        echo "  2. Install from source: go install github.com/AngeleyesTrue/ae-adk/cmd/ae@latest"
         exit 1
     fi
 
@@ -111,8 +111,8 @@ download_binary() {
 
     # Build archive filename matching goreleaser format
     local archive_name="ae-adk_${version}_${os}_${arch}.${ext}"
-    local download_url="https://github.com/modu-ai/ae-adk/releases/download/v${version}/${archive_name}"
-    local checksum_url="https://github.com/modu-ai/ae-adk/releases/download/v${version}/checksums.txt"
+    local download_url="https://github.com/AngeleyesTrue/ae-adk/releases/download/v${version}/${archive_name}"
+    local checksum_url="https://github.com/AngeleyesTrue/ae-adk/releases/download/v${version}/checksums.txt"
 
     # Create temp directory
     TMP_DIR=$(mktemp -d)
@@ -260,7 +260,7 @@ install_binary() {
 # Verify installation
 verify_installation() {
     if command -v ae &> /dev/null; then
-        print_success "MoAI-ADK installed successfully!"
+        print_success "AE-ADK installed successfully!"
         echo ""
         ae version
         echo ""
@@ -286,7 +286,7 @@ verify_installation() {
 main() {
     echo ""
     echo "╔══════════════════════════════════════════════════════════════╗"
-    echo "║          MoAI's Agentic Development Kit Installer           ║"
+    echo "║          AngelEyes Agentic Development Kit Installer           ║"
     echo "╚══════════════════════════════════════════════════════════════╝"
     echo ""
 
@@ -345,7 +345,7 @@ main() {
     echo ""
     print_success "Installation complete!"
     echo ""
-    print_info "Documentation: https://github.com/modu-ai/ae-adk"
+    print_info "Documentation: https://github.com/AngeleyesTrue/ae-adk"
 }
 
 # Run main function

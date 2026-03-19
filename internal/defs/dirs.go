@@ -9,10 +9,10 @@ const (
 	ClaudeDir = ".claude"
 
 	// BackupsDir is the directory where project backups are stored.
-	BackupsDir = ".moai-backups"
+	BackupsDir = ".ae-backups"
 )
 
-// MoAI subdirectory segments (relative to AEDir).
+// AE subdirectory segments (relative to AEDir).
 const (
 	ConfigSubdir   = "config"
 	SectionsSubdir = "config/sections"
@@ -25,10 +25,10 @@ const (
 
 // Claude subdirectory segments (relative to ClaudeDir).
 const (
-	AgentsMoaiSubdir   = "agents/ae"
+	AgentsAESubdir     = "agents/ae"
 	SkillsSubdir       = "skills"
-	CommandsMoaiSubdir = "commands/ae"
-	RulesMoaiSubdir    = "rules/ae"
+	CommandsAESubdir   = "commands/ae"
+	RulesAESubdir      = "rules/ae"
 	OutputStylesSubdir = "output-styles"
-	HooksMoaiSubdir    = "hooks/ae"
+	HooksAESubdir      = "hooks/ae"
 )

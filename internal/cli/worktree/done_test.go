@@ -3,7 +3,7 @@ package worktree
 import (
 	"testing"
 
-	"github.com/modu-ai/moai-adk/internal/core/git"
+	"github.com/AngeleyesTrue/ae-adk/internal/core/git"
 )
 
 // TestRunDoneWithAutoMode_AfterMerge tests auto-cleanup after PR merge.

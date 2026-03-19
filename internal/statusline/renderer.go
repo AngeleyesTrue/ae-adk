@@ -54,7 +54,7 @@ func NewRenderer(themeName string, noColor bool, segmentConfig map[string]bool) 
 // @MX:REASON: Public API boundary; contains mode routing logic
 func (r *Renderer) Render(data *StatusData, mode StatuslineMode) string {
 	if data == nil {
-		return "MoAI"
+		return "AE"
 	}
 
 	// Normalize deprecated mode names to v3 names
@@ -69,7 +69,7 @@ func (r *Renderer) Render(data *StatusData, mode StatuslineMode) string {
 	}
 
 	if result == "" {
-		return "MoAI"
+		return "AE"
 	}
 	return result
 }
@@ -115,13 +115,13 @@ func (r *Renderer) joinSegments(segments []string) string {
 
 // renderDefaultV3 renders the default mode 3-line layout.
 //
-// L1: 🤖 Model │ 🔅 v2.1.50 │ 🗿 v2.8.0 │ ⏳ 2h 34m │ 💬 MoAI
+// L1: 🤖 Model │ 🔅 v2.1.50 │ 🗿 v2.8.0 │ ⏳ 2h 34m │ 💬 AE
 // L2: CW: 🪫 ██████████ 88% │ 5H: 🔋 ██████████ 45% │ 7D: 🪫 ██████████ 82%
 // L3: 📁 ae-adk-go │ 🔀 feat/auth ↑2↓1 │ 📊 +3 M2 ?1
 func (r *Renderer) renderDefaultV3(data *StatusData) string {
 	var lines []string
 
-	// L1: model, Claude version, MoAI version, session time, output style
+	// L1: model, Claude version, AE version, session time, output style
 	l1 := r.renderInfoLine(data, false)
 	if l1 != "" {
 		lines = append(lines, l1)
@@ -147,7 +147,7 @@ func (r *Renderer) renderDefaultV3(data *StatusData) string {
 
 // renderFullV3 renders the full mode 5-line layout.
 //
-// L1: 🤖 Model │ 🔅 v2.1.50 │ 🗿 v2.8.0 │ ⏳ 2h 34m │ 💬 MoAI
+// L1: 🤖 Model │ 🔅 v2.1.50 │ 🗿 v2.8.0 │ ⏳ 2h 34m │ 💬 AE
 // L2: CW: 🪫 ████████████████████████████████████░░░░ 88%
 // L3: 5H: 🔋 ██████████████████░░░░░░░░░░░░░░░░░░░░░░ 45%
 // L4: 7D: 🪫 ████████████████████████████████░░░░░░░░ 82%
@@ -155,7 +155,7 @@ func (r *Renderer) renderDefaultV3(data *StatusData) string {
 func (r *Renderer) renderFullV3(data *StatusData) string {
 	var lines []string
 
-	// L1: model, Claude version, MoAI version, session time, output style (no prefix)
+	// L1: model, Claude version, AE version, session time, output style (no prefix)
 	l1 := r.renderInfoLine(data, false)
 	if l1 != "" {
 		lines = append(lines, l1)
@@ -202,7 +202,7 @@ func (r *Renderer) renderFullV3(data *StatusData) string {
 // ─────────────────────────────────────────────────────────────────────────────
 
 // renderInfoLine renders the L1 info line (shared by default/full).
-// withPrefix=true: full mode format ("Claude v...", "MoAI v...")
+// withPrefix=true: full mode format ("Claude v...", "AE v...")
 // withPrefix=false: default mode format ("v...")
 func (r *Renderer) renderInfoLine(data *StatusData, withPrefix bool) string {
 	var segs []string
@@ -221,11 +221,11 @@ func (r *Renderer) renderInfoLine(data *StatusData, withPrefix bool) string {
 		}
 	}
 
-	// MoAI version
-	if r.isSegmentEnabled(SegmentMoaiVersion) && data.Version.Available && data.Version.Current != "" {
+	// AE version
+	if r.isSegmentEnabled(SegmentAEVersion) && data.Version.Available && data.Version.Current != "" {
 		var versionStr string
 		if withPrefix {
-			versionStr = fmt.Sprintf("🗿 MoAI v%s", data.Version.Current)
+			versionStr = fmt.Sprintf("🗿 AE v%s", data.Version.Current)
 		} else {
 			versionStr = fmt.Sprintf("🗿 v%s", data.Version.Current)
 		}

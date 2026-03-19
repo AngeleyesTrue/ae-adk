@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/modu-ai/moai-adk/internal/core/quality"
-	"github.com/modu-ai/moai-adk/internal/git"
-	"github.com/modu-ai/moai-adk/internal/i18n"
+	"github.com/AngeleyesTrue/ae-adk/internal/core/quality"
+	"github.com/AngeleyesTrue/ae-adk/internal/git"
+	"github.com/AngeleyesTrue/ae-adk/internal/i18n"
 )
 
 // TestIntegration_ParseIssue_ToBranchDetection validates the cross-package flow

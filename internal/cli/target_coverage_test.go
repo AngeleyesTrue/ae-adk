@@ -27,8 +27,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/modu-ai/moai-adk/internal/config"
-	"github.com/modu-ai/moai-adk/pkg/version"
+	"github.com/AngeleyesTrue/ae-adk/internal/config"
+	"github.com/AngeleyesTrue/ae-adk/pkg/version"
 	"github.com/spf13/cobra"
 )
 
@@ -224,7 +224,7 @@ func TestRunTemplateSyncWithProgress_VersionMatchSkips(t *testing.T) {
 	if err := os.MkdirAll(sectionsDir, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	systemYAML := fmt.Sprintf("moai:\n  template_version: %s\n", currentVersion)
+	systemYAML := fmt.Sprintf("ae:\n  template_version: %s\n", currentVersion)
 	if err := os.WriteFile(filepath.Join(sectionsDir, "system.yaml"), []byte(systemYAML), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -273,7 +273,7 @@ func TestRunTemplateSyncWithProgress_ForceFlagBypassesVersionCheck(t *testing.T)
 	if err := os.MkdirAll(sectionsDir, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(sectionsDir, "system.yaml"), []byte("moai:\n  template_version: v0.0.1\n"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(sectionsDir, "system.yaml"), []byte("ae:\n  template_version: v0.0.1\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -963,11 +963,11 @@ func TestRunPrePush_EnforcementDisabled_ReturnsNilImmediately(t *testing.T) {
 }
 
 // =============================================================================
-// backupMoaiConfig — success path: config dir exists
+// backupAEConfig — success path: config dir exists
 // (update.go:977 — at 66.7%)
 // =============================================================================
 
-func TestBackupMoaiConfig_ConfigDirExists(t *testing.T) {
+func TestBackupAEConfig_ConfigDirExists(t *testing.T) {
 	t.Parallel()
 
 	tmpDir := t.TempDir()
@@ -981,34 +981,34 @@ func TestBackupMoaiConfig_ConfigDirExists(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	backupDir, err := backupMoaiConfig(tmpDir)
+	backupDir, err := backupAEConfig(tmpDir)
 	if err != nil {
-		t.Fatalf("backupMoaiConfig error: %v", err)
+		t.Fatalf("backupAEConfig error: %v", err)
 	}
 	if backupDir == "" {
-		t.Error("backupMoaiConfig should return non-empty backup dir when config exists")
+		t.Error("backupAEConfig should return non-empty backup dir when config exists")
 	}
 	if _, statErr := os.Stat(backupDir); statErr != nil {
 		t.Errorf("backup directory should exist, got stat error: %v", statErr)
 	}
 }
 
-func TestBackupMoaiConfig_ConfigDirNotExist(t *testing.T) {
+func TestBackupAEConfig_ConfigDirNotExist(t *testing.T) {
 	t.Parallel()
 
 	tmpDir := t.TempDir()
 	// No .ae/config dir
 
-	backupDir, err := backupMoaiConfig(tmpDir)
+	backupDir, err := backupAEConfig(tmpDir)
 	if err != nil {
-		t.Fatalf("backupMoaiConfig should not error when config dir missing, got: %v", err)
+		t.Fatalf("backupAEConfig should not error when config dir missing, got: %v", err)
 	}
 	if backupDir != "" {
 		t.Errorf("backupDir should be empty when config dir doesn't exist, got %q", backupDir)
 	}
 }
 
-func TestBackupMoaiConfig_PathIsFile(t *testing.T) {
+func TestBackupAEConfig_PathIsFile(t *testing.T) {
 	t.Parallel()
 
 	tmpDir := t.TempDir()
@@ -1021,9 +1021,9 @@ func TestBackupMoaiConfig_PathIsFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err := backupMoaiConfig(tmpDir)
+	_, err := backupAEConfig(tmpDir)
 	if err == nil {
-		t.Error("backupMoaiConfig should error when config path is a file, not a directory")
+		t.Error("backupAEConfig should error when config path is a file, not a directory")
 	}
 	if !strings.Contains(err.Error(), "not a directory") {
 		t.Errorf("error should mention 'not a directory', got: %v", err)
@@ -1031,23 +1031,23 @@ func TestBackupMoaiConfig_PathIsFile(t *testing.T) {
 }
 
 // =============================================================================
-// cleanMoaiManagedPaths — success path with non-existent targets (all skip)
+// cleanAEManagedPaths — success path with non-existent targets (all skip)
 // (update.go:1160 — at 67.6%)
 // =============================================================================
 
-func TestCleanMoaiManagedPaths_AllTargetsAbsent(t *testing.T) {
+func TestCleanAEManagedPaths_AllTargetsAbsent(t *testing.T) {
 	t.Parallel()
 
 	tmpDir := t.TempDir()
 	var buf bytes.Buffer
 
-	err := cleanMoaiManagedPaths(tmpDir, &buf)
+	err := cleanAEManagedPaths(tmpDir, &buf)
 	if err != nil {
-		t.Fatalf("cleanMoaiManagedPaths error: %v", err)
+		t.Fatalf("cleanAEManagedPaths error: %v", err)
 	}
 }
 
-func TestCleanMoaiManagedPaths_WithExistingTarget(t *testing.T) {
+func TestCleanAEManagedPaths_WithExistingTarget(t *testing.T) {
 	t.Parallel()
 
 	tmpDir := t.TempDir()
@@ -1061,9 +1061,9 @@ func TestCleanMoaiManagedPaths_WithExistingTarget(t *testing.T) {
 	}
 
 	var buf bytes.Buffer
-	err := cleanMoaiManagedPaths(tmpDir, &buf)
+	err := cleanAEManagedPaths(tmpDir, &buf)
 	if err != nil {
-		t.Fatalf("cleanMoaiManagedPaths error: %v", err)
+		t.Fatalf("cleanAEManagedPaths error: %v", err)
 	}
 }
 
@@ -1094,11 +1094,11 @@ func TestSaveTemplateDefaults_CreatesSubdirs(t *testing.T) {
 }
 
 // =============================================================================
-// restoreMoaiConfigLegacy — success path: walk with real files
+// restoreAEConfigLegacy — success path: walk with real files
 // (update.go:1411 — at 71.4%)
 // =============================================================================
 
-func TestRestoreMoaiConfigLegacy_WithFiles(t *testing.T) {
+func TestRestoreAEConfigLegacy_WithFiles(t *testing.T) {
 	t.Parallel()
 
 	tmpDir := t.TempDir()
@@ -1119,9 +1119,9 @@ func TestRestoreMoaiConfigLegacy_WithFiles(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err := restoreMoaiConfigLegacy(tmpDir, backupDir, configDir)
+	err := restoreAEConfigLegacy(tmpDir, backupDir, configDir)
 	if err != nil {
-		t.Fatalf("restoreMoaiConfigLegacy error: %v", err)
+		t.Fatalf("restoreAEConfigLegacy error: %v", err)
 	}
 
 	// Verify the restored file exists
@@ -1131,7 +1131,7 @@ func TestRestoreMoaiConfigLegacy_WithFiles(t *testing.T) {
 	}
 }
 
-func TestRestoreMoaiConfigLegacy_MergesExistingFile(t *testing.T) {
+func TestRestoreAEConfigLegacy_MergesExistingFile(t *testing.T) {
 	t.Parallel()
 
 	tmpDir := t.TempDir()
@@ -1154,9 +1154,9 @@ func TestRestoreMoaiConfigLegacy_MergesExistingFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err := restoreMoaiConfigLegacy(tmpDir, backupDir, configDir)
+	err := restoreAEConfigLegacy(tmpDir, backupDir, configDir)
 	if err != nil {
-		t.Fatalf("restoreMoaiConfigLegacy error: %v", err)
+		t.Fatalf("restoreAEConfigLegacy error: %v", err)
 	}
 
 	// Verify the file was merged
@@ -1169,7 +1169,7 @@ func TestRestoreMoaiConfigLegacy_MergesExistingFile(t *testing.T) {
 	}
 }
 
-func TestRestoreMoaiConfigLegacy_SkipsMetadataFile(t *testing.T) {
+func TestRestoreAEConfigLegacy_SkipsMetadataFile(t *testing.T) {
 	t.Parallel()
 
 	tmpDir := t.TempDir()
@@ -1187,9 +1187,9 @@ func TestRestoreMoaiConfigLegacy_SkipsMetadataFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err := restoreMoaiConfigLegacy(tmpDir, backupDir, configDir)
+	err := restoreAEConfigLegacy(tmpDir, backupDir, configDir)
 	if err != nil {
-		t.Fatalf("restoreMoaiConfigLegacy error: %v", err)
+		t.Fatalf("restoreAEConfigLegacy error: %v", err)
 	}
 
 	// Metadata file should NOT be restored to config dir
@@ -1403,11 +1403,11 @@ func TestNewRankLoginCmd_WithCancelledContext(t *testing.T) {
 }
 
 // =============================================================================
-// checkMoAIConfig — verbose=true with .ae/config/sections/ present
+// checkAEConfig — verbose=true with .ae/config/sections/ present
 // (doctor.go:192 — check OK + verbose detail path)
 // =============================================================================
 
-func TestCheckMoAIConfig_VerboseOKPath(t *testing.T) {
+func TestCheckAEConfig_VerboseOKPath(t *testing.T) {
 	// Cannot use t.Parallel() — uses os.Chdir
 	tmpDir := t.TempDir()
 
@@ -1422,12 +1422,12 @@ func TestCheckMoAIConfig_VerboseOKPath(t *testing.T) {
 	}
 	t.Cleanup(func() { _ = os.Chdir(oldWd) })
 
-	check := checkMoAIConfig(true)
+	check := checkAEConfig(true)
 	if check.Status != CheckOK {
-		t.Logf("checkMoAIConfig status=%v (may depend on cwd state)", check.Status)
+		t.Logf("checkAEConfig status=%v (may depend on cwd state)", check.Status)
 	}
 	if check.Status == CheckOK && check.Detail == "" {
-		t.Error("verbose checkMoAIConfig with OK status should have non-empty Detail")
+		t.Error("verbose checkAEConfig with OK status should have non-empty Detail")
 	}
 }
 
@@ -1462,7 +1462,7 @@ func TestCheckClaudeConfig_VerboseOKPath(t *testing.T) {
 
 // =============================================================================
 // runDoctor — fix=true with failCount > 0 (doctor.go:95)
-// Run in a dir without .moai — MoAI Config check returns CheckWarn (not Fail)
+// Run in a dir without .ae — AE Config check returns CheckWarn (not Fail)
 // Trigger CheckFail by running in a minimal tmpDir
 // =============================================================================
 
@@ -1504,7 +1504,7 @@ func TestRunDoctor_FixWithFailures(t *testing.T) {
 // (cc.go:160 — at 75.0%)
 // =============================================================================
 
-func TestCleanupMoaiWorktrees_InGitRepoNoMoaiWorktrees(t *testing.T) {
+func TestCleanupAEWorktrees_InGitRepoNoAEWorktrees(t *testing.T) {
 	t.Parallel()
 
 	tmpDir := t.TempDir()
@@ -1533,7 +1533,7 @@ func TestCleanupMoaiWorktrees_InGitRepoNoMoaiWorktrees(t *testing.T) {
 	}
 
 	// Run cleanupAeWorktrees — should traverse the git worktree list
-	// but find no moai worker worktrees
+	// but find no ae worker worktrees
 	result := cleanupAeWorktrees(tmpDir)
 	if result != "" {
 		t.Logf("cleanupAeWorktrees result: %q (no worker worktrees expected)", result)
@@ -1625,7 +1625,7 @@ func TestRunShellEnvConfig_FreshHome(t *testing.T) {
 func TestRunPrePush_EnforcementEnabled_EmptyStdin(t *testing.T) {
 	// Cannot use t.Parallel() — uses t.Setenv + os.Chdir
 	tmpDir := t.TempDir()
-	// Create a minimal .moai structure so convention loads (or fails gracefully)
+	// Create a minimal .ae structure so convention loads (or fails gracefully)
 	if err := os.MkdirAll(filepath.Join(tmpDir, ".ae", "config"), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -1665,7 +1665,7 @@ func TestGetProjectConfigVersion_WithValidSystemYAML(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Write system.yaml with a template_version
-	systemYAML := []byte("moai:\n  template_version: \"v2.0.0\"\n  version: \"v2.0.0\"\n")
+	systemYAML := []byte("ae:\n  template_version: \"v2.0.0\"\n  version: \"v2.0.0\"\n")
 	if err := os.WriteFile(filepath.Join(sectionsDir, "system.yaml"), systemYAML, 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -1718,7 +1718,7 @@ func TestEnsureSettingsLocalJSON_CreatesNew(t *testing.T) {
 // Simulates the path at cc.go:188 that checks worktree paths
 // =============================================================================
 
-func TestCleanupMoaiWorktrees_ParsesPorcelainOutput(t *testing.T) {
+func TestCleanupAEWorktrees_ParsesPorcelainOutput(t *testing.T) {
 	t.Parallel()
 
 	tmpDir := t.TempDir()
@@ -1743,11 +1743,11 @@ func TestCleanupMoaiWorktrees_ParsesPorcelainOutput(t *testing.T) {
 		t.Skipf("git commit failed: %v", err)
 	}
 
-	// The function should successfully list worktrees and find none matching the moai worker pattern
+	// The function should successfully list worktrees and find none matching the ae worker pattern
 	result := cleanupAeWorktrees(tmpDir)
-	// No moai worker worktrees → empty result
+	// No ae worker worktrees → empty result
 	if result != "" {
-		t.Logf("result: %q (moai worker worktrees found?)", result)
+		t.Logf("result: %q (ae worker worktrees found?)", result)
 	}
 	// Test coverage: the function executed up to the parsing loop
 }

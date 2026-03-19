@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/modu-ai/moai-adk/internal/defs"
+	"github.com/AngeleyesTrue/ae-adk/internal/defs"
 )
 
 // manifestFileName is an alias for defs.ManifestJSON kept for test compatibility.

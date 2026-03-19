@@ -1,11 +1,11 @@
 # System Configuration
-# MoAI-ADK system-level settings
+# AE-ADK system-level settings
 
-moai:
-  # MoAI-ADK version
+ae:
+  # AE-ADK version
   version: "{{.Version}}"
 
-  # Template version (updated by moai update)
+  # Template version (updated by ae update)
   template_version: "{{.Version}}"
 
   # Version update check frequency (daily, weekly, never)
@@ -61,7 +61,7 @@ document_management:
     # Documentation directory (no auto-deletion)
     docs:
       # Base directory for documentation files
-      base: .moai/docs/
+      base: .ae/docs/
 
       # Retention period in days (null = never delete)
       retention_days: null
@@ -69,7 +69,7 @@ document_management:
     # Logs directory (runtime data)
     logs:
       # Base directory for log files
-      base: .moai/logs/
+      base: .ae/logs/
 
       # Retention period in days (30 days default)
       retention_days: 30
@@ -77,7 +77,7 @@ document_management:
     # Temporary files directory
     temp:
       # Base directory for temporary files
-      base: .moai/temp/
+      base: .ae/temp/
 
       # Retention period in days (7 days default)
       retention_days: 7
@@ -88,7 +88,7 @@ document_management:
     # Cache directory
     cache:
       # Base directory for cache files
-      base: .moai/cache/
+      base: .ae/cache/
 
       # Retention period in days (30 days default)
       retention_days: 30

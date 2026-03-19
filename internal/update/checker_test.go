@@ -284,7 +284,7 @@ c3645d112038a45dac052c44dd21f7554466f34e8dfb3e170911d8311b1fa7f4  ae-adk_1.2.0_w
 		TagName:     "v1.2.0",
 		PublishedAt: time.Date(2026, 1, 15, 0, 0, 0, 0, time.UTC),
 		Assets: []githubAsset{
-			{Name: archiveName, BrowserDownloadURL: "https://example.com/moai.tar.gz"},
+			{Name: archiveName, BrowserDownloadURL: "https://example.com/ae.tar.gz"},
 			{Name: "checksums.txt", BrowserDownloadURL: checksumsTS.URL},
 		},
 	}
@@ -329,7 +329,7 @@ func TestChecker_CheckLatest_ChecksumDownloadFailed(t *testing.T) {
 		TagName:     "v1.2.0",
 		PublishedAt: time.Date(2026, 1, 15, 0, 0, 0, 0, time.UTC),
 		Assets: []githubAsset{
-			{Name: archiveName, BrowserDownloadURL: "https://example.com/moai.tar.gz"},
+			{Name: archiveName, BrowserDownloadURL: "https://example.com/ae.tar.gz"},
 			{Name: "checksums.txt", BrowserDownloadURL: checksumsTS.URL},
 		},
 	}

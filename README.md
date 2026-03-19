@@ -108,7 +108,7 @@ AE-ADK implements the **Harness Engineering** paradigm — designing the environ
 #### macOS / Linux / WSL
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/modu-ai/ae-adk/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/AngeleyesTrue/ae-adk/main/install.sh | bash
 ```
 
 #### Windows (PowerShell 7.x+)
@@ -116,7 +116,7 @@ curl -fsSL https://raw.githubusercontent.com/modu-ai/ae-adk/main/install.sh | ba
 > **Recommended**: Use WSL with the Linux installation command above for the best experience.
 
 ```powershell
-irm https://raw.githubusercontent.com/modu-ai/ae-adk/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/AngeleyesTrue/ae-adk/main/install.ps1 | iex
 ```
 
 > Requires [Git for Windows](https://gitforwindows.org/) to be installed first.

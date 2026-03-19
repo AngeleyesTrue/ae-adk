@@ -14,10 +14,10 @@ import (
 
 	"log/slog"
 
-	"github.com/modu-ai/moai-adk/internal/config"
-	"github.com/modu-ai/moai-adk/internal/hook"
-	"github.com/modu-ai/moai-adk/internal/rank"
-	"github.com/modu-ai/moai-adk/internal/update"
+	"github.com/AngeleyesTrue/ae-adk/internal/config"
+	"github.com/AngeleyesTrue/ae-adk/internal/hook"
+	"github.com/AngeleyesTrue/ae-adk/internal/rank"
+	"github.com/AngeleyesTrue/ae-adk/internal/update"
 )
 
 // --- Hook command coverage tests ---
@@ -963,7 +963,7 @@ func TestCheckGit_Verbose(t *testing.T) {
 	}
 }
 
-func TestCheckMoAIConfig_Verbose(t *testing.T) {
+func TestCheckAEConfig_Verbose(t *testing.T) {
 	tmpDir := t.TempDir()
 	if err := os.MkdirAll(filepath.Join(tmpDir, ".ae", "config", "sections"), 0o755); err != nil {
 		t.Fatal(err)
@@ -982,7 +982,7 @@ func TestCheckMoAIConfig_Verbose(t *testing.T) {
 		}
 	}()
 
-	check := checkMoAIConfig(true)
+	check := checkAEConfig(true)
 	if check.Status != CheckOK {
 		t.Errorf("status = %q, want ok", check.Status)
 	}
@@ -994,7 +994,7 @@ func TestCheckMoAIConfig_Verbose(t *testing.T) {
 	}
 }
 
-func TestCheckMoAIConfig_MissingSections(t *testing.T) {
+func TestCheckAEConfig_MissingSections(t *testing.T) {
 	tmpDir := t.TempDir()
 	// Create .ae/ but not .ae/config/sections/
 	if err := os.MkdirAll(filepath.Join(tmpDir, ".ae"), 0o755); err != nil {
@@ -1014,7 +1014,7 @@ func TestCheckMoAIConfig_MissingSections(t *testing.T) {
 		}
 	}()
 
-	check := checkMoAIConfig(false)
+	check := checkAEConfig(false)
 	if check.Status != CheckWarn {
 		t.Errorf("status = %q, want warn for missing sections", check.Status)
 	}
@@ -1083,7 +1083,7 @@ func TestCheckClaudeConfig_Verbose(t *testing.T) {
 }
 
 func TestRunDoctor_FixFlag(t *testing.T) {
-	// Run in a tmpDir with no .moai so MoAI Config check produces a warn
+	// Run in a tmpDir with no .ae so AE Config check produces a warn
 	tmpDir := t.TempDir()
 	origDir, err := os.Getwd()
 	if err != nil {
@@ -1166,7 +1166,7 @@ func TestRunDoctor_CheckFilter(t *testing.T) {
 		t.Errorf("output should contain filtered check name, got %q", output)
 	}
 	// Should NOT contain other checks
-	if strings.Contains(output, "MoAI Config") {
+	if strings.Contains(output, "AE Config") {
 		t.Errorf("output should not contain unfiltered checks, got %q", output)
 	}
 }
@@ -1281,7 +1281,7 @@ func TestRunInit_WithNameAndLanguage(t *testing.T) {
 
 // --- Helper functions ---
 
-// setupMinimalConfig creates a minimal .moai config directory for testing.
+// setupMinimalConfig creates a minimal .ae config directory for testing.
 func setupMinimalConfig(t *testing.T, dir string) {
 	t.Helper()
 	sectionsDir := filepath.Join(dir, ".ae", "config", "sections")
@@ -1311,7 +1311,7 @@ func setupMinimalConfig(t *testing.T, dir string) {
 	}
 }
 
-// setupMinimalConfigWithMode creates a minimal .moai config with a specific mode.
+// setupMinimalConfigWithMode creates a minimal .ae config with a specific mode.
 // Currently unused but kept for future test expansions.
 func setupMinimalConfigWithMode(t *testing.T, dir string, mode string) { //nolint:unused
 	t.Helper()

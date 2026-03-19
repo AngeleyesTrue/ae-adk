@@ -192,10 +192,10 @@ func (t *Theme) RenderHighlight(text string) string {
 	return t.highlightStyle.Render(text)
 }
 
-// NewMoAIHuhTheme creates a huh.Theme styled with MoAI branding.
+// NewAEHuhTheme creates a huh.Theme styled with AE branding.
 // It uses AdaptiveColor for automatic light/dark mode support.
 // Pass noColor=true to return a plain unstyled theme for headless mode.
-func NewMoAIHuhTheme(noColor bool) *huh.Theme {
+func NewAEHuhTheme(noColor bool) *huh.Theme {
 	if noColor {
 		return huh.ThemeBase()
 	}
@@ -203,7 +203,7 @@ func NewMoAIHuhTheme(noColor bool) *huh.Theme {
 	t := huh.ThemeBase()
 
 	var (
-		// MoAI brand orange for focused/selected elements.
+		// AE brand orange for focused/selected elements.
 		primary = lipgloss.AdaptiveColor{Light: "#C45A3C", Dark: "#DA7756"}
 		// Purple for highlights and selectors.
 		secondary = lipgloss.AdaptiveColor{Light: "#5B21B6", Dark: "#7C3AED"}

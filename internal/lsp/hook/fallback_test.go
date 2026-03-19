@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/modu-ai/moai-adk/internal/resilience"
+	"github.com/AngeleyesTrue/ae-adk/internal/resilience"
 )
 
 // TestNewFallbackDiagnostics verifies fallback creation.

@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/modu-ai/moai-adk/internal/core/git"
+	"github.com/AngeleyesTrue/ae-adk/internal/core/git"
 )
 
 // setupMockProvider sets up a MockWorktreeProvider for testing
@@ -188,20 +188,20 @@ func TestTmuxSessionNamePattern(t *testing.T) {
 			name:        "standard SPEC-ID",
 			projectName: "ae-adk-go",
 			specID:      "SPEC-WORKTREE-002",
-			want:        "moai-ae-adk-go-SPEC-WORKTREE-002",
+			want:        "ae-ae-adk-go-SPEC-WORKTREE-002",
 		},
 		{
 			name:        "short project name",
 			projectName: "myproject",
 			specID:      "SPEC-AUTH-001",
-			want:        "moai-myproject-SPEC-AUTH-001",
+			want:        "ae-myproject-SPEC-AUTH-001",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange & Act & Assert
-			// R5.1: validate moai-{ProjectName}-{SPEC-ID} pattern
+			// R5.1: validate ae-{ProjectName}-{SPEC-ID} pattern
 			got := GenerateTmuxSessionName(tt.projectName, tt.specID)
 			if got != tt.want {
 				t.Errorf("GenerateTmuxSessionName() = %v, want %v", got, tt.want)

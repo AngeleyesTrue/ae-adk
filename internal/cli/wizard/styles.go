@@ -2,9 +2,9 @@ package wizard
 
 import "github.com/charmbracelet/lipgloss"
 
-// MoAI brand colors
+// AE brand colors
 const (
-	// ColorPrimary is the MoAI brand orange color.
+	// ColorPrimary is the AE brand orange color.
 	ColorPrimary = "#DA7756"
 	// ColorSecondary is a complementary color for highlights.
 	ColorSecondary = "#7C3AED"
@@ -52,7 +52,7 @@ type Styles struct {
 	Border lipgloss.Style
 }
 
-// NewStyles creates a new Styles instance with MoAI branding.
+// NewStyles creates a new Styles instance with AE branding.
 func NewStyles() *Styles {
 	return &Styles{
 		Title: lipgloss.NewStyle().

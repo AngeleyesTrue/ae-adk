@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"sync"
 
-	gitpkg "github.com/modu-ai/moai-adk/internal/core/git"
-	"github.com/modu-ai/moai-adk/pkg/version"
+	gitpkg "github.com/AngeleyesTrue/ae-adk/internal/core/git"
+	"github.com/AngeleyesTrue/ae-adk/pkg/version"
 )
 
 // defaultBuilder implements the Builder interface by orchestrating

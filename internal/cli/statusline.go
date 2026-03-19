@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/modu-ai/moai-adk/internal/statusline"
+	"github.com/AngeleyesTrue/ae-adk/internal/statusline"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )

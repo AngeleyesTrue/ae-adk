@@ -115,6 +115,6 @@ func TestRootCmd_SubcommandCount(t *testing.T) {
 
 func TestRootCmd_NoRunE(t *testing.T) {
 	if rootCmd.RunE != nil {
-		t.Error("rootCmd should not have RunE (bare moai shows help)")
+		t.Error("rootCmd should not have RunE (bare ae shows help)")
 	}
 }

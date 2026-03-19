@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/modu-ai/moai-adk/internal/defs"
+	"github.com/AngeleyesTrue/ae-adk/internal/defs"
 	"gopkg.in/yaml.v3"
 )
 
@@ -26,8 +26,8 @@ type ProjectValidator interface {
 	// Validate checks the overall project structure.
 	Validate(root string) (*ValidationResult, error)
 
-	// ValidateMoAI checks MoAI-specific configuration and file integrity.
-	ValidateMoAI(root string) (*ValidationResult, error)
+	// ValidateAE checks AE-specific configuration and file integrity.
+	ValidateAE(root string) (*ValidationResult, error)
 }
 
 // ValidationResult holds project validation outcomes.
@@ -67,7 +67,7 @@ var requiredClaudeDirs = []string{
 	"rules/ae",
 }
 
-// Validate checks the overall project structure for MoAI initialization.
+// Validate checks the overall project structure for AE initialization.
 func (v *projectValidator) Validate(root string) (*ValidationResult, error) {
 	root = filepath.Clean(root)
 	if err := validateRoot(root); err != nil {
@@ -106,14 +106,14 @@ func (v *projectValidator) Validate(root string) (*ValidationResult, error) {
 	return result, nil
 }
 
-// ValidateMoAI checks MoAI-specific configuration and file integrity.
-func (v *projectValidator) ValidateMoAI(root string) (*ValidationResult, error) {
+// ValidateAE checks AE-specific configuration and file integrity.
+func (v *projectValidator) ValidateAE(root string) (*ValidationResult, error) {
 	root = filepath.Clean(root)
 	if err := validateRoot(root); err != nil {
 		return nil, err
 	}
 
-	v.logger.Debug("validating MoAI structure", "root", root)
+	v.logger.Debug("validating AE structure", "root", root)
 
 	result := &ValidationResult{Valid: true}
 
@@ -212,7 +212,7 @@ func (v *projectValidator) validateJSONFile(path string, result *ValidationResul
 	}
 }
 
-// BackupExistingProject moves .ae/ to .moai-backups/{timestamp}/.
+// BackupExistingProject moves .ae/ to .ae-backups/{timestamp}/.
 // Returns the backup path or an error.
 func BackupExistingProject(root string) (string, error) {
 	root = filepath.Clean(root)

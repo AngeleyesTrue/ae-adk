@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/modu-ai/moai-adk/internal/config"
+	"github.com/AngeleyesTrue/ae-adk/internal/config"
 )
 
 // TestBuildGLMEnvVars verifies that buildGLMEnvVars produces the correct
@@ -733,9 +733,9 @@ func TestCGAutoResetsGLMMode(t *testing.T) {
 	}
 }
 
-// TestCleanupMoaiWorktrees verifies that cleanupAeWorktrees removes
+// TestCleanupAEWorktrees verifies that cleanupAeWorktrees removes
 // ae-related worktrees when called.
-func TestCleanupMoaiWorktrees(t *testing.T) {
+func TestCleanupAEWorktrees(t *testing.T) {
 	t.Setenv("AE_TEST_MODE", "1")
 
 	// Skip if not in a git repo (for CI environments)

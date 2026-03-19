@@ -21,7 +21,7 @@ func TestValidate(t *testing.T) {
 			wantValid: true,
 		},
 		{
-			name: "existing moai project is invalid",
+			name: "existing ae project is invalid",
 			setup: func(t *testing.T, root string) {
 				t.Helper()
 				mkDir(t, root, ".ae/config/sections")
@@ -104,7 +104,7 @@ func TestValidate_InvalidRoot(t *testing.T) {
 	}
 }
 
-func TestValidateMoAI(t *testing.T) {
+func TestValidateAE(t *testing.T) {
 	tests := []struct {
 		name       string
 		setup      func(t *testing.T, root string)
@@ -112,7 +112,7 @@ func TestValidateMoAI(t *testing.T) {
 		wantErrors []string
 	}{
 		{
-			name: "no moai directory is invalid",
+			name: "no ae directory is invalid",
 			setup: func(t *testing.T, root string) {
 				t.Helper()
 			},
@@ -120,7 +120,7 @@ func TestValidateMoAI(t *testing.T) {
 			wantErrors: []string{".ae/ directory not found"},
 		},
 		{
-			name: "complete moai structure is valid",
+			name: "complete ae structure is valid",
 			setup: func(t *testing.T, root string) {
 				t.Helper()
 				for _, dir := range requiredAEDirs {
@@ -177,9 +177,9 @@ func TestValidateMoAI(t *testing.T) {
 			tt.setup(t, root)
 
 			v := NewValidator(nil)
-			result, err := v.ValidateMoAI(root)
+			result, err := v.ValidateAE(root)
 			if err != nil {
-				t.Fatalf("ValidateMoAI() error = %v", err)
+				t.Fatalf("ValidateAE() error = %v", err)
 			}
 
 			if result.Valid != tt.wantValid {
@@ -196,7 +196,7 @@ func TestValidateMoAI(t *testing.T) {
 }
 
 func TestBackupExistingProject(t *testing.T) {
-	t.Run("backs up existing moai directory", func(t *testing.T) {
+	t.Run("backs up existing ae directory", func(t *testing.T) {
 		root := t.TempDir()
 		mkDir(t, root, ".ae/config/sections")
 		writeFile(t, root, ".ae/config/sections/user.yaml", "user:\n  name: test\n")
@@ -210,8 +210,8 @@ func TestBackupExistingProject(t *testing.T) {
 			t.Fatal("expected non-empty backup path")
 		}
 
-		if !strings.Contains(backupPath, ".moai-backups") {
-			t.Errorf("backup path %q does not contain .moai-backups", backupPath)
+		if !strings.Contains(backupPath, ".ae-backups") {
+			t.Errorf("backup path %q does not contain .ae-backups", backupPath)
 		}
 
 		// Verify original .ae/ no longer exists
@@ -231,7 +231,7 @@ func TestBackupExistingProject(t *testing.T) {
 		}
 	})
 
-	t.Run("returns empty for non-existing moai directory", func(t *testing.T) {
+	t.Run("returns empty for non-existing ae directory", func(t *testing.T) {
 		root := t.TempDir()
 		backupPath, err := BackupExistingProject(root)
 		if err != nil {
@@ -243,10 +243,10 @@ func TestBackupExistingProject(t *testing.T) {
 	})
 }
 
-func TestValidateMoAI_MissingClaudeDir(t *testing.T) {
+func TestValidateAE_MissingClaudeDir(t *testing.T) {
 	root := t.TempDir()
 
-	// Create complete .moai structure but no .claude
+	// Create complete .ae structure but no .claude
 	for _, dir := range requiredAEDirs {
 		mkDir(t, root, filepath.Join(".ae", dir))
 	}
@@ -255,9 +255,9 @@ func TestValidateMoAI_MissingClaudeDir(t *testing.T) {
 	writeFile(t, root, "CLAUDE.md", "# test\n")
 
 	v := NewValidator(nil)
-	result, err := v.ValidateMoAI(root)
+	result, err := v.ValidateAE(root)
 	if err != nil {
-		t.Fatalf("ValidateMoAI() error = %v", err)
+		t.Fatalf("ValidateAE() error = %v", err)
 	}
 
 	// Should be valid but with warnings about missing .claude
@@ -266,7 +266,7 @@ func TestValidateMoAI_MissingClaudeDir(t *testing.T) {
 	}
 }
 
-func TestValidateMoAI_MissingCLAUDEMD(t *testing.T) {
+func TestValidateAE_MissingCLAUDEMD(t *testing.T) {
 	root := t.TempDir()
 
 	for _, dir := range requiredAEDirs {
@@ -276,9 +276,9 @@ func TestValidateMoAI_MissingCLAUDEMD(t *testing.T) {
 	// No CLAUDE.md
 
 	v := NewValidator(nil)
-	result, err := v.ValidateMoAI(root)
+	result, err := v.ValidateAE(root)
 	if err != nil {
-		t.Fatalf("ValidateMoAI() error = %v", err)
+		t.Fatalf("ValidateAE() error = %v", err)
 	}
 
 	if !containsSubstring(result.Warnings, "CLAUDE.md not found") {
@@ -286,7 +286,7 @@ func TestValidateMoAI_MissingCLAUDEMD(t *testing.T) {
 	}
 }
 
-func TestValidateMoAI_MissingManifest(t *testing.T) {
+func TestValidateAE_MissingManifest(t *testing.T) {
 	root := t.TempDir()
 
 	for _, dir := range requiredAEDirs {
@@ -295,9 +295,9 @@ func TestValidateMoAI_MissingManifest(t *testing.T) {
 	// No manifest.json
 
 	v := NewValidator(nil)
-	result, err := v.ValidateMoAI(root)
+	result, err := v.ValidateAE(root)
 	if err != nil {
-		t.Fatalf("ValidateMoAI() error = %v", err)
+		t.Fatalf("ValidateAE() error = %v", err)
 	}
 
 	if !containsSubstring(result.Warnings, "manifest.json not found") {
@@ -305,7 +305,7 @@ func TestValidateMoAI_MissingManifest(t *testing.T) {
 	}
 }
 
-func TestValidateMoAI_NonYAMLFilesSkipped(t *testing.T) {
+func TestValidateAE_NonYAMLFilesSkipped(t *testing.T) {
 	root := t.TempDir()
 
 	for _, dir := range requiredAEDirs {
@@ -323,9 +323,9 @@ func TestValidateMoAI_NonYAMLFilesSkipped(t *testing.T) {
 	}
 
 	v := NewValidator(nil)
-	result, err := v.ValidateMoAI(root)
+	result, err := v.ValidateAE(root)
 	if err != nil {
-		t.Fatalf("ValidateMoAI() error = %v", err)
+		t.Fatalf("ValidateAE() error = %v", err)
 	}
 
 	if !result.Valid {
@@ -333,7 +333,7 @@ func TestValidateMoAI_NonYAMLFilesSkipped(t *testing.T) {
 	}
 }
 
-func TestValidateMoAI_ClaudeDirMissingSubdir(t *testing.T) {
+func TestValidateAE_ClaudeDirMissingSubdir(t *testing.T) {
 	root := t.TempDir()
 
 	for _, dir := range requiredAEDirs {
@@ -344,12 +344,12 @@ func TestValidateMoAI_ClaudeDirMissingSubdir(t *testing.T) {
 
 	// Create .claude but only some subdirs
 	mkDir(t, root, ".claude/skills")
-	// Missing agents/moai, commands/moai, rules/moai
+	// Missing agents/ae, commands/ae, rules/ae
 
 	v := NewValidator(nil)
-	result, err := v.ValidateMoAI(root)
+	result, err := v.ValidateAE(root)
 	if err != nil {
-		t.Fatalf("ValidateMoAI() error = %v", err)
+		t.Fatalf("ValidateAE() error = %v", err)
 	}
 
 	if !containsSubstring(result.Warnings, "missing directory: .claude/") {

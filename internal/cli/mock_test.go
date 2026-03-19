@@ -4,9 +4,9 @@ import (
 	"context"
 	"io"
 
-	"github.com/modu-ai/moai-adk/internal/hook"
-	"github.com/modu-ai/moai-adk/internal/rank"
-	"github.com/modu-ai/moai-adk/internal/update"
+	"github.com/AngeleyesTrue/ae-adk/internal/hook"
+	"github.com/AngeleyesTrue/ae-adk/internal/rank"
+	"github.com/AngeleyesTrue/ae-adk/internal/update"
 )
 
 // --- Mock implementations for CLI dependency testing ---
@@ -68,7 +68,7 @@ func (m *mockUpdateChecker) CheckLatest(ctx context.Context) (*update.VersionInf
 	if m.checkLatestFunc != nil {
 		return m.checkLatestFunc(ctx)
 	}
-	return &update.VersionInfo{Version: "1.0.0", URL: "https://example.com/moai-binary"}, nil
+	return &update.VersionInfo{Version: "1.0.0", URL: "https://example.com/ae-binary"}, nil
 }
 
 func (m *mockUpdateChecker) IsUpdateAvailable(current string) (bool, *update.VersionInfo, error) {

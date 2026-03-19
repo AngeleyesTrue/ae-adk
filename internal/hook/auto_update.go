@@ -59,7 +59,7 @@ func (h *autoUpdateHandler) EventType() EventType {
 //   - The registry's DefaultHookTimeout (30s) expires and ctx.Err() becomes
 //     non-nil, which would cause the registry to return ErrHookTimeout.
 //   - The Claude Code SessionStart hook timeout (30s in settings.json) elapses
-//     and the moai process is forcibly terminated, producing a hook error.
+//     and the ae process is forcibly terminated, producing a hook error.
 //
 // This prevents spurious "SessionStart:startup hook error" messages that
 // occur on Windows when the /model command triggers a new session start

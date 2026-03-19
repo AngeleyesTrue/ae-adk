@@ -8,8 +8,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/modu-ai/moai-adk/internal/defs"
-	lsphook "github.com/modu-ai/moai-adk/internal/lsp/hook"
+	"github.com/AngeleyesTrue/ae-adk/internal/defs"
+	lsphook "github.com/AngeleyesTrue/ae-adk/internal/lsp/hook"
 	"gopkg.in/yaml.v3"
 )
 

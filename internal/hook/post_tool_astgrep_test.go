@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	astgrep "github.com/modu-ai/moai-adk/internal/astgrep"
+	astgrep "github.com/AngeleyesTrue/ae-adk/internal/astgrep"
 )
 
 // makeToolInput safely JSON-encodes key-value pairs for use as ToolInput.

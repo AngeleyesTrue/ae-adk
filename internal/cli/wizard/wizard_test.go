@@ -483,10 +483,10 @@ func TestBuildQuestionGroup_WithCondition(t *testing.T) {
 	}
 }
 
-// --- newMoAIWizardTheme tests ---
+// --- newAEWizardTheme tests ---
 
-func TestNewMoAIWizardTheme_ReturnsNonNil(t *testing.T) {
-	theme := newMoAIWizardTheme()
+func TestNewAEWizardTheme_ReturnsNonNil(t *testing.T) {
+	theme := newAEWizardTheme()
 	if theme == nil {
 		t.Error("expected non-nil theme")
 	}

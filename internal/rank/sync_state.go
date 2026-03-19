@@ -1,4 +1,4 @@
-// Package rank provides sync state tracking for MoAI Rank session submission.
+// Package rank provides sync state tracking for AE Rank session submission.
 package rank
 
 import (
@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/modu-ai/moai-adk/internal/defs"
+	"github.com/AngeleyesTrue/ae-adk/internal/defs"
 )
 
 // SyncedFile records metadata about a synced transcript file.

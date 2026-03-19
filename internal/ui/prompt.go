@@ -87,7 +87,7 @@ func (p *promptImpl) inputInteractive(label string, cfg inputConfig) (string, er
 	inp := buildInputField(label, cfg, &value)
 
 	form := huh.NewForm(huh.NewGroup(inp)).
-		WithTheme(NewMoAIHuhTheme(p.theme.NoColor)).
+		WithTheme(NewAEHuhTheme(p.theme.NoColor)).
 		WithAccessible(p.headless.IsHeadless())
 
 	if err := form.Run(); err != nil {
@@ -106,7 +106,7 @@ func (p *promptImpl) confirmInteractive(label string, defaultVal bool) (bool, er
 	conf := buildConfirmField(label, &value)
 
 	form := huh.NewForm(huh.NewGroup(conf)).
-		WithTheme(NewMoAIHuhTheme(p.theme.NoColor)).
+		WithTheme(NewAEHuhTheme(p.theme.NoColor)).
 		WithAccessible(p.headless.IsHeadless())
 
 	if err := form.Run(); err != nil {

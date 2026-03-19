@@ -19,20 +19,20 @@ func TestLocalChecker_IsUpdateAvailable_DirtyVersionTimestamp(t *testing.T) {
 	}
 
 	// Create a fake "release" binary
-	releaseBinary := filepath.Join(releasesDir, "moai-test-darwin-arm64")
+	releaseBinary := filepath.Join(releasesDir, "ae-test-darwin-arm64")
 	if err := os.WriteFile(releaseBinary, []byte("fake release binary"), 0755); err != nil {
 		t.Fatal(err)
 	}
 
 	// Create version.json
 	versionJSON := filepath.Join(releasesDir, "version.json")
-	versionContent := `{"version":"2871559-dirty","date":"2026-02-04T11:27:11Z","platform":"darwin-arm64","binary":"moai-test-darwin-arm64"}`
+	versionContent := `{"version":"2871559-dirty","date":"2026-02-04T11:27:11Z","platform":"darwin-arm64","binary":"ae-test-darwin-arm64"}`
 	if err := os.WriteFile(versionJSON, []byte(versionContent), 0644); err != nil {
 		t.Fatal(err)
 	}
 
 	// Create a fake "current" binary in a different location
-	currentBinary := filepath.Join(tmpDir, "current-moai")
+	currentBinary := filepath.Join(tmpDir, "current-ae")
 	if err := os.WriteFile(currentBinary, []byte("fake current binary"), 0755); err != nil {
 		t.Fatal(err)
 	}
@@ -105,13 +105,13 @@ func TestLocalChecker_IsUpdateAvailable_SameVersionSameTime(t *testing.T) {
 	}
 
 	// Create release binary and version.json
-	releaseBinary := filepath.Join(releasesDir, "moai-test-darwin-arm64")
+	releaseBinary := filepath.Join(releasesDir, "ae-test-darwin-arm64")
 	if err := os.WriteFile(releaseBinary, []byte("fake binary"), 0755); err != nil {
 		t.Fatal(err)
 	}
 
 	versionJSON := filepath.Join(releasesDir, "version.json")
-	versionContent := `{"version":"2871559-dirty","date":"2026-02-04T11:27:11Z","platform":"darwin-arm64","binary":"moai-test-darwin-arm64"}`
+	versionContent := `{"version":"2871559-dirty","date":"2026-02-04T11:27:11Z","platform":"darwin-arm64","binary":"ae-test-darwin-arm64"}`
 	if err := os.WriteFile(versionJSON, []byte(versionContent), 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -148,14 +148,14 @@ func TestLocalChecker_CheckLatest_Success(t *testing.T) {
 	}
 
 	// Create release binary
-	releaseBinary := filepath.Join(releasesDir, "moai-1.0.0-darwin-arm64")
+	releaseBinary := filepath.Join(releasesDir, "ae-1.0.0-darwin-arm64")
 	if err := os.WriteFile(releaseBinary, []byte("fake binary"), 0755); err != nil {
 		t.Fatal(err)
 	}
 
 	// Create version.json
 	versionJSON := filepath.Join(releasesDir, "version.json")
-	versionContent := `{"version":"1.0.0","date":"2026-02-04T10:00:00Z","platform":"darwin-arm64","binary":"moai-1.0.0-darwin-arm64"}`
+	versionContent := `{"version":"1.0.0","date":"2026-02-04T10:00:00Z","platform":"darwin-arm64","binary":"ae-1.0.0-darwin-arm64"}`
 	if err := os.WriteFile(versionJSON, []byte(versionContent), 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -269,7 +269,7 @@ func TestLocalChecker_CheckLatest_WithChecksum(t *testing.T) {
 	t.Parallel()
 
 	tmpDir := t.TempDir()
-	releaseBinary := filepath.Join(tmpDir, "moai-1.0.0-darwin-arm64")
+	releaseBinary := filepath.Join(tmpDir, "ae-1.0.0-darwin-arm64")
 	if err := os.WriteFile(releaseBinary, []byte("fake binary"), 0755); err != nil {
 		t.Fatal(err)
 	}
@@ -280,7 +280,7 @@ func TestLocalChecker_CheckLatest_WithChecksum(t *testing.T) {
 	}
 
 	versionJSON := filepath.Join(tmpDir, "version.json")
-	versionContent := `{"version":"1.0.0","date":"2026-02-04T10:00:00Z","platform":"darwin-arm64","binary":"moai-1.0.0-darwin-arm64"}`
+	versionContent := `{"version":"1.0.0","date":"2026-02-04T10:00:00Z","platform":"darwin-arm64","binary":"ae-1.0.0-darwin-arm64"}`
 	if err := os.WriteFile(versionJSON, []byte(versionContent), 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -304,13 +304,13 @@ func TestLocalChecker_CheckLatest_InvalidDate(t *testing.T) {
 	t.Parallel()
 
 	tmpDir := t.TempDir()
-	releaseBinary := filepath.Join(tmpDir, "moai-1.0.0")
+	releaseBinary := filepath.Join(tmpDir, "ae-1.0.0")
 	if err := os.WriteFile(releaseBinary, []byte("binary"), 0755); err != nil {
 		t.Fatal(err)
 	}
 
 	versionJSON := filepath.Join(tmpDir, "version.json")
-	versionContent := `{"version":"1.0.0","date":"not-a-date","platform":"darwin-arm64","binary":"moai-1.0.0"}`
+	versionContent := `{"version":"1.0.0","date":"not-a-date","platform":"darwin-arm64","binary":"ae-1.0.0"}`
 	if err := os.WriteFile(versionJSON, []byte(versionContent), 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -364,13 +364,13 @@ func TestLocalChecker_IsUpdateAvailable_SemverComparison(t *testing.T) {
 	t.Parallel()
 
 	tmpDir := t.TempDir()
-	releaseBinary := filepath.Join(tmpDir, "moai-2.0.0")
+	releaseBinary := filepath.Join(tmpDir, "ae-2.0.0")
 	if err := os.WriteFile(releaseBinary, []byte("binary"), 0755); err != nil {
 		t.Fatal(err)
 	}
 
 	versionJSON := filepath.Join(tmpDir, "version.json")
-	versionContent := `{"version":"2.0.0","date":"2026-02-04T10:00:00Z","platform":"darwin-arm64","binary":"moai-2.0.0"}`
+	versionContent := `{"version":"2.0.0","date":"2026-02-04T10:00:00Z","platform":"darwin-arm64","binary":"ae-2.0.0"}`
 	if err := os.WriteFile(versionJSON, []byte(versionContent), 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -400,13 +400,13 @@ func TestLocalChecker_IsUpdateAvailable_NoUpdate(t *testing.T) {
 	t.Parallel()
 
 	tmpDir := t.TempDir()
-	releaseBinary := filepath.Join(tmpDir, "moai-1.0.0")
+	releaseBinary := filepath.Join(tmpDir, "ae-1.0.0")
 	if err := os.WriteFile(releaseBinary, []byte("binary"), 0755); err != nil {
 		t.Fatal(err)
 	}
 
 	versionJSON := filepath.Join(tmpDir, "version.json")
-	versionContent := `{"version":"1.0.0","date":"2026-02-04T10:00:00Z","platform":"darwin-arm64","binary":"moai-1.0.0"}`
+	versionContent := `{"version":"1.0.0","date":"2026-02-04T10:00:00Z","platform":"darwin-arm64","binary":"ae-1.0.0"}`
 	if err := os.WriteFile(versionJSON, []byte(versionContent), 0644); err != nil {
 		t.Fatal(err)
 	}

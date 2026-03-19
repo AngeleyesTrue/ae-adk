@@ -9,11 +9,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/modu-ai/moai-adk/internal/config"
-	"github.com/modu-ai/moai-adk/internal/defs"
-	"github.com/modu-ai/moai-adk/internal/hook"
-	"github.com/modu-ai/moai-adk/internal/update"
-	"github.com/modu-ai/moai-adk/pkg/models"
+	"github.com/AngeleyesTrue/ae-adk/internal/config"
+	"github.com/AngeleyesTrue/ae-adk/internal/defs"
+	"github.com/AngeleyesTrue/ae-adk/internal/hook"
+	"github.com/AngeleyesTrue/ae-adk/internal/update"
+	"github.com/AngeleyesTrue/ae-adk/pkg/models"
 )
 
 // =============================================================================
@@ -243,15 +243,15 @@ func TestCleanLegacyHooks_AllHooksRemovedDeletesHooksKey(t *testing.T) {
 }
 
 // =============================================================================
-// cleanMoaiManagedPaths branch coverage
+// cleanAEManagedPaths branch coverage
 // =============================================================================
 
-func TestCleanMoaiManagedPaths_EmptyProject(t *testing.T) {
+func TestCleanAEManagedPaths_EmptyProject(t *testing.T) {
 	root := t.TempDir()
 	var buf bytes.Buffer
-	err := cleanMoaiManagedPaths(root, &buf)
+	err := cleanAEManagedPaths(root, &buf)
 	if err != nil {
-		t.Fatalf("cleanMoaiManagedPaths on empty project should not error: %v", err)
+		t.Fatalf("cleanAEManagedPaths on empty project should not error: %v", err)
 	}
 	output := buf.String()
 	// Should show "Skipped" messages for missing paths
@@ -260,16 +260,16 @@ func TestCleanMoaiManagedPaths_EmptyProject(t *testing.T) {
 	}
 }
 
-func TestCleanMoaiManagedPaths_GlobTargets(t *testing.T) {
+func TestCleanAEManagedPaths_GlobTargets(t *testing.T) {
 	root := t.TempDir()
 
-	// Create skills/moai-something directories to test glob matching
+	// Create skills/ae-something directories to test glob matching
 	skillsDir := filepath.Join(root, defs.ClaudeDir, defs.SkillsSubdir)
-	moaiSkill1 := filepath.Join(skillsDir, "moai-core")
-	moaiSkill2 := filepath.Join(skillsDir, "moai-workflow")
+	aeSkill1 := filepath.Join(skillsDir, "ae-core")
+	aeSkill2 := filepath.Join(skillsDir, "ae-workflow")
 	userSkill := filepath.Join(skillsDir, "custom-skill")
 
-	for _, dir := range []string{moaiSkill1, moaiSkill2, userSkill} {
+	for _, dir := range []string{aeSkill1, aeSkill2, userSkill} {
 		if err := os.MkdirAll(dir, 0o755); err != nil {
 			t.Fatal(err)
 		}
@@ -279,17 +279,17 @@ func TestCleanMoaiManagedPaths_GlobTargets(t *testing.T) {
 	}
 
 	var buf bytes.Buffer
-	err := cleanMoaiManagedPaths(root, &buf)
+	err := cleanAEManagedPaths(root, &buf)
 	if err != nil {
-		t.Fatalf("cleanMoaiManagedPaths error: %v", err)
+		t.Fatalf("cleanAEManagedPaths error: %v", err)
 	}
 
-	// moai-* skills should be removed
-	if _, err := os.Stat(moaiSkill1); !os.IsNotExist(err) {
-		t.Error("moai-core skill directory should be removed")
+	// ae-* skills should be removed
+	if _, err := os.Stat(aeSkill1); !os.IsNotExist(err) {
+		t.Error("ae-core skill directory should be removed")
 	}
-	if _, err := os.Stat(moaiSkill2); !os.IsNotExist(err) {
-		t.Error("moai-workflow skill directory should be removed")
+	if _, err := os.Stat(aeSkill2); !os.IsNotExist(err) {
+		t.Error("ae-workflow skill directory should be removed")
 	}
 
 	// custom skill should be preserved
@@ -298,7 +298,7 @@ func TestCleanMoaiManagedPaths_GlobTargets(t *testing.T) {
 	}
 }
 
-func TestCleanMoaiManagedPaths_ConfigDirRemoved(t *testing.T) {
+func TestCleanAEManagedPaths_ConfigDirRemoved(t *testing.T) {
 	root := t.TempDir()
 
 	// Create .ae/config directory
@@ -311,9 +311,9 @@ func TestCleanMoaiManagedPaths_ConfigDirRemoved(t *testing.T) {
 	}
 
 	var buf bytes.Buffer
-	err := cleanMoaiManagedPaths(root, &buf)
+	err := cleanAEManagedPaths(root, &buf)
 	if err != nil {
-		t.Fatalf("cleanMoaiManagedPaths error: %v", err)
+		t.Fatalf("cleanAEManagedPaths error: %v", err)
 	}
 
 	// config directory should be removed
@@ -322,7 +322,7 @@ func TestCleanMoaiManagedPaths_ConfigDirRemoved(t *testing.T) {
 	}
 }
 
-func TestCleanMoaiManagedPaths_OutputStylesRemoved(t *testing.T) {
+func TestCleanAEManagedPaths_OutputStylesRemoved(t *testing.T) {
 	root := t.TempDir()
 
 	// Create .claude/output-styles/ae directory
@@ -335,9 +335,9 @@ func TestCleanMoaiManagedPaths_OutputStylesRemoved(t *testing.T) {
 	}
 
 	var buf bytes.Buffer
-	err := cleanMoaiManagedPaths(root, &buf)
+	err := cleanAEManagedPaths(root, &buf)
 	if err != nil {
-		t.Fatalf("cleanMoaiManagedPaths error: %v", err)
+		t.Fatalf("cleanAEManagedPaths error: %v", err)
 	}
 
 	if _, err := os.Stat(outputStylesDir); !os.IsNotExist(err) {
@@ -563,7 +563,7 @@ func TestEnsureGit_InvalidPath(t *testing.T) {
 func TestEnsureGit_AlreadyInitializedIsNoop(t *testing.T) {
 	d := &Dependencies{}
 	// First call with a real git repo (the project root is a git repo)
-	err := d.EnsureGit("/Users/goos/MoAI/ae-adk-go")
+	err := d.EnsureGit("/Users/goos/AE/ae-adk-go")
 	if err != nil {
 		t.Skipf("skipping: cannot open project git repo: %v", err)
 	}

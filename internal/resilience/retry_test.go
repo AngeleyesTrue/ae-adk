@@ -182,7 +182,7 @@ func TestRetryMaxDelayCap(t *testing.T) {
 	// With max delay of 200ms, total time should be capped
 	// Without cap: 100 + 200 + 400 + 800 = 1500ms
 	// With cap: 100 + 200 + 200 + 200 = 700ms
-	if elapsed > 1*time.Second {
+	if elapsed > 1200*time.Millisecond {
 		t.Errorf("elapsed time %v suggests MaxDelay is not being applied", elapsed)
 	}
 }

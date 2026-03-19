@@ -8,7 +8,7 @@ import (
 	"testing"
 	"testing/fstest"
 
-	"github.com/modu-ai/moai-adk/internal/manifest"
+	"github.com/AngeleyesTrue/ae-adk/internal/manifest"
 )
 
 func testFS() fstest.MapFS {
@@ -16,11 +16,11 @@ func testFS() fstest.MapFS {
 		".claude/settings.json": &fstest.MapFile{
 			Data: []byte(`{"hooks":{}}`),
 		},
-		".claude/agents/moai/expert-backend.md": &fstest.MapFile{
+		".claude/agents/ae/expert-backend.md": &fstest.MapFile{
 			Data: []byte("# Expert Backend Agent"),
 		},
 		"CLAUDE.md": &fstest.MapFile{
-			Data: []byte("# MoAI Execution Directive"),
+			Data: []byte("# AE Execution Directive"),
 		},
 		".gitignore": &fstest.MapFile{
 			Data: []byte("node_modules/\n.env\n"),
@@ -54,7 +54,7 @@ func TestDeployerDeploy(t *testing.T) {
 		// Verify all files exist on disk
 		expectedFiles := []string{
 			".claude/settings.json",
-			".claude/agents/moai/expert-backend.md",
+			".claude/agents/ae/expert-backend.md",
 			"CLAUDE.md",
 			".gitignore",
 		}
@@ -126,7 +126,7 @@ func TestDeployerDeploy(t *testing.T) {
 
 	t.Run("file_content_matches", func(t *testing.T) {
 		root, mgr := setupDeployProject(t)
-		expectedContent := []byte("# MoAI Execution Directive")
+		expectedContent := []byte("# AE Execution Directive")
 		fs := fstest.MapFS{
 			"CLAUDE.md": &fstest.MapFile{Data: expectedContent},
 		}
@@ -157,8 +157,8 @@ func TestDeployerExtractTemplate(t *testing.T) {
 		if len(data) == 0 {
 			t.Error("expected non-empty content")
 		}
-		if string(data) != "# MoAI Execution Directive" {
-			t.Errorf("content = %q, want %q", string(data), "# MoAI Execution Directive")
+		if string(data) != "# AE Execution Directive" {
+			t.Errorf("content = %q, want %q", string(data), "# AE Execution Directive")
 		}
 	})
 
@@ -188,10 +188,10 @@ func TestDeployerListTemplates(t *testing.T) {
 		}
 
 		expected := map[string]bool{
-			".claude/settings.json":                 true,
-			".claude/agents/moai/expert-backend.md": true,
-			"CLAUDE.md":                             true,
-			".gitignore":                            true,
+			".claude/settings.json":               true,
+			".claude/agents/ae/expert-backend.md": true,
+			"CLAUDE.md":                           true,
+			".gitignore":                          true,
 		}
 		for _, item := range list {
 			if !expected[item] {
@@ -219,7 +219,7 @@ func TestValidateDeployPath(t *testing.T) {
 		wantErr bool
 	}{
 		{"valid_relative", ".claude/settings.json", false},
-		{"valid_nested", ".claude/agents/moai/file.md", false},
+		{"valid_nested", ".claude/agents/ae/file.md", false},
 		{"valid_simple", "CLAUDE.md", false},
 		{"traversal_dotdot", "../etc/passwd", true},
 		{"traversal_nested", "foo/../../etc/passwd", true},

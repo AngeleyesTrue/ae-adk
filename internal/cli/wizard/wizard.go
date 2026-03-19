@@ -30,7 +30,7 @@ func RunWithLocale(questions []Question, styles *Styles, locale string) (*Wizard
 
 	result := &WizardResult{}
 	currentLocale := locale
-	theme := newMoAIWizardTheme()
+	theme := newAEWizardTheme()
 
 	for i := range questions {
 		q := &questions[i]
@@ -202,8 +202,8 @@ func saveAnswer(id, value string, result *WizardResult, locale *string) {
 	_ = locale // locale is kept for GetLocalizedQuestion compatibility
 }
 
-// newMoAIWizardTheme creates a huh.Theme with MoAI wizard branding.
-func newMoAIWizardTheme() *huh.Theme {
+// newAEWizardTheme creates a huh.Theme with AE wizard branding.
+func newAEWizardTheme() *huh.Theme {
 	t := huh.ThemeBase()
 
 	// Map wizard brand colors to huh theme.

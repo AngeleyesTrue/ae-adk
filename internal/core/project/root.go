@@ -6,14 +6,14 @@ import (
 	"path/filepath"
 )
 
-// @MX:ANCHOR: [AUTO] Core function for project root discovery. All .moai operations are anchored to the project root.
+// @MX:ANCHOR: [AUTO] Core function for project root discovery. All .ae operations are anchored to the project root.
 // @MX:REASON: [AUTO] fan_in=10+, used for root path discovery in all project operations
-// FindProjectRoot locates the project root directory by searching for .moai directory.
-// It starts from the current working directory and traverses upward until it finds .moai.
+// FindProjectRoot locates the project root directory by searching for .ae directory.
+// It starts from the current working directory and traverses upward until it finds .ae.
 // Returns the absolute path to the project root, or an error if not in a AE project.
 //
-// This function ensures that all .moai operations (checkpoints, memory, etc.)
-// are anchored to the project root, preventing duplicate .moai directories in subfolders.
+// This function ensures that all .ae operations (checkpoints, memory, etc.)
+// are anchored to the project root, preventing duplicate .ae directories in subfolders.
 // ~/.ae/ is treated as global state (credentials, cache), not a project root.
 func FindProjectRoot() (string, error) {
 	dir, err := os.Getwd()
@@ -40,21 +40,21 @@ func FindProjectRoot() (string, error) {
 		}
 	}
 
-	// Traverse upward to find .moai directory
+	// Traverse upward to find .ae directory
 	for {
 		// Skip home directory — ~/.ae/ is global state, not a project root.
 		if homeDir != "" && absDir == homeDir {
 			return "", fmt.Errorf("not in a AE project (no .ae directory found in project directories)")
 		}
 
-		moaiPath := filepath.Join(absDir, ".ae")
-		if info, err := os.Stat(moaiPath); err == nil && info.IsDir() {
+		aePath := filepath.Join(absDir, ".ae")
+		if info, err := os.Stat(aePath); err == nil && info.IsDir() {
 			return absDir, nil
 		}
 
 		parent := filepath.Dir(absDir)
 		if parent == absDir {
-			// Reached root directory without finding .moai
+			// Reached root directory without finding .ae
 			return "", fmt.Errorf("not in a AE project (no .ae directory found in %s or any parent directory)", absDir)
 		}
 		absDir = parent

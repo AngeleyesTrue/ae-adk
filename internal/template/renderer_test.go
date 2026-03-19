@@ -160,13 +160,13 @@ func TestRendererPassthroughTokens(t *testing.T) {
 	}{
 		{
 			name:     "CLAUDE_PROJECT_DIR passthrough",
-			template: `{"command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/moai/hook.sh\"", "name": "{{.Name}}"}`,
+			template: `{"command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/hook.sh\"", "name": "{{.Name}}"}`,
 			data:     map[string]string{"Name": "test"},
 			want:     "$CLAUDE_PROJECT_DIR",
 		},
 		{
 			name:     "CLAUDE_SKILL_DIR passthrough",
-			template: `{"path": "$CLAUDE_SKILL_DIR/workflows/moai.md", "name": "{{.Name}}"}`,
+			template: `{"path": "$CLAUDE_SKILL_DIR/workflows/ae.md", "name": "{{.Name}}"}`,
 			data:     map[string]string{"Name": "test"},
 			want:     "$CLAUDE_SKILL_DIR",
 		},

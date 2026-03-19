@@ -30,8 +30,8 @@ type localChecker struct {
 // The expected directory structure:
 //
 //	~/.ae/releases/
-//	├── moai-2.0.0-darwin-arm64      # Platform binary
-//	├── moai-2.0.0-darwin-arm64.sha256 # Checksum file
+//	├── ae-2.0.0-darwin-arm64      # Platform binary
+//	├── ae-2.0.0-darwin-arm64.sha256 # Checksum file
 //	├── version.json                  # Version metadata
 //	└── LATEST                        # Symlink to latest version dir (optional)
 //
@@ -41,7 +41,7 @@ type localChecker struct {
 //	  "version": "2.0.0",
 //	  "date": "2026-02-04T10:00:00Z",
 //	  "platform": "darwin-arm64",
-//	  "binary": "moai-2.0.0-darwin-arm64"
+//	  "binary": "ae-2.0.0-darwin-arm64"
 //	}
 func NewLocalChecker(config LocalConfig) Checker {
 	if config.ReleasesDir == "" {

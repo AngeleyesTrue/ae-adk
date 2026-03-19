@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	lsphook "github.com/modu-ai/moai-adk/internal/lsp/hook"
+	lsphook "github.com/AngeleyesTrue/ae-adk/internal/lsp/hook"
 )
 
 func TestPostToolHandler_EventType(t *testing.T) {
@@ -104,13 +104,13 @@ func TestLogTaskMetrics(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name         string
-		input        *HookInput
-		setupMoaiDir bool // whether to pre-create .ae/ so resolveProjectRoot accepts tmpDir
-		wantFile     bool // whether task-metrics.jsonl should be created
-		wantTokens   int
-		wantTools    int
-		wantSeconds  float64
+		name        string
+		input       *HookInput
+		setupAEDir  bool // whether to pre-create .ae/ so resolveProjectRoot accepts tmpDir
+		wantFile    bool // whether task-metrics.jsonl should be created
+		wantTokens  int
+		wantTools   int
+		wantSeconds float64
 	}{
 		{
 			name: "task tool with valid metrics creates JSONL record",
@@ -119,21 +119,21 @@ func TestLogTaskMetrics(t *testing.T) {
 				ToolName:     "Task",
 				ToolResponse: json.RawMessage(`{"status":"completed","output":"done","metrics":{"tokensUsed":12450,"toolUses":8,"durationSeconds":45.2}}`),
 			},
-			setupMoaiDir: true,
-			wantFile:     true,
-			wantTokens:   12450,
-			wantTools:    8,
-			wantSeconds:  45.2,
+			setupAEDir:  true,
+			wantFile:    true,
+			wantTokens:  12450,
+			wantTools:   8,
+			wantSeconds: 45.2,
 		},
 		{
-			name: "task tool with valid metrics but no .moai dir writes no file",
+			name: "task tool with valid metrics but no .ae dir writes no file",
 			input: &HookInput{
 				SessionID:    "sess-metrics-guard",
 				ToolName:     "Task",
 				ToolResponse: json.RawMessage(`{"status":"completed","output":"done","metrics":{"tokensUsed":100,"toolUses":1,"durationSeconds":1.0}}`),
 			},
-			setupMoaiDir: false,
-			wantFile:     false,
+			setupAEDir: false,
+			wantFile:   false,
 		},
 		{
 			name: "task tool with missing metrics field writes no file",
@@ -173,9 +173,9 @@ func TestLogTaskMetrics(t *testing.T) {
 			tmpDir := t.TempDir()
 			tt.input.CWD = tmpDir
 
-			if tt.setupMoaiDir {
+			if tt.setupAEDir {
 				if err := os.MkdirAll(filepath.Join(tmpDir, ".ae"), 0o755); err != nil {
-					t.Fatalf("pre-create .moai: %v", err)
+					t.Fatalf("pre-create .ae: %v", err)
 				}
 			}
 
@@ -328,7 +328,7 @@ func TestPostToolHandler_Handle_TaskToolRoutesToLogTaskMetrics(t *testing.T) {
 	tmpDir := t.TempDir()
 	// Pre-create .ae/ so resolveProjectRoot accepts tmpDir as a AE project root.
 	if err := os.MkdirAll(filepath.Join(tmpDir, ".ae"), 0o755); err != nil {
-		t.Fatalf("pre-create .moai: %v", err)
+		t.Fatalf("pre-create .ae: %v", err)
 	}
 	h := NewPostToolHandler()
 	ctx := context.Background()
@@ -382,7 +382,7 @@ func TestLogTaskMetrics_AppendMultipleRecords(t *testing.T) {
 	tmpDir := t.TempDir()
 	// Pre-create .ae/ so resolveProjectRoot accepts tmpDir as a AE project root.
 	if err := os.MkdirAll(filepath.Join(tmpDir, ".ae"), 0o755); err != nil {
-		t.Fatalf("pre-create .moai: %v", err)
+		t.Fatalf("pre-create .ae: %v", err)
 	}
 
 	for i := range 3 {

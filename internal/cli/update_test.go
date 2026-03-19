@@ -11,9 +11,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/modu-ai/moai-adk/internal/template"
-	"github.com/modu-ai/moai-adk/internal/update"
-	"github.com/modu-ai/moai-adk/pkg/version"
+	"github.com/AngeleyesTrue/ae-adk/internal/template"
+	"github.com/AngeleyesTrue/ae-adk/internal/update"
+	"github.com/AngeleyesTrue/ae-adk/pkg/version"
 )
 
 // buildSmartPATH is a test helper that builds a Smart PATH for a given home directory.
@@ -182,7 +182,7 @@ func TestGetProjectConfigVersion_ExactlyAtLimit(t *testing.T) {
 
 	// Create file exactly at 10MB limit with valid YAML
 	configPath := filepath.Join(configDir, "system.yaml")
-	validYAML := "moai:\n  template_version: \"1.0.0\"\n"
+	validYAML := "ae:\n  template_version: \"1.0.0\"\n"
 	padding := make([]byte, maxConfigSize-len(validYAML))
 	for i := range padding {
 		padding[i] = '#' // YAML comment padding
@@ -213,7 +213,7 @@ func TestGetProjectConfigVersion_NormalSize(t *testing.T) {
 
 	// Create normal-sized valid config file
 	configPath := filepath.Join(configDir, "system.yaml")
-	content := []byte("moai:\n  template_version: \"2.5.3\"\n")
+	content := []byte("ae:\n  template_version: \"2.5.3\"\n")
 	if err := os.WriteFile(configPath, content, 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -254,7 +254,7 @@ func TestGetProjectConfigVersion_ValidParsing(t *testing.T) {
 
 	// Create valid config file with various YAML structures
 	configPath := filepath.Join(configDir, "system.yaml")
-	content := []byte(`moai:
+	content := []byte(`ae:
   name: "test-project"
   template_version: "3.1.4"
   other_field: "value"
@@ -289,7 +289,7 @@ func TestRunTemplateSync_VersionMatch_SkipsSync(t *testing.T) {
 
 	// Create config with matching version
 	configPath := filepath.Join(configDir, "system.yaml")
-	content := []byte("moai:\n  template_version: \"" + currentVersion + "\"\n")
+	content := []byte("ae:\n  template_version: \"" + currentVersion + "\"\n")
 	if err := os.WriteFile(configPath, content, 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -339,7 +339,7 @@ func TestRunTemplateSync_VersionMismatch_AttemptsSync(t *testing.T) {
 
 	// Create config with different version
 	configPath := filepath.Join(configDir, "system.yaml")
-	content := []byte("moai:\n  template_version: \"0.0.1\"\n")
+	content := []byte("ae:\n  template_version: \"0.0.1\"\n")
 	if err := os.WriteFile(configPath, content, 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -414,7 +414,7 @@ func TestRunTemplateSync_EmbeddedTemplatesError(t *testing.T) {
 
 	// Create config file
 	configPath := filepath.Join(configDir, "system.yaml")
-	content := []byte("moai:\n  template_version: \"0.0.0\"\n")
+	content := []byte("ae:\n  template_version: \"0.0.0\"\n")
 	if err := os.WriteFile(configPath, content, 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -461,7 +461,7 @@ func TestGetProjectConfigVersion_EmptyTemplateVersion(t *testing.T) {
 
 	// Create config without template_version field
 	configPath := filepath.Join(configDir, "system.yaml")
-	content := []byte("moai:\n  name: \"test\"\n")
+	content := []byte("ae:\n  name: \"test\"\n")
 	if err := os.WriteFile(configPath, content, 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -631,39 +631,39 @@ func TestDetermineChangeType(t *testing.T) {
 	}
 }
 
-func TestIsMoaiManaged(t *testing.T) {
+func TestIsAEManaged(t *testing.T) {
 	tests := []struct {
 		name string
 		path string
 		want bool
 	}{
 		{
-			name: "moai skill with prefix",
-			path: ".claude/skills/moai-workflow-project/skill.md",
+			name: "ae skill with prefix",
+			path: ".claude/skills/ae-workflow-project/skill.md",
 			want: true,
 		},
 		{
-			name: "moai skill without prefix",
-			path: ".claude/skills/moai/skill.md",
+			name: "ae skill without prefix",
+			path: ".claude/skills/ae/skill.md",
 			want: true,
 		},
 		{
-			name: "moai rules",
-			path: ".claude/rules/moai/constitution.md",
+			name: "ae rules",
+			path: ".claude/rules/ae/constitution.md",
 			want: true,
 		},
 		{
-			name: "moai agents",
-			path: ".claude/agents/moai-expert/backend.md",
+			name: "ae agents",
+			path: ".claude/agents/ae-expert/backend.md",
 			want: true,
 		},
 		{
-			name: "moai commands",
-			path: ".claude/commands/moai-plan/command.md",
+			name: "ae commands",
+			path: ".claude/commands/ae-plan/command.md",
 			want: true,
 		},
 		{
-			name: "user skill without moai prefix",
+			name: "user skill without ae prefix",
 			path: ".claude/skills/user-custom-skill/skill.md",
 			want: false,
 		},
@@ -703,22 +703,22 @@ func TestIsMoaiManaged(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "moai hyphenated skill",
-			path: ".claude/skills/moai-foundation-claude/skill.md",
+			name: "ae hyphenated skill",
+			path: ".claude/skills/ae-foundation-claude/skill.md",
 			want: true,
 		},
 		{
 			name: "ae hooks",
-			path: ".claude/hooks/moai/handle-session-start.sh",
+			path: ".claude/hooks/ae/handle-session-start.sh",
 			want: true,
 		},
 		{
 			name: "ae hooks nested",
-			path: ".claude/hooks/moai/handle-agent-hook.sh",
+			path: ".claude/hooks/ae/handle-agent-hook.sh",
 			want: true,
 		},
 		{
-			name: "user hooks without moai prefix",
+			name: "user hooks without ae prefix",
 			path: ".claude/hooks/custom/my-hook.sh",
 			want: false,
 		},
@@ -726,33 +726,33 @@ func TestIsMoaiManaged(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := isMoaiManaged(tt.path)
+			got := isAEManaged(tt.path)
 			if got != tt.want {
-				t.Errorf("isMoaiManaged(%q) = %v, want %v", tt.path, got, tt.want)
+				t.Errorf("isAEManaged(%q) = %v, want %v", tt.path, got, tt.want)
 			}
 		})
 	}
 }
 
-func TestIsMoaiManaged_OutputStyles(t *testing.T) {
+func TestIsAEManaged_OutputStyles(t *testing.T) {
 	tests := []struct {
 		name string
 		path string
 		want bool
 	}{
 		{
-			name: "moai output style",
-			path: ".claude/output-styles/moai/moai.md",
+			name: "ae output style",
+			path: ".claude/output-styles/ae/ae.md",
 			want: true,
 		},
 		{
-			name: "moai output style r2d2",
-			path: ".claude/output-styles/moai/r2d2.md",
+			name: "ae output style r2d2",
+			path: ".claude/output-styles/ae/r2d2.md",
 			want: true,
 		},
 		{
-			name: "moai output style yoda",
-			path: ".claude/output-styles/moai/yoda.md",
+			name: "ae output style yoda",
+			path: ".claude/output-styles/ae/yoda.md",
 			want: true,
 		},
 		{
@@ -764,32 +764,32 @@ func TestIsMoaiManaged_OutputStyles(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := isMoaiManaged(tt.path)
+			got := isAEManaged(tt.path)
 			if got != tt.want {
-				t.Errorf("isMoaiManaged(%q) = %v, want %v", tt.path, got, tt.want)
+				t.Errorf("isAEManaged(%q) = %v, want %v", tt.path, got, tt.want)
 			}
 		})
 	}
 }
 
-func TestIsMoaiManaged_MoaiConfig(t *testing.T) {
+func TestIsAEManaged_AEConfig(t *testing.T) {
 	tests := []struct {
 		name string
 		path string
 		want bool
 	}{
 		{
-			name: "moai config file",
+			name: "ae config file",
 			path: ".ae/config/config.yaml",
 			want: true,
 		},
 		{
-			name: "moai config sections",
+			name: "ae config sections",
 			path: ".ae/config/sections/quality.yaml",
 			want: true,
 		},
 		{
-			name: "moai config user template",
+			name: "ae config user template",
 			path: ".ae/config/sections/user.yaml.tmpl",
 			want: true,
 		},
@@ -797,17 +797,17 @@ func TestIsMoaiManaged_MoaiConfig(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := isMoaiManaged(tt.path)
+			got := isAEManaged(tt.path)
 			if got != tt.want {
-				t.Errorf("isMoaiManaged(%q) = %v, want %v", tt.path, got, tt.want)
+				t.Errorf("isAEManaged(%q) = %v, want %v", tt.path, got, tt.want)
 			}
 		})
 	}
 }
 
-// --- Backup functionality tests (matching Python moai template backup) ---
+// --- Backup functionality tests (matching Python ae template backup) ---
 
-func TestBackupMoaiConfig_CreateBackup(t *testing.T) {
+func TestBackupAEConfig_CreateBackup(t *testing.T) {
 	// Create temp directory with config structure
 	tmpDir := t.TempDir()
 	configDir := filepath.Join(tmpDir, ".ae", "config")
@@ -820,7 +820,7 @@ func TestBackupMoaiConfig_CreateBackup(t *testing.T) {
 
 	// Create test files
 	systemPath := filepath.Join(sectionsDir, "system.yaml")
-	systemContent := []byte("moai:\n  name: \"test-project\"\n  template_version: \"1.0.0\"\n")
+	systemContent := []byte("ae:\n  name: \"test-project\"\n  template_version: \"1.0.0\"\n")
 	if err := os.WriteFile(systemPath, systemContent, 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -832,9 +832,9 @@ func TestBackupMoaiConfig_CreateBackup(t *testing.T) {
 	}
 
 	// Create backup
-	backupDir, err := backupMoaiConfig(tmpDir)
+	backupDir, err := backupAEConfig(tmpDir)
 	if err != nil {
-		t.Fatalf("backupMoaiConfig failed: %v", err)
+		t.Fatalf("backupAEConfig failed: %v", err)
 	}
 
 	// Verify backup directory path format
@@ -842,10 +842,10 @@ func TestBackupMoaiConfig_CreateBackup(t *testing.T) {
 		t.Errorf("backup path should be under project root, got: %s", backupDir)
 	}
 
-	// Verify .moai-backups directory exists
-	backupBaseDir := filepath.Join(tmpDir, ".moai-backups")
+	// Verify .ae-backups directory exists
+	backupBaseDir := filepath.Join(tmpDir, ".ae-backups")
 	if _, err := os.Stat(backupBaseDir); os.IsNotExist(err) {
-		t.Error(".moai-backups directory should exist")
+		t.Error(".ae-backups directory should exist")
 	}
 
 	// Find the actual backup directory
@@ -937,14 +937,14 @@ func TestBackupMoaiConfig_CreateBackup(t *testing.T) {
 	}
 }
 
-func TestBackupMoaiConfig_NoConfigDir(t *testing.T) {
+func TestBackupAEConfig_NoConfigDir(t *testing.T) {
 	// Create temp directory without config
 	tmpDir := t.TempDir()
 
 	// Should return empty string without error
-	backupDir, err := backupMoaiConfig(tmpDir)
+	backupDir, err := backupAEConfig(tmpDir)
 	if err != nil {
-		t.Fatalf("backupMoaiConfig should not error when no config exists, got: %v", err)
+		t.Fatalf("backupAEConfig should not error when no config exists, got: %v", err)
 	}
 	if backupDir != "" {
 		t.Errorf("backupDir should be empty when no config exists, got: %s", backupDir)
@@ -956,7 +956,7 @@ func TestCleanupOldBackups(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Create backup directory and some backups
-	backupBaseDir := filepath.Join(tmpDir, ".moai-backups")
+	backupBaseDir := filepath.Join(tmpDir, ".ae-backups")
 	if err := os.MkdirAll(backupBaseDir, 0755); err != nil {
 		t.Fatal(err)
 	}
@@ -1062,7 +1062,7 @@ func TestCleanupOldBackups_InvalidBackupPattern(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Create backup directory with invalid names
-	backupDir := filepath.Join(tmpDir, ".moai-backups")
+	backupDir := filepath.Join(tmpDir, ".ae-backups")
 	if err := os.MkdirAll(backupDir, 0755); err != nil {
 		t.Fatal(err)
 	}
@@ -1094,7 +1094,7 @@ func TestCleanupOldBackups_NoBackupsDir(t *testing.T) {
 	}
 }
 
-func TestRestoreMoaiConfig_MergeBehavior(t *testing.T) {
+func TestRestoreAEConfig_MergeBehavior(t *testing.T) {
 	// Create temp directory with config structure
 	tmpDir := t.TempDir()
 
@@ -1109,15 +1109,15 @@ func TestRestoreMoaiConfig_MergeBehavior(t *testing.T) {
 	// Create old system.yaml (backup will have this)
 	// The "name" field is user-modified (differs from template default)
 	oldSystemPath := filepath.Join(sectionsDir, "system.yaml")
-	oldSystemContent := []byte("moai:\n  name: \"user-modified-name\"\n  template_version: \"1.0.0\"\n")
+	oldSystemContent := []byte("ae:\n  name: \"user-modified-name\"\n  template_version: \"1.0.0\"\n")
 	if err := os.WriteFile(oldSystemPath, oldSystemContent, 0644); err != nil {
 		t.Fatal(err)
 	}
 
 	// Create backup
-	backupDir, err := backupMoaiConfig(tmpDir)
+	backupDir, err := backupAEConfig(tmpDir)
 	if err != nil {
-		t.Fatalf("backupMoaiConfig failed: %v", err)
+		t.Fatalf("backupAEConfig failed: %v", err)
 	}
 
 	// Verify backup contains sections/system.yaml
@@ -1127,14 +1127,14 @@ func TestRestoreMoaiConfig_MergeBehavior(t *testing.T) {
 	}
 
 	// Now simulate template sync by replacing system.yaml with new version
-	newSystemContent := []byte("moai:\n  name: \"new-project\"\n  template_version: \"2.0.0\"\n  new_field: \"value\"\n")
+	newSystemContent := []byte("ae:\n  name: \"new-project\"\n  template_version: \"2.0.0\"\n  new_field: \"value\"\n")
 	if err := os.WriteFile(oldSystemPath, newSystemContent, 0644); err != nil {
 		t.Fatal(err)
 	}
 
 	// Restore from backup
-	if err := restoreMoaiConfig(tmpDir, backupDir); err != nil {
-		t.Fatalf("restoreMoaiConfig failed: %v", err)
+	if err := restoreAEConfig(tmpDir, backupDir); err != nil {
+		t.Fatalf("restoreAEConfig failed: %v", err)
 	}
 
 	// Read restored system.yaml
@@ -1160,7 +1160,7 @@ func TestRestoreMoaiConfig_MergeBehavior(t *testing.T) {
 	}
 }
 
-func TestRestoreMoaiConfig_MissingDirectory(t *testing.T) {
+func TestRestoreAEConfig_MissingDirectory(t *testing.T) {
 	// Test restore when backup contains files in directories that don't exist in target
 	tmpDir := t.TempDir()
 
@@ -1180,9 +1180,9 @@ func TestRestoreMoaiConfig_MissingDirectory(t *testing.T) {
 	}
 
 	// Create backup
-	backupDir, err := backupMoaiConfig(tmpDir)
+	backupDir, err := backupAEConfig(tmpDir)
 	if err != nil {
-		t.Fatalf("backupMoaiConfig failed: %v", err)
+		t.Fatalf("backupAEConfig failed: %v", err)
 	}
 
 	// Delete the questions directory (simulating template without this directory)
@@ -1191,8 +1191,8 @@ func TestRestoreMoaiConfig_MissingDirectory(t *testing.T) {
 	}
 
 	// Restore from backup - should create directory and restore file
-	if err := restoreMoaiConfig(tmpDir, backupDir); err != nil {
-		t.Fatalf("restoreMoaiConfig failed: %v", err)
+	if err := restoreAEConfig(tmpDir, backupDir); err != nil {
+		t.Fatalf("restoreAEConfig failed: %v", err)
 	}
 
 	// Verify the file was restored and directory was created
@@ -1289,11 +1289,11 @@ func TestEnsureGlobalSettingsEnv(t *testing.T) {
 		}
 	})
 
-	// Test 2: Has moai env keys + custom -> removes moai keys, preserves custom, no SessionEnd hook added
-	t.Run("CleanupMoaiManagedKeys", func(t *testing.T) {
+	// Test 2: Has ae env keys + custom -> removes ae keys, preserves custom, no SessionEnd hook added
+	t.Run("CleanupAEManagedKeys", func(t *testing.T) {
 		settingsPath := filepath.Join(claudeDir, "settings.json")
 
-		// Create existing settings with moai-managed env keys and a custom env key
+		// Create existing settings with ae-managed env keys and a custom env key
 		existing := map[string]any{
 			"env": map[string]any{
 				"CUSTOM_VAR":                           "custom_value",
@@ -1336,7 +1336,7 @@ func TestEnsureGlobalSettingsEnv(t *testing.T) {
 			t.Errorf("CUSTOM_VAR not preserved: got %v", envMap["CUSTOM_VAR"])
 		}
 
-		// Moai-managed keys should be REMOVED
+		// ae-managed keys should be REMOVED
 		if _, exists := envMap["PATH"]; exists {
 			t.Error("PATH should be removed from global settings (managed at project level)")
 		}
@@ -1355,7 +1355,7 @@ func TestEnsureGlobalSettingsEnv(t *testing.T) {
 			}
 		}
 
-		// language should be preserved (non-moai-managed top-level key)
+		// language should be preserved (non-ae-managed top-level key)
 		if settings["language"] != "en" {
 			t.Errorf("language not preserved: got %v", settings["language"])
 		}
@@ -1373,7 +1373,7 @@ func TestEnsureGlobalSettingsEnv(t *testing.T) {
 						"hooks": []any{
 							map[string]any{
 								"type":    "command",
-								"command": "\"$HOME/.claude/hooks/moai/handle-session-end.sh\"",
+								"command": "\"$HOME/.claude/hooks/ae/handle-session-end.sh\"",
 								"timeout": 5,
 							},
 						},
@@ -1408,11 +1408,11 @@ func TestEnsureGlobalSettingsEnv(t *testing.T) {
 		}
 	})
 
-	// Test 4: env has only moai keys -> entire env key removed after cleanup
+	// Test 4: env has only ae keys -> entire env key removed after cleanup
 	t.Run("EmptyEnvRemovedEntirely", func(t *testing.T) {
 		settingsPath := filepath.Join(claudeDir, "settings.json")
 
-		// Create settings with env containing only moai-managed keys
+		// Create settings with env containing only ae-managed keys
 		existing := map[string]any{
 			"env": map[string]any{
 				"PATH":                                 "/old/go/bin:/usr/bin",
@@ -1479,7 +1479,7 @@ func TestEnsureGlobalSettingsEnv(t *testing.T) {
 						"hooks": []any{
 							map[string]any{
 								"type":    "command",
-								"command": "\"$HOME/.claude/hooks/moai/handle-session-end.sh\"",
+								"command": "\"$HOME/.claude/hooks/ae/handle-session-end.sh\"",
 								"timeout": 5,
 							},
 						},
@@ -1550,7 +1550,7 @@ func TestEnsureGlobalSettingsEnv_CleanupMigratedSettings(t *testing.T) {
 
 	settingsPath := filepath.Join(claudeDir, "settings.json")
 
-	// Create existing settings with ALL moai-managed settings that should be cleaned up:
+	// Create existing settings with ALL ae-managed settings that should be cleaned up:
 	// env keys (PATH, ENABLE_TOOL_SEARCH, CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS),
 	// permissions with only Task:*, teammateMode "auto", orphaned SessionEnd hook, plus a custom env key
 	existing := map[string]any{
@@ -1570,7 +1570,7 @@ func TestEnsureGlobalSettingsEnv_CleanupMigratedSettings(t *testing.T) {
 					"hooks": []any{
 						map[string]any{
 							"type":    "command",
-							"command": "\"$HOME/.claude/hooks/moai/handle-session-end.sh\"",
+							"command": "\"$HOME/.claude/hooks/ae/handle-session-end.sh\"",
 							"timeout": 5,
 						},
 					},
@@ -1599,7 +1599,7 @@ func TestEnsureGlobalSettingsEnv_CleanupMigratedSettings(t *testing.T) {
 		t.Fatalf("failed to parse settings.json: %v", err)
 	}
 
-	// Moai-managed env keys should be REMOVED from global settings
+	// ae-managed env keys should be REMOVED from global settings
 	env, hasEnv := settings["env"]
 	if !hasEnv {
 		t.Fatal("env should still exist (CUSTOM_VAR is present)")
@@ -1664,7 +1664,7 @@ func TestEnsureGlobalSettingsEnv_RemovesGlobalHooksDir(t *testing.T) {
 		t.Fatalf("failed to write settings: %v", err)
 	}
 
-	t.Run("RemovesExistingGlobalHooksMoaiDir", func(t *testing.T) {
+	t.Run("RemovesExistingGlobalHooksAEDir", func(t *testing.T) {
 		hooksDir := filepath.Join(claudeDir, "hooks", "ae")
 		if err := os.MkdirAll(hooksDir, 0755); err != nil {
 			t.Fatalf("failed to create hooks dir: %v", err)
@@ -1696,18 +1696,18 @@ func TestEnsureGlobalSettingsEnv_RemovesGlobalHooksDir(t *testing.T) {
 	})
 }
 
-func TestCleanLegacyHooks_RemovesMoaiHandleHooks(t *testing.T) {
-	moaiHookPatterns := []struct {
+func TestCleanLegacyHooks_RemovesAEHandleHooks(t *testing.T) {
+	aeHookPatterns := []struct {
 		hookType string
 		command  string
 	}{
-		{"Stop", `"$CLAUDE_PROJECT_DIR/.claude/hooks/moai/handle-stop.sh"`},
-		{"PreToolUse", `"$CLAUDE_PROJECT_DIR/.claude/hooks/moai/handle-pre-tool.sh"`},
-		{"PostToolUse", `"$CLAUDE_PROJECT_DIR/.claude/hooks/moai/handle-post-tool.sh"`},
-		{"SessionStart", `"$CLAUDE_PROJECT_DIR/.claude/hooks/moai/handle-session-start.sh"`},
+		{"Stop", `"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-stop.sh"`},
+		{"PreToolUse", `"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-pre-tool.sh"`},
+		{"PostToolUse", `"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-post-tool.sh"`},
+		{"SessionStart", `"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-session-start.sh"`},
 	}
 
-	for _, tc := range moaiHookPatterns {
+	for _, tc := range aeHookPatterns {
 		t.Run(tc.hookType, func(t *testing.T) {
 			settings := map[string]any{
 				"hooks": map[string]any{
@@ -2044,7 +2044,7 @@ func TestRunBinaryUpdateStep_UpdateAvailable(t *testing.T) {
 	}
 }
 
-func TestCleanMoaiManagedPaths(t *testing.T) {
+func TestCleanAEManagedPaths(t *testing.T) {
 	// Helper to create a file (and its parent directories) inside the temp dir.
 	mkFile := func(t *testing.T, base string, relPath string, content string) {
 		t.Helper()
@@ -2074,11 +2074,11 @@ func TestCleanMoaiManagedPaths(t *testing.T) {
 
 	tests := []struct {
 		name string
-		// setup creates files/dirs in the temp directory before running cleanMoaiManagedPaths.
+		// setup creates files/dirs in the temp directory before running cleanAEManagedPaths.
 		setup func(t *testing.T, root string)
-		// verify runs assertions after cleanMoaiManagedPaths returns.
+		// verify runs assertions after cleanAEManagedPaths returns.
 		verify func(t *testing.T, root string, output string)
-		// wantErr indicates whether cleanMoaiManagedPaths should return an error.
+		// wantErr indicates whether cleanAEManagedPaths should return an error.
 		wantErr bool
 	}{
 		{
@@ -2090,18 +2090,18 @@ func TestCleanMoaiManagedPaths(t *testing.T) {
 				mkFile(t, root, filepath.Join(".claude", "commands", "ae", "plan.md"), "plan")
 				mkDir(t, root, filepath.Join(".claude", "agents", "ae"))
 				mkFile(t, root, filepath.Join(".claude", "agents", "ae", "expert.md"), "expert")
-				// Glob targets: skills/moai*
-				mkDir(t, root, filepath.Join(".claude", "skills", "moai-backend"))
-				mkFile(t, root, filepath.Join(".claude", "skills", "moai-backend", "SKILL.md"), "backend")
-				mkDir(t, root, filepath.Join(".claude", "skills", "moai-frontend"))
-				mkFile(t, root, filepath.Join(".claude", "skills", "moai-frontend", "SKILL.md"), "frontend")
-				// rules/moai
+				// Glob targets: skills/ae*
+				mkDir(t, root, filepath.Join(".claude", "skills", "ae-backend"))
+				mkFile(t, root, filepath.Join(".claude", "skills", "ae-backend", "SKILL.md"), "backend")
+				mkDir(t, root, filepath.Join(".claude", "skills", "ae-frontend"))
+				mkFile(t, root, filepath.Join(".claude", "skills", "ae-frontend", "SKILL.md"), "frontend")
+				// rules/ae
 				mkDir(t, root, filepath.Join(".claude", "rules", "ae"))
 				mkFile(t, root, filepath.Join(".claude", "rules", "ae", "rule.md"), "rule")
-				// output-styles/moai
+				// output-styles/ae
 				mkDir(t, root, filepath.Join(".claude", "output-styles", "ae"))
 				mkFile(t, root, filepath.Join(".claude", "output-styles", "ae", "style.md"), "style")
-				// hooks/moai
+				// hooks/ae
 				mkDir(t, root, filepath.Join(".claude", "hooks", "ae"))
 				mkFile(t, root, filepath.Join(".claude", "hooks", "ae", "hook.sh"), "#!/bin/bash")
 				// .ae/config/ with sections/ and config.yaml
@@ -2119,11 +2119,11 @@ func TestCleanMoaiManagedPaths(t *testing.T) {
 				if pathExists(root, filepath.Join(".claude", "agents", "ae")) {
 					t.Error(".claude/agents/ae should have been removed")
 				}
-				if pathExists(root, filepath.Join(".claude", "skills", "moai-backend")) {
-					t.Error(".claude/skills/moai-backend should have been removed")
+				if pathExists(root, filepath.Join(".claude", "skills", "ae-backend")) {
+					t.Error(".claude/skills/ae-backend should have been removed")
 				}
-				if pathExists(root, filepath.Join(".claude", "skills", "moai-frontend")) {
-					t.Error(".claude/skills/moai-frontend should have been removed")
+				if pathExists(root, filepath.Join(".claude", "skills", "ae-frontend")) {
+					t.Error(".claude/skills/ae-frontend should have been removed")
 				}
 				if pathExists(root, filepath.Join(".claude", "rules", "ae")) {
 					t.Error(".claude/rules/ae should have been removed")
@@ -2162,7 +2162,7 @@ func TestCleanMoaiManagedPaths(t *testing.T) {
 				mkFile(t, root, filepath.Join(".claude", "settings.json"), `{}`)
 				mkDir(t, root, filepath.Join(".claude", "rules", "ae"))
 				mkFile(t, root, filepath.Join(".claude", "rules", "ae", "core.md"), "core")
-				// commands/moai, agents/moai, skills/moai*, output-styles/moai, hooks/ae do NOT exist
+				// commands/ae, agents/ae, skills/ae*, output-styles/ae, hooks/ae do NOT exist
 			},
 			verify: func(t *testing.T, root string, output string) {
 				// Existing paths should be removed
@@ -2212,29 +2212,29 @@ func TestCleanMoaiManagedPaths(t *testing.T) {
 		{
 			name: "GlobMatchesMultiple",
 			setup: func(t *testing.T, root string) {
-				// Create multiple moai* skill directories
-				mkDir(t, root, filepath.Join(".claude", "skills", "moai-backend"))
-				mkFile(t, root, filepath.Join(".claude", "skills", "moai-backend", "SKILL.md"), "be")
-				mkDir(t, root, filepath.Join(".claude", "skills", "moai-frontend"))
-				mkFile(t, root, filepath.Join(".claude", "skills", "moai-frontend", "SKILL.md"), "fe")
-				mkDir(t, root, filepath.Join(".claude", "skills", "moai-testing"))
-				mkFile(t, root, filepath.Join(".claude", "skills", "moai-testing", "SKILL.md"), "test")
-				// Non-moai skill that should survive
+				// Create multiple ae* skill directories
+				mkDir(t, root, filepath.Join(".claude", "skills", "ae-backend"))
+				mkFile(t, root, filepath.Join(".claude", "skills", "ae-backend", "SKILL.md"), "be")
+				mkDir(t, root, filepath.Join(".claude", "skills", "ae-frontend"))
+				mkFile(t, root, filepath.Join(".claude", "skills", "ae-frontend", "SKILL.md"), "fe")
+				mkDir(t, root, filepath.Join(".claude", "skills", "ae-testing"))
+				mkFile(t, root, filepath.Join(".claude", "skills", "ae-testing", "SKILL.md"), "test")
+				// Non-ae skill that should survive
 				mkDir(t, root, filepath.Join(".claude", "skills", "custom-skill"))
 				mkFile(t, root, filepath.Join(".claude", "skills", "custom-skill", "SKILL.md"), "custom")
 			},
 			verify: func(t *testing.T, root string, output string) {
-				// All moai* skills should be removed
-				if pathExists(root, filepath.Join(".claude", "skills", "moai-backend")) {
-					t.Error(".claude/skills/moai-backend should have been removed")
+				// All ae* skills should be removed
+				if pathExists(root, filepath.Join(".claude", "skills", "ae-backend")) {
+					t.Error(".claude/skills/ae-backend should have been removed")
 				}
-				if pathExists(root, filepath.Join(".claude", "skills", "moai-frontend")) {
-					t.Error(".claude/skills/moai-frontend should have been removed")
+				if pathExists(root, filepath.Join(".claude", "skills", "ae-frontend")) {
+					t.Error(".claude/skills/ae-frontend should have been removed")
 				}
-				if pathExists(root, filepath.Join(".claude", "skills", "moai-testing")) {
-					t.Error(".claude/skills/moai-testing should have been removed")
+				if pathExists(root, filepath.Join(".claude", "skills", "ae-testing")) {
+					t.Error(".claude/skills/ae-testing should have been removed")
 				}
-				// Non-moai skill should be preserved
+				// Non-ae skill should be preserved
 				if !pathExists(root, filepath.Join(".claude", "skills", "custom-skill")) {
 					t.Error(".claude/skills/custom-skill should have been preserved")
 				}
@@ -2270,7 +2270,7 @@ func TestCleanMoaiManagedPaths(t *testing.T) {
 			tt.setup(t, root)
 
 			var buf bytes.Buffer
-			err := cleanMoaiManagedPaths(root, &buf)
+			err := cleanAEManagedPaths(root, &buf)
 
 			if tt.wantErr {
 				if err == nil {
@@ -2406,7 +2406,7 @@ func TestMigrateLegacyMemoryDir(t *testing.T) {
 // --- TDD RED: Statusline wizard config tests ---
 
 func TestPresetToSegments(t *testing.T) {
-	allSegments := []string{"model", "context", "output_style", "directory", "git_status", "claude_version", "moai_version", "git_branch"}
+	allSegments := []string{"model", "context", "output_style", "directory", "git_status", "claude_version", "ae_version", "git_branch"}
 
 	tests := []struct {
 		name      string
@@ -2424,13 +2424,13 @@ func TestPresetToSegments(t *testing.T) {
 			name:      "compact preset enables subset",
 			preset:    "compact",
 			wantTrue:  []string{"model", "context", "git_status", "git_branch"},
-			wantFalse: []string{"output_style", "directory", "claude_version", "moai_version"},
+			wantFalse: []string{"output_style", "directory", "claude_version", "ae_version"},
 		},
 		{
 			name:      "minimal preset enables model and context only",
 			preset:    "minimal",
 			wantTrue:  []string{"model", "context"},
-			wantFalse: []string{"output_style", "directory", "git_status", "claude_version", "moai_version", "git_branch"},
+			wantFalse: []string{"output_style", "directory", "git_status", "claude_version", "ae_version", "git_branch"},
 		},
 		{
 			name:   "custom preset uses provided map",
@@ -2585,7 +2585,7 @@ func TestMergeGitignoreFile_EmptyBackup(t *testing.T) {
 	}
 }
 
-func TestRestoreMoaiConfig_CustomSectionPreserved(t *testing.T) {
+func TestRestoreAEConfig_CustomSectionPreserved(t *testing.T) {
 	// Test that user's custom config sections (not in template) are restored
 	tmpDir := t.TempDir()
 
@@ -2598,7 +2598,7 @@ func TestRestoreMoaiConfig_CustomSectionPreserved(t *testing.T) {
 
 	// Standard section that exists in template
 	standardPath := filepath.Join(sectionsDir, "system.yaml")
-	standardContent := []byte("moai:\n  version: \"1.0.0\"\n")
+	standardContent := []byte("ae:\n  version: \"1.0.0\"\n")
 	if err := os.WriteFile(standardPath, standardContent, 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -2611,23 +2611,23 @@ func TestRestoreMoaiConfig_CustomSectionPreserved(t *testing.T) {
 	}
 
 	// Create backup (includes both standard and custom)
-	backupDir, err := backupMoaiConfig(tmpDir)
+	backupDir, err := backupAEConfig(tmpDir)
 	if err != nil {
-		t.Fatalf("backupMoaiConfig failed: %v", err)
+		t.Fatalf("backupAEConfig failed: %v", err)
 	}
 
 	// Simulate template sync: remove custom section (template doesn't have it)
 	_ = os.Remove(customPath)
 
 	// Update standard section (as if template deployed a new version)
-	newStandardContent := []byte("moai:\n  version: \"2.0.0\"\n  new_field: \"added\"\n")
+	newStandardContent := []byte("ae:\n  version: \"2.0.0\"\n  new_field: \"added\"\n")
 	if err := os.WriteFile(standardPath, newStandardContent, 0644); err != nil {
 		t.Fatal(err)
 	}
 
 	// Restore from backup
-	if err := restoreMoaiConfig(tmpDir, backupDir); err != nil {
-		t.Fatalf("restoreMoaiConfig failed: %v", err)
+	if err := restoreAEConfig(tmpDir, backupDir); err != nil {
+		t.Fatalf("restoreAEConfig failed: %v", err)
 	}
 
 	// Verify: custom section should be restored

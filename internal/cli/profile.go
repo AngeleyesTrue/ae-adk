@@ -3,7 +3,7 @@ package cli
 import (
 	"fmt"
 
-	"github.com/modu-ai/moai-adk/internal/profile"
+	"github.com/AngeleyesTrue/ae-adk/internal/profile"
 	"github.com/spf13/cobra"
 )
 

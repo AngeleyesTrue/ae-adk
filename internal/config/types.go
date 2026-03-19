@@ -3,7 +3,7 @@ package config
 import (
 	"slices"
 
-	"github.com/modu-ai/moai-adk/pkg/models"
+	"github.com/AngeleyesTrue/ae-adk/pkg/models"
 )
 
 // Config is the root configuration aggregate containing all sections.

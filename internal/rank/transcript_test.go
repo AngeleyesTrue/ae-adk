@@ -116,6 +116,7 @@ func TestFindTranscripts_MultipleSources(t *testing.T) {
 func TestFindTranscripts_EmptyDirectory(t *testing.T) {
 	tempHome := t.TempDir()
 	t.Setenv("HOME", tempHome)
+	t.Setenv("USERPROFILE", tempHome)
 
 	// No Claude directories at all.
 	transcripts, err := FindTranscripts()
@@ -131,6 +132,7 @@ func TestFindTranscripts_EmptyDirectory(t *testing.T) {
 func TestFindTranscripts_Deduplication(t *testing.T) {
 	tempHome := t.TempDir()
 	t.Setenv("HOME", tempHome)
+	t.Setenv("USERPROFILE", tempHome)
 
 	claudeDir := filepath.Join(tempHome, ".claude")
 
@@ -218,6 +220,7 @@ func TestFindTranscriptForSession_OldFormat(t *testing.T) {
 func TestFindTranscriptForSession_NotFound(t *testing.T) {
 	tempHome := t.TempDir()
 	t.Setenv("HOME", tempHome)
+	t.Setenv("USERPROFILE", tempHome)
 
 	result := FindTranscriptForSession("nonexistent-session")
 	if result != "" {
@@ -296,6 +299,7 @@ func TestIsValidSessionID(t *testing.T) {
 func TestFindTranscriptForSession_PathTraversal(t *testing.T) {
 	tempHome := t.TempDir()
 	t.Setenv("HOME", tempHome)
+	t.Setenv("USERPROFILE", tempHome)
 
 	// Attempt path traversal attack - should return empty.
 	result := FindTranscriptForSession("../../../etc/passwd")

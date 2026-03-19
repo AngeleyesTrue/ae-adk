@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/modu-ai/moai-adk/internal/manifest"
+	"github.com/AngeleyesTrue/ae-adk/internal/manifest"
 )
 
 // ModelPolicy represents the token consumption tier for agent models.

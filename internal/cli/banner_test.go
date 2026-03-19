@@ -53,7 +53,7 @@ func TestPrintBanner_OutputFormat(t *testing.T) {
 
 	// Verify output contains expected strings
 	expectedStrings := []string{
-		"MoAI",        // Banner should contain MoAI
+		"AE",        // Banner should contain AE
 		"Version",     // Version label
 		"1.2.3",       // Actual version
 		"Agentic",     // Description text
@@ -124,8 +124,8 @@ func TestPrintBanner_EmptyVersion(t *testing.T) {
 		t.Error("PrintBanner with empty version should still produce output")
 	}
 
-	// Should contain MoAI branding
-	if !strings.Contains(output, "MoAI") {
-		t.Error("PrintBanner should contain MoAI branding")
+	// Should contain AE branding
+	if !strings.Contains(output, "AE") {
+		t.Error("PrintBanner should contain AE branding")
 	}
 }

@@ -10,7 +10,7 @@ import (
 
 // EnvConfigurator orchestrates shell environment configuration.
 type EnvConfigurator interface {
-	// Configure sets up shell environment for MoAI/Claude Code.
+	// Configure sets up shell environment for AE/Claude Code.
 	// This adds CLAUDE_DISABLE_PATH_WARNING and optionally PATH setup.
 	Configure(opts ConfigOptions) (*ConfigResult, error)
 
@@ -92,7 +92,7 @@ func (e *envConfigurator) GetRecommendation() *Recommendation {
 	}
 }
 
-// Configure sets up shell environment for MoAI/Claude Code.
+// Configure sets up shell environment for AE/Claude Code.
 func (e *envConfigurator) Configure(opts ConfigOptions) (*ConfigResult, error) {
 	config := e.detector.GetShellConfig()
 

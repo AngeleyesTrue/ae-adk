@@ -16,12 +16,12 @@
       "text": "Where should question templates be stored?",
       "type": "single_choice",
       "required": true,
-      "default_value": ".moai/templates/questions",
+      "default_value": ".ae/templates/questions",
       "options": [
         {
-          "label": "Default (.moai/templates/questions)",
-          "value": ".moai/templates/questions",
-          "description": "Standard MoAI template location"
+          "label": "Default (.ae/templates/questions)",
+          "value": ".ae/templates/questions",
+          "description": "Standard AE template location"
         },
         {
           "label": "Project root (.questions)",
@@ -54,7 +54,7 @@
       "type": "boolean",
       "required": true,
       "default_value": true,
-      "description": "Save responses to .moai/responses/ for future reference"
+      "description": "Save responses to .ae/responses/ for future reference"
     },
     {
       "id": "batch_questions.validation_level",
@@ -90,7 +90,7 @@
     }
   ],
   "metadata": {
-    "skill": "moai-project-batch-questions",
+    "skill": "ae-project-batch-questions",
     "category": "project_configuration",
     "version": "1.0.0"
   }

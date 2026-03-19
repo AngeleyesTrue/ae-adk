@@ -75,7 +75,7 @@ func (c *checkboxImpl) multiSelectInteractive(label string, items []SelectItem) 
 	ms := buildMultiSelectField(label, items, &selected)
 
 	form := huh.NewForm(huh.NewGroup(ms)).
-		WithTheme(NewMoAIHuhTheme(c.theme.NoColor)).
+		WithTheme(NewAEHuhTheme(c.theme.NoColor)).
 		WithAccessible(c.headless.IsHeadless())
 
 	if err := form.Run(); err != nil {

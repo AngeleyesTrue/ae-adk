@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/modu-ai/moai-adk/pkg/models"
+	"github.com/AngeleyesTrue/ae-adk/pkg/models"
 )
 
 // Default value constants to avoid magic numbers and strings.
@@ -34,7 +34,7 @@ const (
 	DefaultRunTokens  = 180000
 	DefaultSyncTokens = 40000
 
-	DefaultBranchPrefix = "moai/"
+	DefaultBranchPrefix = "ae/"
 	DefaultCommitStyle  = "conventional"
 
 	DefaultGLMEnvVar  = "GLM_API_KEY"

@@ -10,7 +10,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/modu-ai/moai-adk/internal/hook/security"
+	"github.com/AngeleyesTrue/ae-adk/internal/hook/security"
 	"golang.org/x/text/unicode/norm"
 )
 
@@ -384,7 +384,7 @@ func (h *preToolHandler) scanWriteContent(ctx context.Context, toolInput json.Ra
 	}
 
 	// Create temporary file with the content
-	tmpFile, err := os.CreateTemp("", "moai-security-scan-*"+ext)
+	tmpFile, err := os.CreateTemp("", "ae-security-scan-*"+ext)
 	if err != nil {
 		slog.Warn("failed to create temp file for security scan", "error", err)
 		return "", ""

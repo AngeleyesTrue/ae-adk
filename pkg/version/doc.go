@@ -2,9 +2,9 @@
 //
 // The version information is injected at build time via ldflags:
 //
-//	go build -ldflags "-X github.com/modu-ai/moai-adk/pkg/version.Version=1.0.0 \
-//	  -X github.com/modu-ai/moai-adk/pkg/version.Commit=abc123 \
-//	  -X github.com/modu-ai/moai-adk/pkg/version.Date=2026-01-01"
+//	go build -ldflags "-X github.com/AngeleyesTrue/ae-adk/pkg/version.Version=1.0.0 \
+//	  -X github.com/AngeleyesTrue/ae-adk/pkg/version.Commit=abc123 \
+//	  -X github.com/AngeleyesTrue/ae-adk/pkg/version.Date=2026-01-01"
 //
 // # Variables
 //
@@ -23,10 +23,10 @@
 //
 // # Usage
 //
-//	import "github.com/modu-ai/moai-adk/pkg/version"
+//	import "github.com/AngeleyesTrue/ae-adk/pkg/version"
 //
 //	func main() {
 //	    fmt.Println(version.GetFullVersion())
-//	    // Output: moai v1.14.0 (abc123def) built on 2026-01-01
+//	    // Output: ae v1.14.0 (abc123def) built on 2026-01-01
 //	}
 package version

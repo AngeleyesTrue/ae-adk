@@ -11,8 +11,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/modu-ai/moai-adk/internal/defs"
-	"github.com/modu-ai/moai-adk/pkg/version"
+	"github.com/AngeleyesTrue/ae-adk/internal/defs"
+	"github.com/AngeleyesTrue/ae-adk/pkg/version"
 )
 
 // CheckStatus represents the result of a single diagnostic check.
@@ -124,9 +124,9 @@ func runDiagnosticChecks(verbose bool, filterCheck string) []DiagnosticCheck {
 	allChecks := []checkFunc{
 		{"Go Runtime", checkGoRuntime},
 		{"Git", checkGit},
-		{"MoAI Config", checkMoAIConfig},
+		{"AE Config", checkAEConfig},
 		{"Claude Config", checkClaudeConfig},
-		{"MoAI Version", checkMoAIVersion},
+		{"AE Version", checkAEVersion},
 	}
 
 	var results []DiagnosticCheck
@@ -189,9 +189,9 @@ func checkGit(verbose bool) DiagnosticCheck {
 	return check
 }
 
-// checkMoAIConfig verifies .ae/ directory exists and contains valid config.
-func checkMoAIConfig(verbose bool) DiagnosticCheck {
-	check := DiagnosticCheck{Name: "MoAI Config"}
+// checkAEConfig verifies .ae/ directory exists and contains valid config.
+func checkAEConfig(verbose bool) DiagnosticCheck {
+	check := DiagnosticCheck{Name: "AE Config"}
 
 	cwd, err := os.Getwd()
 	if err != nil {
@@ -250,10 +250,10 @@ func checkClaudeConfig(verbose bool) DiagnosticCheck {
 	return check
 }
 
-// checkMoAIVersion reports the current AE-ADK version.
-func checkMoAIVersion(_ bool) DiagnosticCheck {
+// checkAEVersion reports the current AE-ADK version.
+func checkAEVersion(_ bool) DiagnosticCheck {
 	return DiagnosticCheck{
-		Name:    "MoAI Version",
+		Name:    "AE Version",
 		Status:  CheckOK,
 		Message: fmt.Sprintf("ae-adk %s", version.GetVersion()),
 	}

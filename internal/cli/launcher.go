@@ -10,11 +10,11 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/modu-ai/moai-adk/internal/config"
-	"github.com/modu-ai/moai-adk/internal/defs"
-	gitops "github.com/modu-ai/moai-adk/internal/git/ops"
-	"github.com/modu-ai/moai-adk/internal/profile"
-	"github.com/modu-ai/moai-adk/internal/tmux"
+	"github.com/AngeleyesTrue/ae-adk/internal/config"
+	"github.com/AngeleyesTrue/ae-adk/internal/defs"
+	gitops "github.com/AngeleyesTrue/ae-adk/internal/git/ops"
+	"github.com/AngeleyesTrue/ae-adk/internal/profile"
+	"github.com/AngeleyesTrue/ae-adk/internal/tmux"
 )
 
 // --- Unified Launch ---
@@ -294,7 +294,7 @@ func cleanupAeWorktrees(projectRoot string) string {
 		basePaths = append(basePaths, resolveSymlinks(localBase))
 	}
 
-	// 2. Global ~/.ae/worktrees/*/ paths (MoAI worktree migration target).
+	// 2. Global ~/.ae/worktrees/*/ paths (AE worktree migration target).
 	if homeDir, err := os.UserHomeDir(); err == nil {
 		globalBase := filepath.Join(homeDir, ".ae", "worktrees")
 		if entries, err := os.ReadDir(globalBase); err == nil {
@@ -521,7 +521,7 @@ func parseProfileFlag(args []string) (string, []string, error) {
 		}
 		if args[i] == "--profile" || args[i] == "-p" {
 			if i+1 >= len(args) || args[i+1] == "" || strings.HasPrefix(args[i+1], "-") {
-				return "", nil, fmt.Errorf("flag %s requires a profile name\n\nUsage:\n  moai <command> -p <profile-name>\n\nExamples:\n  ae cg -p work\n  ae cc -p default", args[i])
+				return "", nil, fmt.Errorf("flag %s requires a profile name\n\nUsage:\n  ae <command> -p <profile-name>\n\nExamples:\n  ae cg -p work\n  ae cc -p default", args[i])
 			}
 			profileName = args[i+1]
 			i++
@@ -531,14 +531,14 @@ func parseProfileFlag(args []string) (string, []string, error) {
 		if strings.HasPrefix(args[i], "--profile=") {
 			profileName = strings.TrimPrefix(args[i], "--profile=")
 			if profileName == "" {
-				return "", nil, fmt.Errorf("flag --profile= requires a non-empty profile name\n\nUsage:\n  moai <command> -p <profile-name>\n\nExamples:\n  ae cg -p work\n  ae cc --profile=default")
+				return "", nil, fmt.Errorf("flag --profile= requires a non-empty profile name\n\nUsage:\n  ae <command> -p <profile-name>\n\nExamples:\n  ae cg -p work\n  ae cc --profile=default")
 			}
 			continue
 		}
 		if strings.HasPrefix(args[i], "-p=") {
 			profileName = strings.TrimPrefix(args[i], "-p=")
 			if profileName == "" {
-				return "", nil, fmt.Errorf("flag -p= requires a non-empty profile name\n\nUsage:\n  moai <command> -p <profile-name>\n\nExamples:\n  ae cg -p work\n  ae cc -p=default")
+				return "", nil, fmt.Errorf("flag -p= requires a non-empty profile name\n\nUsage:\n  ae <command> -p <profile-name>\n\nExamples:\n  ae cg -p work\n  ae cc -p=default")
 			}
 			continue
 		}

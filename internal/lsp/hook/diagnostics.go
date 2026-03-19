@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/modu-ai/moai-adk/internal/lsp"
+	"github.com/AngeleyesTrue/ae-adk/internal/lsp"
 )
 
 // diagnosticsCollector implements LSPDiagnosticsCollector interface.

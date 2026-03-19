@@ -130,14 +130,14 @@ func TestLoadSegmentConfig(t *testing.T) {
     directory: true
     git_status: true
     claude_version: true
-    moai_version: true
+    ae_version: true
     git_branch: true
 `,
 			wantNil: false,
 			wantKeys: map[string]bool{
 				"model": true, "context": true, "output_style": true,
 				"directory": true, "git_status": true, "claude_version": true,
-				"moai_version": true, "git_branch": true,
+				"ae_version": true, "git_branch": true,
 			},
 		},
 		{
@@ -151,14 +151,14 @@ func TestLoadSegmentConfig(t *testing.T) {
     directory: false
     git_status: true
     claude_version: false
-    moai_version: false
+    ae_version: false
     git_branch: true
 `,
 			wantNil: false,
 			wantKeys: map[string]bool{
 				"model": true, "context": true, "output_style": false,
 				"directory": false, "git_status": true, "claude_version": false,
-				"moai_version": false, "git_branch": true,
+				"ae_version": false, "git_branch": true,
 			},
 		},
 		{

@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/AngeleyesTrue/ae-adk/internal/profile"
 	"github.com/charmbracelet/huh"
-	"github.com/modu-ai/moai-adk/internal/profile"
 	"github.com/spf13/cobra"
 )
 
@@ -182,8 +182,8 @@ func runProfileSetup(cmd *cobra.Command, args []string) error {
 				Title(t.StatuslineThemeTitle).
 				Description(t.StatuslineThemeDesc).
 				Options(
-					huh.NewOption(t.ThemeMoaiDark, "catppuccin-mocha"),
-					huh.NewOption(t.ThemeMoaiLight, "catppuccin-latte"),
+					huh.NewOption(t.ThemeAEDark, "catppuccin-mocha"),
+					huh.NewOption(t.ThemeAELight, "catppuccin-latte"),
 				).
 				Value(&statuslineTheme),
 		).Title(t.DisplayTitle),

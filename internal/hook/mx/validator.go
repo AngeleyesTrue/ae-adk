@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -248,40 +247,50 @@ func extractFunctions(lines []string) []funcInfo {
 }
 
 // countFanIn counts the number of references to funcName in the project directory.
-// It uses grep to search for the function name and subtracts 1 for the declaration.
+// It searches for the function name in all .go files and subtracts 1 for the declaration.
 func (v *mxValidator) countFanIn(ctx context.Context, funcName, currentFile string) int {
 	if v.projectRoot == "" {
 		return 0
 	}
 
-	// Use grep to count references to the function name in .go files
-	cmd := exec.CommandContext(ctx, "grep", "-r", "--include=*.go", "-l", funcName, v.projectRoot)
-	out, err := cmd.Output()
-	if err != nil {
-		// grep returns exit 1 when no matches found
-		return 0
-	}
-
-	// Count files that reference the function
-	files := strings.Split(strings.TrimSpace(string(out)), "\n")
 	callerCount := 0
-	for _, f := range files {
-		f = strings.TrimSpace(f)
-		if f == "" {
-			continue
-		}
-		// Count the number of times funcName appears in each file
-		data, err := os.ReadFile(f)
+	_ = filepath.WalkDir(v.projectRoot, func(path string, d os.DirEntry, err error) error {
 		if err != nil {
-			continue
+			return nil
 		}
+
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+		}
+
+		if d.IsDir() {
+			if strings.HasPrefix(d.Name(), ".") && d.Name() != "." {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+
+		if !strings.HasSuffix(d.Name(), ".go") {
+			return nil
+		}
+
+		data, err := os.ReadFile(path)
+		if err != nil {
+			return nil
+		}
+
 		count := strings.Count(string(data), funcName)
-		if f == currentFile {
+		if path == currentFile {
 			// Subtract 1 for the declaration itself
 			count--
 		}
-		callerCount += count
-	}
+		if count > 0 {
+			callerCount += count
+		}
+		return nil
+	})
 
 	return callerCount
 }

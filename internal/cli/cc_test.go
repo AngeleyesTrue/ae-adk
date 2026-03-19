@@ -80,6 +80,15 @@ func TestCCCmd_Execution_NoDeps(t *testing.T) {
 }
 
 func TestCCCmd_WithProfile(t *testing.T) {
+	tmpDir := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(tmpDir, ".ae"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	origFn := findProjectRootFn
+	findProjectRootFn = func() (string, error) { return tmpDir, nil }
+	defer func() { findProjectRootFn = origFn }()
+
 	origDeps := deps
 	defer func() { deps = origDeps }()
 	deps = nil

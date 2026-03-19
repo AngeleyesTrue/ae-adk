@@ -5,7 +5,7 @@ import (
 	"io"
 	"testing"
 
-	"github.com/modu-ai/moai-adk/internal/hook"
+	"github.com/AngeleyesTrue/ae-adk/internal/hook"
 )
 
 // --- Spy types for verifying event dispatch wiring ---

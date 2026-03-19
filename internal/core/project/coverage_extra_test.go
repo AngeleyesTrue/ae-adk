@@ -20,8 +20,8 @@ func resolveSymlinks(t *testing.T, path string) string {
 	return resolved
 }
 
-func TestFindProjectRoot_WithMoAI(t *testing.T) {
-	// This test creates a temp dir with .moai, changes to it, and verifies FindProjectRoot works
+func TestFindProjectRoot_WithAE(t *testing.T) {
+	// This test creates a temp dir with .ae, changes to it, and verifies FindProjectRoot works
 	root := resolveSymlinks(t, t.TempDir())
 	mkDir(t, root, ".ae")
 
@@ -48,8 +48,8 @@ func TestFindProjectRoot_WithMoAI(t *testing.T) {
 	}
 }
 
-func TestFindProjectRoot_NoMoAI(t *testing.T) {
-	// Create a temp dir without .moai at any level
+func TestFindProjectRoot_NoAE(t *testing.T) {
+	// Create a temp dir without .ae at any level
 	tmpDir := t.TempDir()
 	subDir := filepath.Join(tmpDir, "a", "b", "c")
 	if err := os.MkdirAll(subDir, 0755); err != nil {
@@ -74,7 +74,7 @@ func TestFindProjectRoot_NoMoAI(t *testing.T) {
 	}
 }
 
-func TestFindProjectRootOrCurrent_WithMoAI(t *testing.T) {
+func TestFindProjectRootOrCurrent_WithAE(t *testing.T) {
 	root := resolveSymlinks(t, t.TempDir())
 	mkDir(t, root, ".ae")
 
@@ -100,7 +100,7 @@ func TestFindProjectRootOrCurrent_WithMoAI(t *testing.T) {
 	}
 }
 
-func TestFindProjectRootOrCurrent_NoMoAI(t *testing.T) {
+func TestFindProjectRootOrCurrent_NoAE(t *testing.T) {
 	tmpDir := resolveSymlinks(t, t.TempDir())
 
 	origDir, err := os.Getwd()

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/modu-ai/moai-adk/internal/github"
+	"github.com/AngeleyesTrue/ae-adk/internal/github"
 	"github.com/spf13/cobra"
 )
 

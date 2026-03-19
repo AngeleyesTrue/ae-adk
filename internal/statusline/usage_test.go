@@ -221,7 +221,7 @@ func TestReadOAuthToken_Fallback(t *testing.T) {
 // TestReadOAuthToken_DotPrefixCredentials verifies that credentials stored at
 // ~/.claude/.credentials.json (dot-prefixed, as Claude Code uses on Linux/WSL2)
 // are read correctly when keychain is unavailable.
-// Regression test for: https://github.com/modu-ai/moai-adk/issues/496
+// Regression test for: https://github.com/AngeleyesTrue/ae-adk/issues/496
 func TestReadOAuthToken_DotPrefixCredentials(t *testing.T) {
 	t.Parallel()
 
@@ -257,7 +257,7 @@ func TestReadOAuthToken_DotPrefixCredentials(t *testing.T) {
 
 // TestReadOAuthToken_DotPrefixNestedCredentials verifies that nested claudeAiOauth.accessToken
 // format in ~/.claude/.credentials.json is read correctly on Linux/WSL2.
-// Regression test for: https://github.com/modu-ai/moai-adk/issues/496
+// Regression test for: https://github.com/AngeleyesTrue/ae-adk/issues/496
 func TestReadOAuthToken_DotPrefixNestedCredentials(t *testing.T) {
 	t.Parallel()
 

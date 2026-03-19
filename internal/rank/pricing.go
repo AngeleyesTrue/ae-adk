@@ -1,4 +1,4 @@
-// Package rank provides model pricing for MoAI Rank cost calculation.
+// Package rank provides model pricing for AE Rank cost calculation.
 package rank
 
 // ModelPricing holds pricing information for a Claude model.

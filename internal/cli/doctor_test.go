@@ -173,7 +173,7 @@ func TestCheckGit(t *testing.T) {
 	}
 }
 
-func TestCheckMoAIConfig_Missing(t *testing.T) {
+func TestCheckAEConfig_Missing(t *testing.T) {
 	// Use a temp directory without .ae/
 	tmpDir := t.TempDir()
 	origDir, err := os.Getwd()
@@ -189,13 +189,13 @@ func TestCheckMoAIConfig_Missing(t *testing.T) {
 		}
 	}()
 
-	check := checkMoAIConfig(false)
+	check := checkAEConfig(false)
 	if check.Status != CheckWarn {
 		t.Errorf("check.Status = %q, want %q for missing .ae/", check.Status, CheckWarn)
 	}
 }
 
-func TestCheckMoAIConfig_Present(t *testing.T) {
+func TestCheckAEConfig_Present(t *testing.T) {
 	tmpDir := t.TempDir()
 	if err := os.MkdirAll(filepath.Join(tmpDir, ".ae", "config", "sections"), 0o755); err != nil {
 		t.Fatal(err)
@@ -214,7 +214,7 @@ func TestCheckMoAIConfig_Present(t *testing.T) {
 		}
 	}()
 
-	check := checkMoAIConfig(false)
+	check := checkAEConfig(false)
 	if check.Status != CheckOK {
 		t.Errorf("check.Status = %q, want %q for present .ae/", check.Status, CheckOK)
 	}
@@ -241,10 +241,10 @@ func TestCheckClaudeConfig_Missing(t *testing.T) {
 	}
 }
 
-func TestCheckMoAIVersion(t *testing.T) {
-	check := checkMoAIVersion(false)
-	if check.Name != "MoAI Version" {
-		t.Errorf("check.Name = %q, want 'MoAI Version'", check.Name)
+func TestCheckAEVersion(t *testing.T) {
+	check := checkAEVersion(false)
+	if check.Name != "AE Version" {
+		t.Errorf("check.Name = %q, want 'AE Version'", check.Name)
 	}
 	if check.Status != CheckOK {
 		t.Errorf("check.Status = %q, want %q", check.Status, CheckOK)

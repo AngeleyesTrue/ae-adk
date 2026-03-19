@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"strings"
 
-	"github.com/modu-ai/moai-adk/internal/core/quality"
+	"github.com/AngeleyesTrue/ae-adk/internal/core/quality"
 )
 
 // ReviewDecision represents the outcome of a PR review.

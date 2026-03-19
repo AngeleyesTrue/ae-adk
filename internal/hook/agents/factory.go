@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/modu-ai/moai-adk/internal/hook"
+	"github.com/AngeleyesTrue/ae-adk/internal/hook"
 )
 
 // Factory creates agent-specific hook handlers based on action.

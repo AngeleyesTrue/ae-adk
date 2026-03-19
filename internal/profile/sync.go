@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/modu-ai/moai-adk/internal/config"
-	"github.com/modu-ai/moai-adk/pkg/models"
+	"github.com/AngeleyesTrue/ae-adk/internal/config"
+	"github.com/AngeleyesTrue/ae-adk/pkg/models"
 	"gopkg.in/yaml.v3"
 )
 
@@ -153,7 +153,7 @@ func defaultStatuslineSegments() map[string]bool {
 		"directory":      true,
 		"git_status":     true,
 		"claude_version": true,
-		"moai_version":   true,
+		"ae_version":     true,
 		"git_branch":     true,
 		"session_time":   true,
 		"usage_5h":       true,

@@ -1,4 +1,4 @@
-// Package rank provides device identification for MoAI Rank multi-device support.
+// Package rank provides device identification for AE Rank multi-device support.
 package rank
 
 import (
@@ -37,7 +37,7 @@ func GetDeviceInfo() DeviceInfo {
 // generateDeviceID creates a stable device identifier from the hostname.
 // The ID is truncated to 16 characters for brevity.
 func generateDeviceID(hostname string) string {
-	data := fmt.Sprintf("moai-device:%s:%s:%s", hostname, runtime.GOOS, runtime.GOARCH)
+	data := fmt.Sprintf("ae-device:%s:%s:%s", hostname, runtime.GOOS, runtime.GOARCH)
 	hash := sha256.Sum256([]byte(data))
 	return hex.EncodeToString(hash[:])[:16]
 }

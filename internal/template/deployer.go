@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/modu-ai/moai-adk/internal/manifest"
+	"github.com/AngeleyesTrue/ae-adk/internal/manifest"
 )
 
 // @MX:ANCHOR: [AUTO] Deployer is the core interface that extracts templates from embedded filesystem and deploys to project root. Each file is tracked in manifest.

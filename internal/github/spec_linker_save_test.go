@@ -22,14 +22,14 @@ func TestSpecLinker_Save_MkdirAllFails(t *testing.T) {
 		t.Fatalf("NewSpecLinker() error: %v", err)
 	}
 
-	// Now make the parent of .moai read-only so MkdirAll will fail when
+	// Now make the parent of .ae read-only so MkdirAll will fail when
 	// save() tries to create a subdirectory inside the read-only dir.
 	// We achieve this by making the temp dir itself read-only,
-	// which prevents creation of the .moai directory within it.
-	// First ensure .moai does NOT yet exist (it won't since no link was saved).
+	// which prevents creation of the .ae directory within it.
+	// First ensure .ae does NOT yet exist (it won't since no link was saved).
 	aeDir := filepath.Join(dir, ".ae")
 	if _, err := os.Stat(aeDir); err == nil {
-		// If .moai already exists, remove it so MkdirAll is needed.
+		// If .ae already exists, remove it so MkdirAll is needed.
 		if err := os.RemoveAll(aeDir); err != nil {
 			t.Fatalf("RemoveAll: %v", err)
 		}
@@ -129,12 +129,12 @@ func TestSpecLinker_Save_AtomicWrite(t *testing.T) {
 	}
 }
 
-// TestSpecLinker_Save_CreatesDir verifies that save() creates the .moai directory if absent.
+// TestSpecLinker_Save_CreatesDir verifies that save() creates the .ae directory if absent.
 func TestSpecLinker_Save_CreatesDir(t *testing.T) {
 	t.Parallel()
 
 	dir := t.TempDir()
-	// Do NOT pre-create the .moai directory; save() should create it.
+	// Do NOT pre-create the .ae directory; save() should create it.
 	registryPath := filepath.Join(dir, ".ae", RegistryFileName)
 
 	linker := &fileSpecLinker{
@@ -146,7 +146,7 @@ func TestSpecLinker_Save_CreatesDir(t *testing.T) {
 	}
 
 	if err := linker.save(); err != nil {
-		t.Fatalf("save() error = %v (should create .moai dir)", err)
+		t.Fatalf("save() error = %v (should create .ae dir)", err)
 	}
 
 	if _, err := os.Stat(registryPath); err != nil {

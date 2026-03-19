@@ -1,8 +1,10 @@
 package template
 
 import (
-	"github.com/modu-ai/moai-adk/internal/config"
-	"github.com/modu-ai/moai-adk/pkg/models"
+	"runtime"
+
+	"github.com/AngeleyesTrue/ae-adk/internal/config"
+	"github.com/AngeleyesTrue/ae-adk/pkg/models"
 )
 
 // TemplateContext provides data for template rendering during project initialization.
@@ -131,9 +133,14 @@ func WithDevelopmentMode(mode string) ContextOption {
 }
 
 // WithPlatform sets the target platform.
+// Falls back to runtime.GOOS if platform is empty.
 func WithPlatform(platform string) ContextOption {
 	return func(c *TemplateContext) {
-		c.Platform = platform
+		if platform == "" {
+			c.Platform = runtime.GOOS
+		} else {
+			c.Platform = platform
+		}
 	}
 }
 

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/modu-ai/moai-adk/internal/config"
+	"github.com/AngeleyesTrue/ae-adk/internal/config"
 )
 
 func TestGLMCmd_Exists(t *testing.T) {

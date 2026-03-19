@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/modu-ai/moai-adk/internal/hook/security"
+	"github.com/AngeleyesTrue/ae-adk/internal/hook/security"
 )
 
 // TestScanWriteContent_InvalidJSON tests scanWriteContent with invalid JSON input.

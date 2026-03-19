@@ -19,7 +19,7 @@ func setupProject(t *testing.T) string {
 	return dir
 }
 
-// writeManifest writes a manifest JSON file to the project's .moai directory.
+// writeManifest writes a manifest JSON file to the project's .ae directory.
 func writeManifest(t *testing.T, projectRoot string, data []byte) {
 	t.Helper()
 	path := filepath.Join(projectRoot, ".ae", manifestFileName)
@@ -563,7 +563,7 @@ func TestManagerIntegration(t *testing.T) {
 
 		// Create test files
 		writeProjectFile(t, root, ".claude/settings.json", []byte(`{"hooks":{}}`))
-		writeProjectFile(t, root, "CLAUDE.md", []byte("# MoAI"))
+		writeProjectFile(t, root, "CLAUDE.md", []byte("# AE"))
 
 		// 1. Load (fresh manifest)
 		mgr := NewManager()
@@ -611,7 +611,7 @@ func TestManagerIntegration(t *testing.T) {
 		}
 
 		// 6. Modify file and detect
-		writeProjectFile(t, root, "CLAUDE.md", []byte("# Modified MoAI"))
+		writeProjectFile(t, root, "CLAUDE.md", []byte("# Modified AE"))
 		changes, err = mgr2.DetectChanges()
 		if err != nil {
 			t.Fatalf("DetectChanges error: %v", err)

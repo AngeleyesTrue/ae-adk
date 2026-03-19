@@ -7,12 +7,12 @@ import (
 	"testing"
 )
 
-// TestCleanupMoaiWorktrees_GlobalPath verifies that cleanupAeWorktrees
+// TestCleanupAEWorktrees_GlobalPath verifies that cleanupAeWorktrees
 // removes worker worktrees from both the local .claude/worktrees/ path and
 // the global ~/.ae/worktrees/*/ path.
 //
 // NOTE: does not call t.Parallel() because it sets HOME via t.Setenv.
-func TestCleanupMoaiWorktrees_GlobalPath(t *testing.T) {
+func TestCleanupAEWorktrees_GlobalPath(t *testing.T) {
 	tests := []struct {
 		name         string
 		createLocal  bool // create a worktree under .claude/worktrees/
@@ -369,7 +369,7 @@ func TestUnifiedLaunch_CG_WithTestMode(t *testing.T) {
 
 func TestUnifiedLaunch_NotInProject(t *testing.T) {
 	tmpDir := t.TempDir()
-	// No .moai directory
+	// No .ae directory
 
 	origDir, _ := os.Getwd()
 	defer func() { _ = os.Chdir(origDir) }()

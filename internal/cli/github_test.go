@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/modu-ai/moai-adk/internal/github"
-	"github.com/modu-ai/moai-adk/internal/workflow"
+	"github.com/AngeleyesTrue/ae-adk/internal/github"
+	"github.com/AngeleyesTrue/ae-adk/internal/workflow"
 )
 
 // mockIssueParser implements github.IssueParser for testing.

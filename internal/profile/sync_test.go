@@ -177,7 +177,7 @@ func TestSyncToProjectConfig_PartialPrefs(t *testing.T) {
 
 func TestSyncToProjectConfig_NoConfigDir(t *testing.T) {
 	projectRoot := t.TempDir()
-	// No .moai directory - should still work (ConfigManager creates defaults)
+	// No .ae directory - should still work (ConfigManager creates defaults)
 
 	prefs := ProfilePreferences{
 		UserName:         "testuser",
@@ -264,7 +264,7 @@ func TestSyncToProjectConfig_StatuslineDefaultsWhenAbsent(t *testing.T) {
 		t.Errorf("preset = %q, want %q", wrapper.Statusline.Preset, "full")
 	}
 	// Segments should all be enabled
-	for _, seg := range []string{"model", "context", "output_style", "directory", "git_status", "claude_version", "moai_version", "git_branch"} {
+	for _, seg := range []string{"model", "context", "output_style", "directory", "git_status", "claude_version", "ae_version", "git_branch"} {
 		if !wrapper.Statusline.Segments[seg] {
 			t.Errorf("segment %q should be enabled by default", seg)
 		}

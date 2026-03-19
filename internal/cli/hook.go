@@ -8,7 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/modu-ai/moai-adk/internal/hook"
+	"github.com/AngeleyesTrue/ae-adk/internal/hook"
 )
 
 var hookCmd = &cobra.Command{

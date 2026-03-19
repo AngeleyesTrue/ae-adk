@@ -1,4 +1,4 @@
-// Package rank provides a client for the MoAI Rank API service.
+// Package rank provides a client for the AE Rank API service.
 // It supports session submission, leaderboard queries, user ranking,
 // and HMAC-SHA256 authenticated requests.
 package rank
@@ -173,7 +173,7 @@ func WithHTTPClient(httpClient *http.Client) ClientOption {
 
 // --- Client Implementation ---
 
-// RankClient implements Client for the MoAI Rank API.
+// RankClient implements Client for the AE Rank API.
 type RankClient struct {
 	apiKey     string
 	baseURL    string

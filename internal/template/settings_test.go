@@ -124,7 +124,7 @@ func TestSettingsTemplatePlatformHookCommands(t *testing.T) {
 		if strings.Contains(output, `bash \"$CLAUDE_PROJECT_DIR`) {
 			t.Error("darwin should not use bash prefix for hook commands")
 		}
-		if !strings.Contains(output, `\"$CLAUDE_PROJECT_DIR/.claude/hooks/moai/handle-session-start.sh\"`) {
+		if !strings.Contains(output, `\"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-session-start.sh\"`) {
 			t.Error("darwin should have direct path to hook script")
 		}
 	})
@@ -143,8 +143,8 @@ func TestSettingsTemplateOutputStyle(t *testing.T) {
 	ctx := testContext("darwin")
 	output := renderTemplate(t, ".claude/settings.json.tmpl", ctx)
 
-	if !strings.Contains(output, `"outputStyle": "MoAI"`) {
-		t.Error("settings should contain outputStyle: MoAI")
+	if !strings.Contains(output, `"outputStyle": "AE"`) {
+		t.Error("settings should contain outputStyle.*AE")
 	}
 }
 
@@ -176,12 +176,12 @@ func TestSettingsTemplateAttribution(t *testing.T) {
 		t.Fatal("missing attribution section")
 	}
 	commit, _ := attr["commit"].(string)
-	if !strings.Contains(commit, "MoAI") {
-		t.Errorf("attribution.commit should contain MoAI, got %q", commit)
+	if !strings.Contains(commit, "AE") {
+		t.Errorf("attribution.commit should contain AE, got %q", commit)
 	}
 	pr, _ := attr["pr"].(string)
-	if !strings.Contains(pr, "MoAI") {
-		t.Errorf("attribution.pr should contain MoAI, got %q", pr)
+	if !strings.Contains(pr, "AE") {
+		t.Errorf("attribution.pr should contain AE, got %q", pr)
 	}
 }
 
@@ -464,7 +464,7 @@ func TestSettingsTemplateNewHooksPlatformCompatibility(t *testing.T) {
 
 					switch platform {
 					case "darwin", "linux":
-						expected := `"$CLAUDE_PROJECT_DIR/.claude/hooks/moai/` + ne.scriptName + `"`
+						expected := `"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/` + ne.scriptName + `"`
 						if !strings.Contains(command, expected) {
 							t.Errorf("%s/%s: command %q does not contain expected path %q", platform, ne.event, command, expected)
 						}
@@ -567,12 +567,12 @@ func TestMCPTemplatePlatformCommands(t *testing.T) {
 		}
 	})
 
-	t.Run("windows_uses_cmd", func(t *testing.T) {
+	t.Run("windows_uses_pwsh", func(t *testing.T) {
 		ctx := testContext("windows")
 		output := renderTemplate(t, ".mcp.json.tmpl", ctx)
 
-		if !strings.Contains(output, "cmd.exe") {
-			t.Error("windows should use cmd.exe")
+		if !strings.Contains(output, "pwsh.exe") {
+			t.Error("windows should use pwsh.exe")
 		}
 	})
 }
@@ -858,6 +858,59 @@ func TestIsUserScopedWindowsPath(t *testing.T) {
 				t.Errorf("isUserScopedWindowsPath(%q) = %v, want %v", tt.entry, got, tt.want)
 			}
 		})
+	}
+}
+
+// TestBuildSmartPATH_Windows verifies that Windows-specific paths are included
+// when running on Windows (GOOS=windows).
+func TestBuildSmartPATH_Windows(t *testing.T) {
+	if runtime.GOOS != "windows" {
+		t.Skip("Windows PATH tests only apply on Windows")
+	}
+
+	path := BuildSmartPATH()
+	sep := string(os.PathListSeparator)
+
+	// Windows system paths must be present
+	winDir := os.Getenv("SystemRoot")
+	if winDir == "" {
+		winDir = `C:\WINDOWS`
+	}
+
+	system32 := filepath.Join(winDir, "system32")
+	if !PathContainsDir(path, system32, sep) {
+		t.Errorf("Windows: SmartPATH should contain %q\nfull SmartPATH: %s", system32, path)
+	}
+
+	// Common development tool paths should be present
+	programFiles := os.Getenv("ProgramFiles")
+	if programFiles == "" {
+		programFiles = `C:\Program Files`
+	}
+
+	nodejsPath := filepath.Join(programFiles, "nodejs")
+	if !PathContainsDir(path, nodejsPath, sep) {
+		t.Errorf("Windows: SmartPATH should contain %q (for npx/npm/node)\nfull SmartPATH: %s", nodejsPath, path)
+	}
+
+	goPath := filepath.Join(programFiles, "Go", "bin")
+	if !PathContainsDir(path, goPath, sep) {
+		t.Errorf("Windows: SmartPATH should contain %q\nfull SmartPATH: %s", goPath, path)
+	}
+
+	pwshPath := filepath.Join(programFiles, "PowerShell", "7")
+	if !PathContainsDir(path, pwshPath, sep) {
+		t.Errorf("Windows: SmartPATH should contain %q\nfull SmartPATH: %s", pwshPath, path)
+	}
+
+	ghPath := filepath.Join(programFiles, "GitHub CLI")
+	if !PathContainsDir(path, ghPath, sep) {
+		t.Errorf("Windows: SmartPATH should contain %q\nfull SmartPATH: %s", ghPath, path)
+	}
+
+	// Git Bash POSIX paths should also be present (Claude Code runs in Git Bash)
+	if !PathContainsDir(path, "/usr/bin", sep) {
+		t.Errorf("Windows: SmartPATH should contain /usr/bin for Git Bash compatibility\nfull SmartPATH: %s", path)
 	}
 }
 

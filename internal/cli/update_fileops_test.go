@@ -8,14 +8,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/modu-ai/moai-adk/internal/defs"
+	"github.com/AngeleyesTrue/ae-adk/internal/defs"
 )
 
-// --- backupMoaiConfig additional edge case tests ---
+// --- backupAEConfig additional edge case tests ---
 
-func TestBackupMoaiConfig_ConfigPathIsFile(t *testing.T) {
+func TestBackupAEConfig_ConfigPathIsFile(t *testing.T) {
 	// When .ae/config is a regular file instead of a directory,
-	// backupMoaiConfig should return an error.
+	// backupAEConfig should return an error.
 	tmpDir := t.TempDir()
 	aeDir := filepath.Join(tmpDir, defs.AEDir)
 	if err := os.MkdirAll(aeDir, 0o755); err != nil {
@@ -28,7 +28,7 @@ func TestBackupMoaiConfig_ConfigPathIsFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err := backupMoaiConfig(tmpDir)
+	_, err := backupAEConfig(tmpDir)
 	if err == nil {
 		t.Fatal("expected error when config path is a file, got nil")
 	}
@@ -37,7 +37,7 @@ func TestBackupMoaiConfig_ConfigPathIsFile(t *testing.T) {
 	}
 }
 
-func TestBackupMoaiConfig_MetadataContainsAllFields(t *testing.T) {
+func TestBackupAEConfig_MetadataContainsAllFields(t *testing.T) {
 	tmpDir := t.TempDir()
 	sectionsDir := filepath.Join(tmpDir, defs.AEDir, defs.ConfigSubdir, "sections")
 	if err := os.MkdirAll(sectionsDir, 0o755); err != nil {
@@ -47,9 +47,9 @@ func TestBackupMoaiConfig_MetadataContainsAllFields(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	backupDir, err := backupMoaiConfig(tmpDir)
+	backupDir, err := backupAEConfig(tmpDir)
 	if err != nil {
-		t.Fatalf("backupMoaiConfig failed: %v", err)
+		t.Fatalf("backupAEConfig failed: %v", err)
 	}
 	if backupDir == "" {
 		t.Fatal("expected non-empty backup dir")
@@ -90,7 +90,7 @@ func TestBackupMoaiConfig_MetadataContainsAllFields(t *testing.T) {
 	}
 }
 
-func TestBackupMoaiConfig_NestedSubdirectories(t *testing.T) {
+func TestBackupAEConfig_NestedSubdirectories(t *testing.T) {
 	// Verify that deeply nested files are backed up properly.
 	tmpDir := t.TempDir()
 	deepDir := filepath.Join(tmpDir, defs.AEDir, defs.ConfigSubdir, "sections", "nested", "deep")
@@ -101,9 +101,9 @@ func TestBackupMoaiConfig_NestedSubdirectories(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	backupDir, err := backupMoaiConfig(tmpDir)
+	backupDir, err := backupAEConfig(tmpDir)
 	if err != nil {
-		t.Fatalf("backupMoaiConfig failed: %v", err)
+		t.Fatalf("backupAEConfig failed: %v", err)
 	}
 
 	// Verify the deeply nested file was backed up
@@ -223,9 +223,9 @@ func TestSaveTemplateDefaults_OverwritesExisting(t *testing.T) {
 	}
 }
 
-// --- restoreMoaiConfigLegacy tests ---
+// --- restoreAEConfigLegacy tests ---
 
-func TestRestoreMoaiConfigLegacy_RestoresFiles(t *testing.T) {
+func TestRestoreAEConfigLegacy_RestoresFiles(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Create the config directory (simulating freshly deployed templates)
@@ -247,9 +247,9 @@ func TestRestoreMoaiConfigLegacy_RestoresFiles(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err := restoreMoaiConfigLegacy(tmpDir, backupDir, configDir)
+	err := restoreAEConfigLegacy(tmpDir, backupDir, configDir)
 	if err != nil {
-		t.Fatalf("restoreMoaiConfigLegacy failed: %v", err)
+		t.Fatalf("restoreAEConfigLegacy failed: %v", err)
 	}
 
 	// Verify the file was restored to the config directory
@@ -263,7 +263,7 @@ func TestRestoreMoaiConfigLegacy_RestoresFiles(t *testing.T) {
 	}
 }
 
-func TestRestoreMoaiConfigLegacy_SkipsMetadata(t *testing.T) {
+func TestRestoreAEConfigLegacy_SkipsMetadata(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	configDir := filepath.Join(tmpDir, defs.AEDir, defs.ConfigSubdir)
@@ -291,9 +291,9 @@ func TestRestoreMoaiConfigLegacy_SkipsMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err := restoreMoaiConfigLegacy(tmpDir, backupDir, configDir)
+	err := restoreAEConfigLegacy(tmpDir, backupDir, configDir)
 	if err != nil {
-		t.Fatalf("restoreMoaiConfigLegacy failed: %v", err)
+		t.Fatalf("restoreAEConfigLegacy failed: %v", err)
 	}
 
 	// backup_metadata.json should NOT be restored to config dir
@@ -309,7 +309,7 @@ func TestRestoreMoaiConfigLegacy_SkipsMetadata(t *testing.T) {
 	}
 }
 
-func TestRestoreMoaiConfigLegacy_MergesWithExistingTarget(t *testing.T) {
+func TestRestoreAEConfigLegacy_MergesWithExistingTarget(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	configDir := filepath.Join(tmpDir, defs.AEDir, defs.ConfigSubdir)
@@ -334,9 +334,9 @@ func TestRestoreMoaiConfigLegacy_MergesWithExistingTarget(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err := restoreMoaiConfigLegacy(tmpDir, backupDir, configDir)
+	err := restoreAEConfigLegacy(tmpDir, backupDir, configDir)
 	if err != nil {
-		t.Fatalf("restoreMoaiConfigLegacy failed: %v", err)
+		t.Fatalf("restoreAEConfigLegacy failed: %v", err)
 	}
 
 	// Read the merged result
@@ -351,7 +351,7 @@ func TestRestoreMoaiConfigLegacy_MergesWithExistingTarget(t *testing.T) {
 	}
 }
 
-func TestRestoreMoaiConfigLegacy_EmptyBackup(t *testing.T) {
+func TestRestoreAEConfigLegacy_EmptyBackup(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	configDir := filepath.Join(tmpDir, defs.AEDir, defs.ConfigSubdir)
@@ -366,15 +366,15 @@ func TestRestoreMoaiConfigLegacy_EmptyBackup(t *testing.T) {
 	}
 
 	// Should complete without error
-	err := restoreMoaiConfigLegacy(tmpDir, backupDir, configDir)
+	err := restoreAEConfigLegacy(tmpDir, backupDir, configDir)
 	if err != nil {
-		t.Fatalf("restoreMoaiConfigLegacy should succeed with empty backup, got: %v", err)
+		t.Fatalf("restoreAEConfigLegacy should succeed with empty backup, got: %v", err)
 	}
 }
 
-// --- restoreMoaiConfig (3-way merge path) tests ---
+// --- restoreAEConfig (3-way merge path) tests ---
 
-func TestRestoreMoaiConfig_FallsBackToLegacyWhenNoSections(t *testing.T) {
+func TestRestoreAEConfig_FallsBackToLegacyWhenNoSections(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Create config directory
@@ -393,9 +393,9 @@ func TestRestoreMoaiConfig_FallsBackToLegacyWhenNoSections(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err := restoreMoaiConfig(tmpDir, backupDir)
+	err := restoreAEConfig(tmpDir, backupDir)
 	if err != nil {
-		t.Fatalf("restoreMoaiConfig should fall back to legacy, got: %v", err)
+		t.Fatalf("restoreAEConfig should fall back to legacy, got: %v", err)
 	}
 
 	// The file should be restored via the legacy path
@@ -409,7 +409,7 @@ func TestRestoreMoaiConfig_FallsBackToLegacyWhenNoSections(t *testing.T) {
 	}
 }
 
-func TestRestoreMoaiConfig_3WayMergeWithTemplateDefaults(t *testing.T) {
+func TestRestoreAEConfig_3WayMergeWithTemplateDefaults(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Create config directory with new template data
@@ -447,9 +447,9 @@ func TestRestoreMoaiConfig_3WayMergeWithTemplateDefaults(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err := restoreMoaiConfig(tmpDir, backupDir)
+	err := restoreAEConfig(tmpDir, backupDir)
 	if err != nil {
-		t.Fatalf("restoreMoaiConfig failed: %v", err)
+		t.Fatalf("restoreAEConfig failed: %v", err)
 	}
 
 	// Read the merged result
@@ -469,7 +469,7 @@ func TestRestoreMoaiConfig_3WayMergeWithTemplateDefaults(t *testing.T) {
 	}
 }
 
-func TestRestoreMoaiConfig_SkipsNonYAMLFiles(t *testing.T) {
+func TestRestoreAEConfig_SkipsNonYAMLFiles(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	configDir := filepath.Join(tmpDir, defs.AEDir, defs.ConfigSubdir)
@@ -495,9 +495,9 @@ func TestRestoreMoaiConfig_SkipsNonYAMLFiles(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err := restoreMoaiConfig(tmpDir, backupDir)
+	err := restoreAEConfig(tmpDir, backupDir)
 	if err != nil {
-		t.Fatalf("restoreMoaiConfig failed: %v", err)
+		t.Fatalf("restoreAEConfig failed: %v", err)
 	}
 
 	// JSON file should NOT be restored
@@ -513,9 +513,9 @@ func TestRestoreMoaiConfig_SkipsNonYAMLFiles(t *testing.T) {
 	}
 }
 
-// --- cleanMoaiManagedPaths additional tests ---
+// --- cleanAEManagedPaths additional tests ---
 
-func TestCleanMoaiManagedPaths_OnlyUserFilesPreserved(t *testing.T) {
+func TestCleanAEManagedPaths_OnlyUserFilesPreserved(t *testing.T) {
 	root := t.TempDir()
 
 	// Create user files in .claude/ that should NOT be deleted
@@ -528,19 +528,19 @@ func TestCleanMoaiManagedPaths_OnlyUserFilesPreserved(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Create moai-managed files
-	moaiAgentDir := filepath.Join(root, ".claude", "agents", "ae")
-	if err := os.MkdirAll(moaiAgentDir, 0o755); err != nil {
+	// Create ae-managed files
+	aeAgentDir := filepath.Join(root, ".claude", "agents", "ae")
+	if err := os.MkdirAll(aeAgentDir, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(moaiAgentDir, "expert.md"), []byte("managed"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(aeAgentDir, "expert.md"), []byte("managed"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 
 	var buf bytes.Buffer
-	err := cleanMoaiManagedPaths(root, &buf)
+	err := cleanAEManagedPaths(root, &buf)
 	if err != nil {
-		t.Fatalf("cleanMoaiManagedPaths failed: %v", err)
+		t.Fatalf("cleanAEManagedPaths failed: %v", err)
 	}
 
 	// User's custom agent directory should still exist
@@ -548,9 +548,9 @@ func TestCleanMoaiManagedPaths_OnlyUserFilesPreserved(t *testing.T) {
 		t.Error("user's custom agent file should be preserved")
 	}
 
-	// Moai-managed agent directory should be removed
-	if _, err := os.Stat(moaiAgentDir); !os.IsNotExist(err) {
-		t.Error("moai-managed agents directory should be removed")
+	// ae-managed agent directory should be removed
+	if _, err := os.Stat(aeAgentDir); !os.IsNotExist(err) {
+		t.Error("ae-managed agents directory should be removed")
 	}
 }
 
@@ -612,7 +612,7 @@ func TestRunTemplateSyncWithProgress_VersionUpToDate(t *testing.T) {
 
 	// Write system.yaml with the current version to trigger "up-to-date" path
 	currentVersion := "0.0.0-test"
-	systemContent := []byte("moai:\n  template_version: \"" + currentVersion + "\"\n")
+	systemContent := []byte("ae:\n  template_version: \"" + currentVersion + "\"\n")
 	if err := os.WriteFile(filepath.Join(sectionsDir, defs.SystemYAML), systemContent, 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -649,7 +649,7 @@ func TestGetProjectConfigVersion_ValidFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	content := []byte("moai:\n  template_version: \"2.5.0\"\n")
+	content := []byte("ae:\n  template_version: \"2.5.0\"\n")
 	if err := os.WriteFile(filepath.Join(sectionsDir, defs.SystemYAML), content, 0o644); err != nil {
 		t.Fatal(err)
 	}

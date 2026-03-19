@@ -24,7 +24,7 @@ func TestUpdater_Download_Success(t *testing.T) {
 	// Use platform-specific binary name
 	binaryName := "ae"
 	if runtime.GOOS == "windows" {
-		binaryName = "moai.exe"
+		binaryName = "ae.exe"
 	}
 
 	binaryContent := []byte("fake binary content for testing")
@@ -42,7 +42,7 @@ func TestUpdater_Download_Success(t *testing.T) {
 
 	info := &VersionInfo{
 		Version:  "v1.2.0",
-		URL:      ts.URL + "/moai-darwin-arm64.tar.gz",
+		URL:      ts.URL + "/ae-darwin-arm64.tar.gz",
 		Checksum: checksum,
 	}
 
@@ -199,7 +199,7 @@ func TestUpdater_Replace_Success(t *testing.T) {
 	}
 
 	// Write new binary with valid Mach-O 64-bit magic bytes.
-	newPath := filepath.Join(dir, "moai-new")
+	newPath := filepath.Join(dir, "ae-new")
 	newContent := append([]byte{0xcf, 0xfa, 0xed, 0xfe}, []byte("new binary payload")...)
 	if err := os.WriteFile(newPath, newContent, 0o755); err != nil {
 		t.Fatalf("write new: %v", err)
@@ -259,7 +259,7 @@ func TestUpdater_Replace_RejectsGzipArchive(t *testing.T) {
 	}
 
 	// Write a gzip file as "new binary".
-	newPath := filepath.Join(dir, "moai-new")
+	newPath := filepath.Join(dir, "ae-new")
 	gzipContent := []byte{0x1f, 0x8b, 0x08, 0x00} // gzip magic bytes
 	if err := os.WriteFile(newPath, gzipContent, 0o755); err != nil {
 		t.Fatalf("write gzip: %v", err)
@@ -296,7 +296,7 @@ func TestUpdater_Replace_RejectsZipArchive(t *testing.T) {
 	}
 
 	// Write a zip file as "new binary".
-	newPath := filepath.Join(dir, "moai-new")
+	newPath := filepath.Join(dir, "ae-new")
 	zipContent := []byte{0x50, 0x4b, 0x03, 0x04} // zip magic bytes (PK)
 	if err := os.WriteFile(newPath, zipContent, 0o755); err != nil {
 		t.Fatalf("write zip: %v", err)
@@ -324,7 +324,7 @@ func TestUpdater_Replace_RejectsUnknownFormat(t *testing.T) {
 	}
 
 	// Write a file with unknown magic bytes.
-	newPath := filepath.Join(dir, "moai-new")
+	newPath := filepath.Join(dir, "ae-new")
 	unknownContent := []byte{0xde, 0xad, 0xbe, 0xef}
 	if err := os.WriteFile(newPath, unknownContent, 0o755); err != nil {
 		t.Fatalf("write unknown: %v", err)
@@ -352,7 +352,7 @@ func TestUpdater_Replace_AcceptsELF(t *testing.T) {
 	}
 
 	// Write a valid ELF binary.
-	newPath := filepath.Join(dir, "moai-new")
+	newPath := filepath.Join(dir, "ae-new")
 	elfContent := append([]byte{0x7f, 0x45, 0x4c, 0x46}, []byte("elf payload")...)
 	if err := os.WriteFile(newPath, elfContent, 0o755); err != nil {
 		t.Fatalf("write elf: %v", err)
@@ -376,7 +376,7 @@ func TestUpdater_Replace_AcceptsPE(t *testing.T) {
 	}
 
 	// Write a valid PE (Windows) binary.
-	newPath := filepath.Join(dir, "moai-new")
+	newPath := filepath.Join(dir, "ae-new")
 	peContent := append([]byte{0x4d, 0x5a}, []byte("pe payload")...)
 	if err := os.WriteFile(newPath, peContent, 0o755); err != nil {
 		t.Fatalf("write pe: %v", err)
@@ -400,7 +400,7 @@ func TestUpdater_Replace_AcceptsMachOUniversal(t *testing.T) {
 	}
 
 	// Write a valid Mach-O Universal Binary (Fat Binary).
-	newPath := filepath.Join(dir, "moai-new")
+	newPath := filepath.Join(dir, "ae-new")
 	fatContent := append([]byte{0xca, 0xfe, 0xba, 0xbe}, []byte("fat payload")...)
 	if err := os.WriteFile(newPath, fatContent, 0o755); err != nil {
 		t.Fatalf("write fat: %v", err)
@@ -424,7 +424,7 @@ func TestUpdater_Replace_RejectsTooSmallFile(t *testing.T) {
 	}
 
 	// Write a file too small to have valid magic bytes.
-	newPath := filepath.Join(dir, "moai-new")
+	newPath := filepath.Join(dir, "ae-new")
 	if err := os.WriteFile(newPath, []byte{0x00}, 0o755); err != nil {
 		t.Fatalf("write tiny: %v", err)
 	}
@@ -457,7 +457,7 @@ func TestReplaceOnWindows(t *testing.T) {
 	}
 
 	// Create new binary.
-	newBinaryPath := filepath.Join(dir, "moai.new")
+	newBinaryPath := filepath.Join(dir, "ae.new")
 	if err := os.WriteFile(newBinaryPath, []byte("new-binary"), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -496,7 +496,7 @@ func TestUpdater_Download_FromZipArchive(t *testing.T) {
 
 	binaryName := "ae"
 	if runtime.GOOS == "windows" {
-		binaryName = "moai.exe"
+		binaryName = "ae.exe"
 	}
 
 	binaryContent := []byte("zip binary content for testing")
@@ -514,7 +514,7 @@ func TestUpdater_Download_FromZipArchive(t *testing.T) {
 
 	info := &VersionInfo{
 		Version:  "v1.3.0",
-		URL:      ts.URL + "/moai-darwin-arm64.zip",
+		URL:      ts.URL + "/ae-darwin-arm64.zip",
 		Checksum: checksum,
 	}
 
@@ -537,7 +537,7 @@ func TestUpdater_Download_NoChecksum(t *testing.T) {
 
 	binaryName := "ae"
 	if runtime.GOOS == "windows" {
-		binaryName = "moai.exe"
+		binaryName = "ae.exe"
 	}
 
 	binaryContent := []byte("binary without checksum")
@@ -554,7 +554,7 @@ func TestUpdater_Download_NoChecksum(t *testing.T) {
 
 	info := &VersionInfo{
 		Version: "v1.4.0",
-		URL:     ts.URL + "/moai.tar.gz",
+		URL:     ts.URL + "/ae.tar.gz",
 		// No Checksum - should still succeed
 	}
 
@@ -598,7 +598,7 @@ func TestExtractFromZip_BinaryNotFound(t *testing.T) {
 	dir := t.TempDir()
 
 	// Create a zip with a different file name
-	archiveData := createZip(t, "not-moai", []byte("some content"))
+	archiveData := createZip(t, "not-ae", []byte("some content"))
 	archivePath := filepath.Join(dir, "test.zip")
 	if err := os.WriteFile(archivePath, archiveData, 0o644); err != nil {
 		t.Fatal(err)
@@ -619,7 +619,7 @@ func TestExtractFromTarGz_BinaryNotFound(t *testing.T) {
 
 	dir := t.TempDir()
 
-	archiveData := createTarGz(t, "not-moai", []byte("some content"))
+	archiveData := createTarGz(t, "not-ae", []byte("some content"))
 	archivePath := filepath.Join(dir, "test.tar.gz")
 	if err := os.WriteFile(archivePath, archiveData, 0o644); err != nil {
 		t.Fatal(err)

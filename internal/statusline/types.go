@@ -81,7 +81,7 @@ type WorkspaceInfo struct {
 
 // OutputStyleInfo represents the output style from Claude Code.
 type OutputStyleInfo struct {
-	Name string `json:"name"` // e.g., "MoAI", "R2-D2", "Yoda"
+	Name string `json:"name"` // e.g., "AE", "R2-D2", "Yoda"
 }
 
 // CostData represents the session cost information from Claude Code.
@@ -178,7 +178,7 @@ const (
 	SegmentDirectory     = "directory"
 	SegmentGitStatus     = "git_status"
 	SegmentClaudeVersion = "claude_version"
-	SegmentMoaiVersion   = "moai_version"
+	SegmentAEVersion     = "ae_version"
 	SegmentGitBranch     = "git_branch"
 
 	// v3 new segment constants (REQ-V3-TIME-003, enabled in Phase 4)

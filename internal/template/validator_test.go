@@ -119,7 +119,7 @@ func TestValidatorValidateDeployment(t *testing.T) {
 
 		// Create valid files
 		writeFile(t, root, ".claude/settings.json", []byte(`{"hooks":{}}`))
-		writeFile(t, root, "CLAUDE.md", []byte("# MoAI"))
+		writeFile(t, root, "CLAUDE.md", []byte("# AE"))
 
 		report := v.ValidateDeployment(root, []string{
 			".claude/settings.json",
@@ -139,7 +139,7 @@ func TestValidatorValidateDeployment(t *testing.T) {
 
 	t.Run("missing_file", func(t *testing.T) {
 		root := t.TempDir()
-		writeFile(t, root, "CLAUDE.md", []byte("# MoAI"))
+		writeFile(t, root, "CLAUDE.md", []byte("# AE"))
 
 		report := v.ValidateDeployment(root, []string{
 			".claude/settings.json", // does not exist

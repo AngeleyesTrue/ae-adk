@@ -7,7 +7,7 @@ import (
 	"slices"
 	"time"
 
-	"github.com/modu-ai/moai-adk/internal/config"
+	"github.com/AngeleyesTrue/ae-adk/internal/config"
 )
 
 // DefaultHookTimeout is the default timeout for hook execution (30 seconds).

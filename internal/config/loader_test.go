@@ -116,10 +116,10 @@ func TestLoaderMissingSectionsDir(t *testing.T) {
 	t.Parallel()
 
 	tempDir := t.TempDir()
-	// Create .moai but not the config/sections subdirectory
+	// Create .ae but not the config/sections subdirectory
 	aeDir := filepath.Join(tempDir, ".ae")
 	if err := os.MkdirAll(aeDir, 0o755); err != nil {
-		t.Fatalf("failed to create moai dir: %v", err)
+		t.Fatalf("failed to create ae dir: %v", err)
 	}
 
 	loader := NewLoader()

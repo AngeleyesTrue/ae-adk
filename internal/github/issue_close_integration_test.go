@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/modu-ai/moai-adk/internal/i18n"
+	"github.com/AngeleyesTrue/ae-adk/internal/i18n"
 )
 
 // TestIntegration_CommentGenerator_To_IssueCloser verifies the end-to-end flow:

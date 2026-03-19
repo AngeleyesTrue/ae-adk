@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/modu-ai/moai-adk/internal/config"
+	"github.com/AngeleyesTrue/ae-adk/internal/config"
 )
 
 // --- Tests for loadGLMConfig ---
@@ -328,13 +328,13 @@ func TestGetGLMEnvPath_ReturnsExpectedPath(t *testing.T) {
 	}
 }
 
-func TestGetGLMEnvPath_ContainsMoaiDir(t *testing.T) {
+func TestGetGLMEnvPath_ContainsAEDir(t *testing.T) {
 	path := getGLMEnvPath()
 	if path == "" {
 		t.Skip("cannot determine home directory")
 	}
 	if !strings.Contains(path, ".ae") {
-		t.Errorf("getGLMEnvPath() = %q, should contain '.moai'", path)
+		t.Errorf("getGLMEnvPath() = %q, should contain '.ae'", path)
 	}
 	if !strings.HasSuffix(path, ".env.glm") {
 		t.Errorf("getGLMEnvPath() = %q, should end with '.env.glm'", path)
@@ -348,7 +348,7 @@ func TestSaveGLMKey_DirectoryCreation(t *testing.T) {
 	t.Setenv("HOME", tmpHome)
 	t.Setenv("USERPROFILE", tmpHome)
 
-	// .moai directory does not exist yet.
+	// .ae directory does not exist yet.
 	err := saveGLMKey("new-key")
 	if err != nil {
 		t.Fatalf("saveGLMKey should create directory, got: %v", err)

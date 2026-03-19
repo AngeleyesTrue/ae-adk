@@ -211,27 +211,27 @@ func TestThemeConfig_Defaults(t *testing.T) {
 	}
 }
 
-// --- NewMoAIHuhTheme tests ---
+// --- NewAEHuhTheme tests ---
 
-func TestNewMoAIHuhTheme_Default(t *testing.T) {
-	theme := NewMoAIHuhTheme(false)
+func TestNewAEHuhTheme_Default(t *testing.T) {
+	theme := NewAEHuhTheme(false)
 	if theme == nil {
-		t.Fatal("NewMoAIHuhTheme(false) returned nil")
+		t.Fatal("NewAEHuhTheme(false) returned nil")
 	}
 }
 
-func TestNewMoAIHuhTheme_NoColor(t *testing.T) {
-	theme := NewMoAIHuhTheme(true)
+func TestNewAEHuhTheme_NoColor(t *testing.T) {
+	theme := NewAEHuhTheme(true)
 	if theme == nil {
-		t.Fatal("NewMoAIHuhTheme(true) returned nil")
+		t.Fatal("NewAEHuhTheme(true) returned nil")
 	}
 }
 
-func TestNewMoAIHuhTheme_DifferentFromBase(t *testing.T) {
+func TestNewAEHuhTheme_DifferentFromBase(t *testing.T) {
 	// The no-color theme should be the base theme;
 	// the color theme should be customized.
-	noColorTheme := NewMoAIHuhTheme(true)
-	colorTheme := NewMoAIHuhTheme(false)
+	noColorTheme := NewAEHuhTheme(true)
+	colorTheme := NewAEHuhTheme(false)
 
 	if noColorTheme == nil || colorTheme == nil {
 		t.Fatal("themes should not be nil")

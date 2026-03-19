@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/modu-ai/moai-adk/internal/tmux"
+	"github.com/AngeleyesTrue/ae-adk/internal/tmux"
 )
 
 // TmuxIntegration implements SPEC-WORKTREE-002 R5: Tmux Integration requirements.
@@ -37,7 +37,7 @@ type TmuxSessionConfig struct {
 
 // CreateTmuxSession creates a tmux session for the worktree.
 //
-// R5.1: Session name pattern: moai-{ProjectName}-{SPEC-ID}
+// R5.1: Session name pattern: ae-{ProjectName}-{SPEC-ID}
 // R5.2-5.3: Inject environment variables in GLM/CG mode; no injection in CC mode
 // R5.4: After session creation, cd to worktree and execute /ae run command
 //
@@ -99,10 +99,10 @@ func buildTmuxInitialCommand(cfg *TmuxSessionConfig) string {
 	cdCmd := fmt.Sprintf("cd %s", cfg.WorktreePath)
 
 	// Execute the /ae run command
-	moaiCmd := fmt.Sprintf("/ae run %s", cfg.SpecID)
+	aeCmd := fmt.Sprintf("/ae run %s", cfg.SpecID)
 
 	// Chain the two commands (separated by ;)
-	return fmt.Sprintf("%s ; %s", cdCmd, moaiCmd)
+	return fmt.Sprintf("%s ; %s", cdCmd, aeCmd)
 }
 
 // IsTmuxAvailable checks whether tmux is available in the current environment.

@@ -66,7 +66,7 @@ func (s *selectorImpl) selectInteractive(label string, items []SelectItem) (stri
 	sel := buildSelectField(label, items, &selected)
 
 	form := huh.NewForm(huh.NewGroup(sel)).
-		WithTheme(NewMoAIHuhTheme(s.theme.NoColor)).
+		WithTheme(NewAEHuhTheme(s.theme.NoColor)).
 		WithAccessible(s.headless.IsHeadless())
 
 	if err := form.Run(); err != nil {

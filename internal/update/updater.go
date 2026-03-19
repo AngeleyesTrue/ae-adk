@@ -54,7 +54,7 @@ func (u *updaterImpl) Download(ctx context.Context, version *VersionInfo) (strin
 
 	// Create temp file in the same directory as the binary for atomic rename.
 	dir := filepath.Dir(u.binaryPath)
-	tmpFile, err := os.CreateTemp(dir, ".moai-download-*.tmp")
+	tmpFile, err := os.CreateTemp(dir, ".ae-download-*.tmp")
 	if err != nil {
 		return "", fmt.Errorf("%w: create temp file: %v", ErrDownloadFailed, err)
 	}
@@ -173,12 +173,12 @@ func (u *updaterImpl) replaceOnWindows(newBinaryPath string) error {
 	return nil
 }
 
-// extractBinary detects the archive format and extracts the moai binary.
+// extractBinary detects the archive format and extracts the ae binary.
 // It returns the path to a temp file containing the extracted binary.
 func (u *updaterImpl) extractBinary(archivePath string) (string, error) {
 	binaryName := "ae"
 	if runtime.GOOS == "windows" {
-		binaryName = "moai.exe"
+		binaryName = "ae.exe"
 	}
 
 	// Detect format via magic bytes.
@@ -279,9 +279,9 @@ func validateBinaryFormat(path string) error {
 	// Reject known archive formats (the most common mistake).
 	switch {
 	case magic[0] == 0x1f && magic[1] == 0x8b:
-		return fmt.Errorf("%w: file is a gzip archive, not an executable. Run: curl -sSL https://raw.githubusercontent.com/modu-ai/ae-adk/main/install.sh | bash", ErrReplaceFailed)
+		return fmt.Errorf("%w: file is a gzip archive, not an executable. Run: curl -sSL https://raw.githubusercontent.com/AngeleyesTrue/ae-adk/main/install.sh | bash", ErrReplaceFailed)
 	case magic[0] == 0x50 && magic[1] == 0x4b:
-		return fmt.Errorf("%w: file is a zip archive, not an executable. Run: curl -sSL https://raw.githubusercontent.com/modu-ai/ae-adk/main/install.sh | bash", ErrReplaceFailed)
+		return fmt.Errorf("%w: file is a zip archive, not an executable. Run: curl -sSL https://raw.githubusercontent.com/AngeleyesTrue/ae-adk/main/install.sh | bash", ErrReplaceFailed)
 	}
 
 	// Accept known executable formats.
@@ -309,14 +309,14 @@ func validateBinaryFormat(path string) error {
 		return nil
 	}
 
-	return fmt.Errorf("%w: unrecognized binary format (magic: %x). Run: curl -sSL https://raw.githubusercontent.com/modu-ai/ae-adk/main/install.sh | bash", ErrReplaceFailed, magic[:n])
+	return fmt.Errorf("%w: unrecognized binary format (magic: %x). Run: curl -sSL https://raw.githubusercontent.com/AngeleyesTrue/ae-adk/main/install.sh | bash", ErrReplaceFailed, magic[:n])
 }
 
 // writeExtractedBinary writes the binary content from r to a temp file
 // in the same directory as the target binary.
 func (u *updaterImpl) writeExtractedBinary(r io.Reader) (string, error) {
 	dir := filepath.Dir(u.binaryPath)
-	tmp, err := os.CreateTemp(dir, ".moai-extracted-*.tmp")
+	tmp, err := os.CreateTemp(dir, ".ae-extracted-*.tmp")
 	if err != nil {
 		return "", fmt.Errorf("create temp file: %w", err)
 	}

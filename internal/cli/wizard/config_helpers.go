@@ -8,15 +8,15 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// moaiSectionsDir returns the path to the sections directory relative to the project root.
-func moaiSectionsDir(projectRoot string) string {
+// aeSectionsDir returns the path to the sections directory relative to the project root.
+func aeSectionsDir(projectRoot string) string {
 	return filepath.Join(projectRoot, ".ae", "config", "sections")
 }
 
 // ReadLocaleFromProject reads conversation_language from language.yaml.
 // Returns an empty string if the file is missing or parsing fails.
 func ReadLocaleFromProject(projectRoot string) string {
-	langPath := filepath.Join(moaiSectionsDir(projectRoot), "language.yaml")
+	langPath := filepath.Join(aeSectionsDir(projectRoot), "language.yaml")
 	data, err := os.ReadFile(langPath)
 	if err != nil {
 		return ""
@@ -50,7 +50,7 @@ func ReadGitLabUsernameFromConfig(projectRoot string) string {
 
 // readUserField reads a specific field from the user section of user.yaml.
 func readUserField(projectRoot, field string) string {
-	userPath := filepath.Join(moaiSectionsDir(projectRoot), "user.yaml")
+	userPath := filepath.Join(aeSectionsDir(projectRoot), "user.yaml")
 	data, err := os.ReadFile(userPath)
 	if err != nil {
 		return ""

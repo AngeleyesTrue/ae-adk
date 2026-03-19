@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/modu-ai/moai-adk/internal/rank"
+	"github.com/AngeleyesTrue/ae-adk/internal/rank"
 )
 
 func TestRankCmd_Exists(t *testing.T) {

@@ -17,11 +17,11 @@ func TestGetProfileText_ThemeFields(t *testing.T) {
 			if text.StatuslineThemeDesc == "" {
 				t.Errorf("lang %q: StatuslineThemeDesc is empty", lang)
 			}
-			if text.ThemeMoaiDark == "" {
-				t.Errorf("lang %q: ThemeMoaiDark is empty", lang)
+			if text.ThemeAEDark == "" {
+				t.Errorf("lang %q: ThemeAEDark is empty", lang)
 			}
-			if text.ThemeMoaiLight == "" {
-				t.Errorf("lang %q: ThemeMoaiLight is empty", lang)
+			if text.ThemeAELight == "" {
+				t.Errorf("lang %q: ThemeAELight is empty", lang)
 			}
 		})
 	}

@@ -57,8 +57,8 @@ type profileSetupText struct {
 	// Statusline theme selector
 	StatuslineThemeTitle string
 	StatuslineThemeDesc  string
-	ThemeMoaiDark        string
-	ThemeMoaiLight       string
+	ThemeAEDark        string
+	ThemeAELight       string
 
 	// Messages
 	SetupCancelled string
@@ -107,8 +107,8 @@ var profileSetupTexts = map[string]profileSetupText{
 		ModeMinimal:          "Minimal - Model and context only",
 		StatuslineThemeTitle: "Statusline Theme",
 		StatuslineThemeDesc:  "Select a color theme for the statusline.",
-		ThemeMoaiDark:        "MoAI Dark",
-		ThemeMoaiLight:       "MoAI Light",
+		ThemeAEDark:        "AE Dark",
+		ThemeAELight:       "AE Light",
 		SetupCancelled:       "Setup cancelled.",
 		SavedProfile:         "\nSaved profile '%s':\n  Preferences → %s\n",
 	},
@@ -152,8 +152,8 @@ var profileSetupTexts = map[string]profileSetupText{
 		ModeMinimal:          "Minimal - 모델과 컨텍스트만 표시",
 		StatuslineThemeTitle: "Statusline 테마",
 		StatuslineThemeDesc:  "상태줄 색상 테마를 선택하세요.",
-		ThemeMoaiDark:        "MoAI Dark",
-		ThemeMoaiLight:       "MoAI Light",
+		ThemeAEDark:        "AE Dark",
+		ThemeAELight:       "AE Light",
 		SetupCancelled:       "설정이 취소되었습니다.",
 		SavedProfile:         "\n프로필 '%s' 저장 완료:\n  환경설정 → %s\n",
 	},
@@ -197,8 +197,8 @@ var profileSetupTexts = map[string]profileSetupText{
 		ModeMinimal:          "Minimal - モデルとコンテキストのみ",
 		StatuslineThemeTitle: "ステータスラインテーマ",
 		StatuslineThemeDesc:  "ステータスラインのカラーテーマを選択してください。",
-		ThemeMoaiDark:        "MoAI Dark",
-		ThemeMoaiLight:       "MoAI Light",
+		ThemeAEDark:        "AE Dark",
+		ThemeAELight:       "AE Light",
 		SetupCancelled:       "セットアップがキャンセルされました。",
 		SavedProfile:         "\nプロファイル '%s' を保存しました:\n  環境設定 → %s\n",
 	},
@@ -242,8 +242,8 @@ var profileSetupTexts = map[string]profileSetupText{
 		ModeMinimal:          "Minimal - 仅显示模型和上下文",
 		StatuslineThemeTitle: "状态栏主题",
 		StatuslineThemeDesc:  "选择状态栏的颜色主题。",
-		ThemeMoaiDark:        "MoAI Dark",
-		ThemeMoaiLight:       "MoAI Light",
+		ThemeAEDark:        "AE Dark",
+		ThemeAELight:       "AE Light",
 		SetupCancelled:       "设置已取消。",
 		SavedProfile:         "\n配置文件 '%s' 已保存:\n  偏好设置 → %s\n",
 	},

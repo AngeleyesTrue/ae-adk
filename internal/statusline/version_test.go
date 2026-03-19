@@ -27,7 +27,7 @@ func TestVersionCollector_CheckUpdate(t *testing.T) {
 					t.Fatal(err)
 				}
 				configPath := filepath.Join(configDir, "system.yaml")
-				content := []byte("moai:\n  version: 1.14.0\n")
+				content := []byte("ae:\n  version: 1.14.0\n")
 				if err := os.WriteFile(configPath, content, 0644); err != nil {
 					t.Fatal(err)
 				}
@@ -47,7 +47,7 @@ func TestVersionCollector_CheckUpdate(t *testing.T) {
 					t.Fatal(err)
 				}
 				configPath := filepath.Join(configDir, "system.yaml")
-				content := []byte("moai:\n  version: v2.0.0\n")
+				content := []byte("ae:\n  version: v2.0.0\n")
 				if err := os.WriteFile(configPath, content, 0644); err != nil {
 					t.Fatal(err)
 				}
@@ -68,7 +68,7 @@ func TestVersionCollector_CheckUpdate(t *testing.T) {
 					t.Fatal(err)
 				}
 				configPath := filepath.Join(configDir, "system.yaml")
-				content := []byte("moai:\n  version: v2.0.0\n")
+				content := []byte("ae:\n  version: v2.0.0\n")
 				if err := os.WriteFile(configPath, content, 0644); err != nil {
 					t.Fatal(err)
 				}
@@ -98,7 +98,7 @@ func TestVersionCollector_CheckUpdate(t *testing.T) {
 					t.Fatal(err)
 				}
 				configPath := filepath.Join(configDir, "system.yaml")
-				content := []byte("moai:\n  version: ''\n")
+				content := []byte("ae:\n  version: ''\n")
 				if err := os.WriteFile(configPath, content, 0644); err != nil {
 					t.Fatal(err)
 				}
@@ -126,7 +126,7 @@ func TestVersionCollector_CheckUpdate(t *testing.T) {
 					t.Fatal(err)
 				}
 				configPath := filepath.Join(configDir, "system.yaml")
-				content := []byte("moai:\n  version: v2.0.0\n")
+				content := []byte("ae:\n  version: v2.0.0\n")
 				if err := os.WriteFile(configPath, content, 0644); err != nil {
 					t.Fatal(err)
 				}
@@ -179,9 +179,9 @@ func TestVersionCollector_CheckUpdate(t *testing.T) {
 }
 
 func TestVersionCollector_PrefersTemplateVersion(t *testing.T) {
-	// Reproduction test: when moai.template_version differs from moai.version,
-	// the collector should use moai.template_version (updated by ae update)
-	// rather than moai.version (only set during ae init).
+	// Reproduction test: when ae.template_version differs from ae.version,
+	// the collector should use ae.template_version (updated by ae update)
+	// rather than ae.version (only set during ae init).
 	dir := t.TempDir()
 	configDir := filepath.Join(dir, ".ae", "config", "sections")
 	if err := os.MkdirAll(configDir, 0755); err != nil {
@@ -189,7 +189,7 @@ func TestVersionCollector_PrefersTemplateVersion(t *testing.T) {
 	}
 	configPath := filepath.Join(configDir, "system.yaml")
 	// Simulate a project initialized at v0.40.1, then updated to v2.2.1
-	content := []byte("moai:\n  version: 0.40.1\n  template_version: 2.2.1\n")
+	content := []byte("ae:\n  version: 0.40.1\n  template_version: 2.2.1\n")
 	if err := os.WriteFile(configPath, content, 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -206,9 +206,9 @@ func TestVersionCollector_PrefersTemplateVersion(t *testing.T) {
 		t.Fatalf("CheckUpdate() error = %v", err)
 	}
 
-	// Should read template_version (2.2.1), not moai.version (0.40.1)
+	// Should read template_version (2.2.1), not ae.version (0.40.1)
 	if got.Current != "2.2.1" {
-		t.Errorf("CheckUpdate() Current = %q, want %q (should prefer moai.template_version)", got.Current, "2.2.1")
+		t.Errorf("CheckUpdate() Current = %q, want %q (should prefer ae.template_version)", got.Current, "2.2.1")
 	}
 	// Binary matches template_version, so no update should be available
 	if got.UpdateAvailable {
@@ -216,15 +216,15 @@ func TestVersionCollector_PrefersTemplateVersion(t *testing.T) {
 	}
 }
 
-func TestVersionCollector_FallbackToMoaiVersion(t *testing.T) {
-	// When moai.template_version is missing, fall back to moai.version
+func TestVersionCollector_FallbackToAEVersion(t *testing.T) {
+	// When ae.template_version is missing, fall back to ae.version
 	dir := t.TempDir()
 	configDir := filepath.Join(dir, ".ae", "config", "sections")
 	if err := os.MkdirAll(configDir, 0755); err != nil {
 		t.Fatal(err)
 	}
 	configPath := filepath.Join(configDir, "system.yaml")
-	content := []byte("moai:\n  version: 1.5.0\n")
+	content := []byte("ae:\n  version: 1.5.0\n")
 	if err := os.WriteFile(configPath, content, 0644); err != nil {
 		t.Fatal(err)
 	}

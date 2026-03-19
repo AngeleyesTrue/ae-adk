@@ -203,11 +203,17 @@ func TestRunTool(t *testing.T) {
 			t.Fatalf("failed to create test file: %v", err)
 		}
 
-		// Use echo command which should work everywhere
+		cmdName := "echo"
+		args := []string{"test"}
+		if runtime.GOOS == "windows" {
+			cmdName = "cmd"
+			args = []string{"/c", "echo", "test"}
+		}
+
 		tool := ToolConfig{
 			Name:           "echo-test",
-			Command:        "echo",
-			Args:           []string{"test"},
+			Command:        cmdName,
+			Args:           args,
 			Extensions:     []string{".txt"},
 			ToolType:       ToolTypeFormatter,
 			TimeoutSeconds: 5,
@@ -368,10 +374,17 @@ func TestShellInjectionPrevention(t *testing.T) {
 		_ = os.WriteFile(testFile, []byte("content"), 0644)
 
 		// Try to inject shell commands
+		cmdName := "echo"
+		args := []string{"$(echo payload)", "; rm -rf /", "$(whoami)"}
+		if runtime.GOOS == "windows" {
+			cmdName = "cmd"
+			args = append([]string{"/c", "echo"}, args...)
+		}
+
 		tool := ToolConfig{
 			Name:           "inject-test",
-			Command:        "echo",
-			Args:           []string{"$(echo payload)", "; rm -rf /", "$(whoami)"},
+			Command:        cmdName,
+			Args:           args,
 			Extensions:     []string{".test"},
 			ToolType:       ToolTypeFormatter,
 			TimeoutSeconds: 5,

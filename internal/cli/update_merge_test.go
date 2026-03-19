@@ -75,7 +75,7 @@ func TestMergeUserFiles_NoBaseTemplate(t *testing.T) {
 	// Create parent directory
 	aeDir := filepath.Join(tempDir, ".ae")
 	if err := os.MkdirAll(aeDir, 0755); err != nil {
-		t.Fatalf("create .moai dir: %v", err)
+		t.Fatalf("create .ae dir: %v", err)
 	}
 
 	userContent := `#!/bin/bash
@@ -213,13 +213,13 @@ func TestMergeUserFiles_EdgeCases(t *testing.T) {
 
 // TestCollectMergeableFiles_ConfigSections tests that the collectMergeableFiles
 // function returns only the fixed files, excluding .ae/config/sections/*.yaml
-// which are handled by restoreMoaiConfig.
+// which are handled by restoreAEConfig.
 func TestCollectMergeableFiles_ConfigSections(t *testing.T) {
 	t.Parallel()
 
 	// Create the collectMergeableFiles function inline for testing
 	collectMergeableFiles := func(projectRoot string) []string {
-		// Fixed mergeable files at project root that are NOT handled by restoreMoaiConfig
+		// Fixed mergeable files at project root that are NOT handled by restoreAEConfig
 		return []string{
 			".mcp.json",
 			".claude/settings.json",
@@ -264,12 +264,12 @@ func TestCollectMergeableFiles_ConfigSections(t *testing.T) {
 		}
 	}
 
-	// Verify config section YAML files are NOT included (they're handled by restoreMoaiConfig)
+	// Verify config section YAML files are NOT included (they're handled by restoreAEConfig)
 	for _, cf := range configFiles {
 		excludedPath := filepath.Join(".ae", "config", "sections", cf)
 		for _, rf := range result {
 			if rf == excludedPath {
-				t.Errorf("config section file %s should NOT be in result (handled by restoreMoaiConfig)", excludedPath)
+				t.Errorf("config section file %s should NOT be in result (handled by restoreAEConfig)", excludedPath)
 			}
 		}
 	}

@@ -64,15 +64,64 @@ func BuildSmartPATH() string {
 			"/usr/local/bin",     // Intel Homebrew / system
 			"/usr/local/sbin",    // Intel Homebrew system
 		)
+		// Standard POSIX system paths
+		candidates = append(candidates, "/usr/bin", "/bin", "/usr/sbin", "/sbin")
+	case "windows":
+		// Windows native paths: Claude Code on Windows runs inside Git Bash (MINGW64)
+		// but MCP servers, hooks, and status line need access to Windows-installed tools
+		// (npx, npm, node, go, gh, pip, etc.) via the system PATH.
+		winDir := os.Getenv("SystemRoot")
+		if winDir == "" {
+			winDir = `C:\WINDOWS`
+		}
+		programFiles := os.Getenv("ProgramFiles")
+		if programFiles == "" {
+			programFiles = `C:\Program Files`
+		}
+		appData := os.Getenv("APPDATA")
+		localAppData := os.Getenv("LOCALAPPDATA")
+
+		// System essentials
+		candidates = append(candidates,
+			filepath.Join(winDir, "system32"),
+			winDir,
+			filepath.Join(winDir, "System32", "Wbem"),
+			filepath.Join(winDir, "System32", "WindowsPowerShell", "v1.0"),
+			filepath.Join(winDir, "System32", "OpenSSH"),
+		)
+		// Common development tools
+		candidates = append(candidates,
+			filepath.Join(programFiles, "nodejs"),          // node, npm, npx
+			filepath.Join(programFiles, "Go", "bin"),       // go
+			filepath.Join(programFiles, "PowerShell", "7"), // pwsh
+			filepath.Join(programFiles, "GitHub CLI"),      // gh
+			filepath.Join(programFiles, "Git", "cmd"),      // git
+			filepath.Join(programFiles, "Docker", "Docker", "resources", "bin"), // docker
+		)
+		// User-scoped tools
+		if appData != "" {
+			candidates = append(candidates,
+				filepath.Join(appData, "npm"), // global npm packages
+			)
+		}
+		if localAppData != "" {
+			candidates = append(candidates,
+				filepath.Join(localAppData, "Programs", "ae"),                  // ae-adk binary (install.ps1)
+				filepath.Join(localAppData, "Python", "bin"),                   // pip, python (Windows Store)
+				filepath.Join(localAppData, "Microsoft", "WindowsApps"),        // winget aliases
+				filepath.Join(localAppData, "Programs", "Microsoft VS Code", "bin"), // code CLI
+			)
+		}
+		// Git Bash POSIX layer (needed since Claude Code shell is Git Bash)
+		candidates = append(candidates, "/usr/local/bin", "/usr/local/sbin", "/usr/bin", "/bin", "/usr/sbin", "/sbin")
 	default: // linux, etc.
 		candidates = append(candidates,
 			"/usr/local/bin",
 			"/usr/local/sbin",
 		)
+		// Standard POSIX system paths
+		candidates = append(candidates, "/usr/bin", "/bin", "/usr/sbin", "/sbin")
 	}
-
-	// Standard POSIX system paths (always required)
-	candidates = append(candidates, "/usr/bin", "/bin", "/usr/sbin", "/sbin")
 
 	// WSL2: append Windows drive-mount paths from the current terminal PATH.
 	// WSL2 maps Windows drives as /mnt/<letter>/ (e.g., /mnt/c/, /mnt/d/),

@@ -5,7 +5,7 @@ package wizard
 import (
 	"errors"
 
-	"github.com/modu-ai/moai-adk/pkg/models"
+	"github.com/AngeleyesTrue/ae-adk/pkg/models"
 )
 
 // WizardResult holds the user's selections from the init wizard.

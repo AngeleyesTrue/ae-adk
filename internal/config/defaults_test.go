@@ -3,7 +3,7 @@ package config
 import (
 	"testing"
 
-	"github.com/modu-ai/moai-adk/pkg/models"
+	"github.com/AngeleyesTrue/ae-adk/pkg/models"
 )
 
 func TestNewDefaultConfig(t *testing.T) {
@@ -388,7 +388,7 @@ func TestDefaultConstants(t *testing.T) {
 		{"DefaultPlanTokens", DefaultPlanTokens, 30000},
 		{"DefaultRunTokens", DefaultRunTokens, 180000},
 		{"DefaultSyncTokens", DefaultSyncTokens, 40000},
-		{"DefaultBranchPrefix", DefaultBranchPrefix, "moai/"},
+		{"DefaultBranchPrefix", DefaultBranchPrefix, "ae/"},
 		{"DefaultCommitStyle", DefaultCommitStyle, "conventional"},
 		{"DefaultCacheTTLSeconds", DefaultCacheTTLSeconds, 5},
 		{"DefaultTimeoutSeconds", DefaultTimeoutSeconds, 3},

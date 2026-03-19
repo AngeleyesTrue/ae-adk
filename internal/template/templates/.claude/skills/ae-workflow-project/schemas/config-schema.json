@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://moai-adk.github.io/schemas/moai-menu-project-config.json",
-  "title": "MoAI Menu Project Configuration",
+  "$id": "https://ae-adk.github.io/schemas/ae-project-config.json",
+  "title": "AE Project Configuration",
   "description": "Unified configuration schema for menu project management system",
   "type": "object",
   "version": "1.0.0",

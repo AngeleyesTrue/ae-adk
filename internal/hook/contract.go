@@ -82,7 +82,7 @@ func (c *executionContract) Guarantees() []string {
 // NonGuarantees returns the list of non-guaranteed execution conditions per ADR-012.
 func (c *executionContract) NonGuarantees() []string {
 	return []string{
-		"User PATH: moai binary must be in system PATH",
+		"User PATH: ae binary must be in system PATH",
 		"shell environment variables: .bashrc/.zshrc are not loaded",
 		"shell functions or alias definitions",
 		"Python/Node.js/uv runtime availability",

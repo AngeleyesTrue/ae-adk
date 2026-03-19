@@ -15,7 +15,7 @@ func TestDetectProjectName_GoMod(t *testing.T) {
 	}{
 		{
 			name:       "multi-segment module path",
-			moduleLine: "module github.com/modu-ai/moai-adk\n",
+			moduleLine: "module github.com/AngeleyesTrue/ae-adk\n",
 			want:       "ae-adk",
 		},
 		{
@@ -53,17 +53,17 @@ func TestDetectProjectName_GitRemote(t *testing.T) {
 	}{
 		{
 			name:   "SSH remote with .git suffix",
-			remote: "git@github.com:modu-ai/some-repo.git",
+			remote: "git@github.com:AngeleyesTrue/some-repo.git",
 			want:   "some-repo",
 		},
 		{
 			name:   "HTTPS remote with .git suffix",
-			remote: "https://github.com/modu-ai/another-repo.git",
+			remote: "https://github.com/AngeleyesTrue/another-repo.git",
 			want:   "another-repo",
 		},
 		{
 			name:   "HTTPS remote without .git suffix",
-			remote: "https://github.com/modu-ai/clean-repo",
+			remote: "https://github.com/AngeleyesTrue/clean-repo",
 			want:   "clean-repo",
 		},
 	}

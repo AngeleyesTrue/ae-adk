@@ -11,8 +11,8 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/modu-ai/moai-adk/internal/manifest"
-	"github.com/modu-ai/moai-adk/internal/template"
+	"github.com/AngeleyesTrue/ae-adk/internal/manifest"
+	"github.com/AngeleyesTrue/ae-adk/internal/template"
 )
 
 // --- Mock implementations for testing ---
@@ -586,9 +586,9 @@ func TestInit_ManifestPreservesDeployedEntries(t *testing.T) {
 	// simulating the real embedded template deployer.
 	dep := &trackingMockDeployer{
 		files: map[string][]byte{
-			".claude/agents/moai/expert-backend.md":   []byte("# Expert Backend Agent"),
-			".claude/rules/moai/core/constitution.md": []byte("# MoAI Constitution"),
-			"CLAUDE.md": []byte("# MoAI Execution Directive"),
+			".claude/agents/ae/expert-backend.md":   []byte("# Expert Backend Agent"),
+			".claude/rules/ae/core/constitution.md": []byte("# AE Constitution"),
+			"CLAUDE.md":                             []byte("# AE Execution Directive"),
 		},
 	}
 	mgr := manifest.NewManager()

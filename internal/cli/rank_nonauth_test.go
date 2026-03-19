@@ -127,7 +127,7 @@ func TestDeployGlobalRankHookScript_ContentContainsShebang(t *testing.T) {
 	}
 }
 
-func TestDeployGlobalRankHookScript_ContentContainsMoaiCommand(t *testing.T) {
+func TestDeployGlobalRankHookScript_ContentContainsAECommand(t *testing.T) {
 	homeDir := t.TempDir()
 
 	err := deployGlobalRankHookScript(homeDir)
@@ -162,8 +162,8 @@ func TestDeployGlobalRankHookScript_ContentContainsCommandCheck(t *testing.T) {
 	}
 
 	content := string(data)
-	if !strings.Contains(content, "command -v moai") {
-		t.Error("script should contain 'command -v moai' check")
+	if !strings.Contains(content, "command -v ae") {
+		t.Error("script should contain 'command -v ae' check")
 	}
 }
 

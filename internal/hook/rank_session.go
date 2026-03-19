@@ -11,10 +11,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/modu-ai/moai-adk/internal/rank"
+	"github.com/AngeleyesTrue/ae-adk/internal/rank"
 )
 
-// rankSessionHandler processes SessionEnd events and submits metrics to MoAI Rank API.
+// rankSessionHandler processes SessionEnd events and submits metrics to AE Rank API.
 // It checks exclusion patterns and submits session data non-blocking.
 // Errors are logged but don't break the hook chain (per REQ-HOOK-034).
 type rankSessionHandler struct {
@@ -37,7 +37,7 @@ func (h *rankSessionHandler) EventType() EventType {
 	return EventSessionEnd
 }
 
-// Handle processes a SessionEnd event and submits metrics to MoAI Rank.
+// Handle processes a SessionEnd event and submits metrics to AE Rank.
 // SessionEnd hooks return empty JSON {} per Claude Code protocol.
 // Errors are non-blocking: log warnings and return empty output.
 func (h *rankSessionHandler) Handle(ctx context.Context, input *HookInput) (*HookOutput, error) {

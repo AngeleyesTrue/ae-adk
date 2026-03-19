@@ -1,4 +1,4 @@
-# MoAI-ADK Go Edition Installer for Windows
+# AE-ADK Go Edition Installer for Windows
 # Requires PowerShell 5.1 or later
 # Supports piped execution: irm https://... | iex
 
@@ -105,7 +105,7 @@ function Get-Platform {
     # Validate detection result
     if (-not $detectedArch) {
         Print-Error "Failed to detect system architecture through all detection methods"
-        Print-Error "Please report this issue at: https://github.com/modu-ai/ae-adk/issues"
+        Print-Error "Please report this issue at: https://github.com/AngeleyesTrue/ae-adk/issues"
         Print-Info "System information:"
         Write-Host "  - ARCHITEW6432: $env:ARCHITEW6432" -ForegroundColor Gray
         Write-Host "  - PROCESSOR_ARCHITECTURE: $env:PROCESSOR_ARCHITECTURE" -ForegroundColor Gray
@@ -136,7 +136,7 @@ function Get-Platform {
 
 # Get latest Go edition version
 function Get-LatestVersion {
-    $versionUrl = "https://api.github.com/repos/modu-ai/ae-adk/releases"
+    $versionUrl = "https://api.github.com/repos/AngeleyesTrue/ae-adk/releases"
 
     try {
         $response = Invoke-RestMethod -Uri $versionUrl -Method Get
@@ -147,7 +147,7 @@ function Get-LatestVersion {
             Print-Error "No releases found"
             Print-Info "You can:"
             Write-Host "  1. Install a specific version: .\install.ps1 -version 2.0.0"
-            Write-Host "  2. Install from source: go install github.com/modu-ai/ae-adk/cmd/ae@latest"
+            Write-Host "  2. Install from source: go install github.com/AngeleyesTrue/ae-adk/cmd/ae@latest"
             exit 1
         }
 
@@ -175,8 +175,8 @@ function Download-Binary {
 
     # Build archive filename matching goreleaser format
     $archiveName = "ae-adk_${Version}_${os}_${arch}.zip"
-    $downloadUrl = "https://github.com/modu-ai/ae-adk/releases/download/v$Version/$archiveName"
-    $checksumUrl = "https://github.com/modu-ai/ae-adk/releases/download/v$Version/checksums.txt"
+    $downloadUrl = "https://github.com/AngeleyesTrue/ae-adk/releases/download/v$Version/$archiveName"
+    $checksumUrl = "https://github.com/AngeleyesTrue/ae-adk/releases/download/v$Version/checksums.txt"
 
     # Use cross-platform temp directory
     $tmpBase = ([System.IO.Path]::GetTempPath())
@@ -341,7 +341,7 @@ function Verify-Installation {
     try {
         $output = & $TargetPath version 2>&1
         if ($LASTEXITCODE -eq 0) {
-            Print-Success "MoAI-ADK installed successfully!"
+            Print-Success "AE-ADK installed successfully!"
             Write-Host ""
             Write-Host $output
             Write-Host ""
@@ -363,7 +363,7 @@ function Main {
 
     Write-Host ""
     Write-Host "=============================================================="
-    Write-Host "          MoAI-ADK Go Edition Installer v2.0"
+    Write-Host "          AE-ADK Go Edition Installer v2.0"
     Write-Host "=============================================================="
     Write-Host ""
 
@@ -434,7 +434,7 @@ function Main {
     Write-Host ""
     Print-Success "Installation complete!"
     Write-Host ""
-    Print-Info "Documentation: https://github.com/modu-ai/ae-adk"
+    Print-Info "Documentation: https://github.com/AngeleyesTrue/ae-adk"
 }
 
 # Run main function with script arguments

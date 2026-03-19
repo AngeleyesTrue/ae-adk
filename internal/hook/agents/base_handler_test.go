@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/modu-ai/moai-adk/internal/hook"
+	"github.com/AngeleyesTrue/ae-adk/internal/hook"
 )
 
 // TestBaseHandler_DirectAccess tests baseHandler methods directly.

@@ -1,11 +1,12 @@
-# MoAI-ADK Go Edition
+# AE-ADK Go Edition
 # Build and development automation
+# Note: On Windows, run via Git Bash or use 'go build/test/install' directly in PowerShell.
 
 BINARY_NAME := ae
-MODULE := github.com/modu-ai/ae-adk
+MODULE := github.com/AngeleyesTrue/ae-adk
 VERSION ?= $(shell git describe --tags --abbrev=0 2>/dev/null || git rev-parse --short HEAD 2>/dev/null || echo "dev")
 COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null || echo "none")
-DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
+DATE := $(shell go run -mod=readonly ./internal/cmd/datestamp 2>/dev/null || date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || echo "unknown")
 LDFLAGS := -ldflags "-s -w -X $(MODULE)/pkg/version.Version=$(VERSION) -X $(MODULE)/pkg/version.Commit=$(COMMIT) -X $(MODULE)/pkg/version.Date=$(DATE)"
 
 # Local release configuration
@@ -24,7 +25,7 @@ release-local: build ## Create a local release for development updates
 	@echo "Creating local release: $(VERSION)"
 	@mkdir -p $(LOCAL_RELEASE_DIR)
 	@cp bin/$(BINARY_NAME) $(LOCAL_RELEASE_DIR)/$(RELEASE_BINARY)
-	@chmod +x $(LOCAL_RELEASE_DIR)/$(RELEASE_BINARY)
+	@chmod +x $(LOCAL_RELEASE_DIR)/$(RELEASE_BINARY) 2>/dev/null || true
 	@echo '{"version":"$(VERSION)","date":"$(DATE)","platform":"$(PLATFORM)","binary":"$(RELEASE_BINARY)"}' > $(LOCAL_RELEASE_DIR)/version.json
 	@echo "Local release created at: $(LOCAL_RELEASE_DIR)"
 	@echo "  Binary: $(RELEASE_BINARY)"
@@ -60,7 +61,8 @@ generate: ## Run go generate
 	go generate ./...
 
 clean: ## Remove build artifacts
-	rm -rf bin/ coverage.out coverage.html
+	go clean
+	rm -rf bin/ coverage.out coverage.html 2>/dev/null || true
 
 tidy: ## Tidy go modules
 	go mod tidy

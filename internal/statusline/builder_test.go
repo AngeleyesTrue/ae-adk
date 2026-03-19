@@ -108,7 +108,7 @@ func TestBuilder_Build_FullData(t *testing.T) {
 		t.Errorf("should contain git status, got %q", got)
 	}
 	if !strings.Contains(got, "🗿 v1.2.0") {
-		t.Errorf("should contain MoAI version with 🗿 emoji, got %q", got)
+		t.Errorf("should contain AE version with 🗿 emoji, got %q", got)
 	}
 	if !strings.Contains(got, "🔀 main") {
 		t.Errorf("should contain branch, got %q", got)
@@ -521,7 +521,7 @@ func realisticInput() *StdinData {
 		Cost:          &CostData{TotalUSD: 0.15, TotalDurationMS: 4980000},
 		ContextWindow: &ContextWindowInfo{Used: 120000, Total: 200000},
 		CWD:           "/Users/test/ae-adk-go",
-		OutputStyle:   &OutputStyleInfo{Name: "MoAI"},
+		OutputStyle:   &OutputStyleInfo{Name: "AE"},
 		Version:       "2.1.69",
 	}
 }

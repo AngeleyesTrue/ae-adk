@@ -14,7 +14,7 @@ func newGoCmd() *cobra.Command {
 
 Use with shell command substitution to change directory:
   cd $(ae worktree go my-branch)
-  cd $(moai wt go my-branch)`,
+  cd $(ae wt go my-branch)`,
 		Args: cobra.ExactArgs(1),
 		RunE: runGo,
 	}
@@ -35,7 +35,7 @@ func runGo(cmd *cobra.Command, args []string) error {
 
 	for _, wt := range worktrees {
 		if wt.Branch == branchName {
-			// Output only the path for shell eval: cd $(moai wt go branch)
+			// Output only the path for shell eval: cd $(ae wt go branch)
 			_, _ = fmt.Fprintln(out, wt.Path)
 			return nil
 		}
