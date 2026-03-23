@@ -21,10 +21,15 @@ func (b *branchManager) HasConflicts(target string) (bool, error) {
 		return false, fmt.Errorf("conflict check for %q: %w", target, ErrBranchNotFound)
 	}
 
-	// Get the current branch.
+	// Get the current branch or HEAD commit (supports detached HEAD).
 	current, err := currentBranch(ctx, b.root)
 	if err != nil {
-		return false, fmt.Errorf("conflict check: %w", err)
+		// Detached HEAD: fall back to rev-parse HEAD for the commit hash.
+		head, revErr := execGit(ctx, b.root, "rev-parse", "HEAD")
+		if revErr != nil {
+			return false, fmt.Errorf("conflict check: %w", err)
+		}
+		current = head
 	}
 
 	// Find the merge base.
