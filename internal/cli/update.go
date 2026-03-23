@@ -2134,43 +2134,6 @@ func presetToSegments(preset string, custom map[string]bool) map[string]bool {
 	return segments
 }
 
-// settingsLocalEnv represents the structure of .claude/settings.local.json.
-type settingsLocalEnv struct {
-	Env map[string]string `json:"env,omitempty"`
-}
-
-// updateSettingsLocalEnv updates a single environment variable in settings.local.json.
-// If the file doesn't exist, it creates a new one. If the env map doesn't exist, it creates it.
-func updateSettingsLocalEnv(settingsPath, key, value string) error {
-	var settings settingsLocalEnv
-
-	// Read existing settings if file exists
-	if data, err := os.ReadFile(settingsPath); err == nil {
-		if err := json.Unmarshal(data, &settings); err != nil {
-			return fmt.Errorf("parse settings.local.json: %w", err)
-		}
-	}
-
-	// Initialize env map if nil
-	if settings.Env == nil {
-		settings.Env = make(map[string]string)
-	}
-
-	// Set the environment variable
-	settings.Env[key] = value
-
-	// Marshal back to JSON
-	data, err := json.MarshalIndent(settings, "", "  ")
-	if err != nil {
-		return fmt.Errorf("marshal settings.local.json: %w", err)
-	}
-
-	if err := os.WriteFile(settingsPath, data, defs.FilePerm); err != nil {
-		return fmt.Errorf("write settings.local.json: %w", err)
-	}
-
-	return nil
-}
 
 // ensureGlobalSettingsEnv cleans up ae-managed settings from ~/.claude/settings.json.
 // All settings (env, permissions, teammateMode, hooks) are managed at the project level.

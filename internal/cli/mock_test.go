@@ -30,33 +30,6 @@ func (m *mockHookProtocol) WriteOutput(w io.Writer, output *hook.HookOutput) err
 	return nil
 }
 
-// mockHookRegistry implements hook.Registry for testing.
-type mockHookRegistry struct {
-	registerFunc func(handler hook.Handler)
-	dispatchFunc func(ctx context.Context, event hook.EventType, input *hook.HookInput) (*hook.HookOutput, error)
-	handlersFunc func(event hook.EventType) []hook.Handler
-}
-
-func (m *mockHookRegistry) Register(handler hook.Handler) {
-	if m.registerFunc != nil {
-		m.registerFunc(handler)
-	}
-}
-
-func (m *mockHookRegistry) Dispatch(ctx context.Context, event hook.EventType, input *hook.HookInput) (*hook.HookOutput, error) {
-	if m.dispatchFunc != nil {
-		return m.dispatchFunc(ctx, event, input)
-	}
-	return hook.NewAllowOutput(), nil
-}
-
-func (m *mockHookRegistry) Handlers(event hook.EventType) []hook.Handler {
-	if m.handlersFunc != nil {
-		return m.handlersFunc(event)
-	}
-	return nil
-}
-
 // mockUpdateChecker implements update.Checker for testing.
 type mockUpdateChecker struct {
 	checkLatestFunc   func(ctx context.Context) (*update.VersionInfo, error)
@@ -89,15 +62,3 @@ func (m *mockUpdateOrchestrator) Update(ctx context.Context) (*update.UpdateResu
 	return &update.UpdateResult{PreviousVersion: "v0.0.0", NewVersion: "v0.0.1"}, nil
 }
 
-// mockHandler implements hook.Handler for testing.
-type mockHandler struct {
-	eventType hook.EventType
-}
-
-func (m *mockHandler) Handle(_ context.Context, _ *hook.HookInput) (*hook.HookOutput, error) {
-	return hook.NewAllowOutput(), nil
-}
-
-func (m *mockHandler) EventType() hook.EventType {
-	return m.eventType
-}
