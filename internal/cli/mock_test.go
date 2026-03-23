@@ -2,33 +2,11 @@ package cli
 
 import (
 	"context"
-	"io"
 
-	"github.com/AngeleyesTrue/ae-adk/internal/hook"
 	"github.com/AngeleyesTrue/ae-adk/internal/update"
 )
 
 // --- Mock implementations for CLI dependency testing ---
-
-// mockHookProtocol implements hook.Protocol for testing.
-type mockHookProtocol struct {
-	readInputFunc   func(r io.Reader) (*hook.HookInput, error)
-	writeOutputFunc func(w io.Writer, output *hook.HookOutput) error
-}
-
-func (m *mockHookProtocol) ReadInput(r io.Reader) (*hook.HookInput, error) {
-	if m.readInputFunc != nil {
-		return m.readInputFunc(r)
-	}
-	return &hook.HookInput{}, nil
-}
-
-func (m *mockHookProtocol) WriteOutput(w io.Writer, output *hook.HookOutput) error {
-	if m.writeOutputFunc != nil {
-		return m.writeOutputFunc(w, output)
-	}
-	return nil
-}
 
 // mockUpdateChecker implements update.Checker for testing.
 type mockUpdateChecker struct {
