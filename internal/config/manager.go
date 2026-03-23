@@ -264,8 +264,8 @@ func (m *ConfigManager) getSectionLocked(name string) (any, error) {
 		return m.config.LLM, nil
 	case "pricing":
 		return m.config.Pricing, nil
-	case "ralph":
-		return m.config.Ralph, nil
+	case "loop":
+		return m.config.Loop, nil
 	case "workflow":
 		return m.config.Workflow, nil
 	default:
@@ -330,12 +330,12 @@ func (m *ConfigManager) setSectionLocked(name string, value any) error {
 			return fmt.Errorf("%w: expected PricingConfig for section %q", ErrSectionTypeMismatch, name)
 		}
 		m.config.Pricing = v
-	case "ralph":
-		v, ok := value.(RalphConfig)
+	case "loop":
+		v, ok := value.(LoopConfig)
 		if !ok {
-			return fmt.Errorf("%w: expected RalphConfig for section %q", ErrSectionTypeMismatch, name)
+			return fmt.Errorf("%w: expected LoopConfig for section %q", ErrSectionTypeMismatch, name)
 		}
-		m.config.Ralph = v
+		m.config.Loop = v
 	case "workflow":
 		v, ok := value.(WorkflowConfig)
 		if !ok {

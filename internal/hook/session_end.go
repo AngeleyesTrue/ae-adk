@@ -20,7 +20,7 @@ type teamConfig struct {
 
 // sessionEndHandler processes SessionEnd events.
 // It persists session metrics, cleans up temporary resources, and optionally
-// submits ranking data (REQ-HOOK-034). Always returns "allow".
+// cleans up temporary resources (REQ-HOOK-034). Always returns "allow".
 type sessionEndHandler struct{}
 
 // NewSessionEndHandler creates a new SessionEnd event handler.

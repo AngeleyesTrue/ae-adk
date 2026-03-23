@@ -1,9 +1,11 @@
 package cli
 
 import (
+	"context"
 	"testing"
 
 	"github.com/AngeleyesTrue/ae-adk/internal/core/git"
+	"github.com/AngeleyesTrue/ae-adk/internal/loop"
 )
 
 func TestInitDependencies(t *testing.T) {
@@ -26,9 +28,6 @@ func TestInitDependencies(t *testing.T) {
 	}
 	if deps.HookRegistry == nil {
 		t.Error("deps.HookRegistry should not be nil")
-	}
-	if deps.RankCredStore == nil {
-		t.Error("deps.RankCredStore should not be nil")
 	}
 	if deps.Logger == nil {
 		t.Error("deps.Logger should not be nil")
@@ -110,51 +109,6 @@ func TestEnsureUpdate_AlreadyInitialized(t *testing.T) {
 	}
 }
 
-func TestEnsureRank_NilCredStore(t *testing.T) {
-	d := &Dependencies{}
-	err := d.EnsureRank()
-	if err == nil {
-		t.Error("EnsureRank should error when RankCredStore is nil")
-	}
-}
-
-func TestEnsureRank_NoAPIKey(t *testing.T) {
-	d := &Dependencies{
-		RankCredStore: &mockCredentialStore{
-			getKeyFunc: func() (string, error) { return "", nil },
-		},
-	}
-	err := d.EnsureRank()
-	if err == nil {
-		t.Error("EnsureRank should error when no API key is configured")
-	}
-}
-
-func TestEnsureRank_Success(t *testing.T) {
-	d := &Dependencies{
-		RankCredStore: &mockCredentialStore{
-			getKeyFunc: func() (string, error) { return "test-key", nil },
-		},
-	}
-	err := d.EnsureRank()
-	if err != nil {
-		t.Errorf("EnsureRank should succeed: %v", err)
-	}
-	if d.RankClient == nil {
-		t.Error("EnsureRank should set RankClient")
-	}
-}
-
-func TestEnsureRank_AlreadyInitialized(t *testing.T) {
-	d := &Dependencies{}
-	d.RankClient = &mockRankClient{}
-
-	err := d.EnsureRank()
-	if err != nil {
-		t.Errorf("EnsureRank should return nil when RankClient is already set: %v", err)
-	}
-}
-
 // mockGitRepository implements git.Repository for testing EnsureGit
 type mockGitRepository struct{}
 
@@ -164,3 +118,77 @@ func (m *mockGitRepository) Log(_ int) ([]git.Commit, error)  { return nil, nil 
 func (m *mockGitRepository) Diff(_, _ string) (string, error) { return "", nil }
 func (m *mockGitRepository) IsClean() (bool, error)           { return true, nil }
 func (m *mockGitRepository) Root() string                     { return "/mock/root" }
+
+func TestDefaultDecisionEngine_ConvergeOnQualityPass(t *testing.T) {
+	t.Parallel()
+	e := &defaultDecisionEngine{autoConverge: true}
+	state := &loop.LoopState{Iteration: 1, MaxIter: 10}
+	fb := &loop.Feedback{BuildSuccess: true, TestsFailed: 0, LintErrors: 0}
+
+	d, err := e.Decide(context.Background(), state, fb)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if d.Action != loop.ActionConverge || !d.Converged {
+		t.Errorf("expected converge, got action=%q converged=%v", d.Action, d.Converged)
+	}
+}
+
+func TestDefaultDecisionEngine_ContinueOnFailingTests(t *testing.T) {
+	t.Parallel()
+	e := &defaultDecisionEngine{autoConverge: true}
+	state := &loop.LoopState{Iteration: 1, MaxIter: 10}
+	fb := &loop.Feedback{BuildSuccess: true, TestsFailed: 3, LintErrors: 0}
+
+	d, err := e.Decide(context.Background(), state, fb)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if d.Action != loop.ActionContinue {
+		t.Errorf("expected continue, got action=%q", d.Action)
+	}
+}
+
+func TestDefaultDecisionEngine_AbortOnMaxIterations(t *testing.T) {
+	t.Parallel()
+	e := &defaultDecisionEngine{autoConverge: true}
+	state := &loop.LoopState{Iteration: 10, MaxIter: 10}
+	fb := &loop.Feedback{BuildSuccess: false}
+
+	d, err := e.Decide(context.Background(), state, fb)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if d.Action != loop.ActionAbort {
+		t.Errorf("expected abort, got action=%q", d.Action)
+	}
+}
+
+func TestDefaultDecisionEngine_NilFeedback(t *testing.T) {
+	t.Parallel()
+	e := &defaultDecisionEngine{autoConverge: true}
+	state := &loop.LoopState{Iteration: 1, MaxIter: 10}
+
+	d, err := e.Decide(context.Background(), state, nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if d.Action != loop.ActionContinue {
+		t.Errorf("expected continue on nil feedback, got action=%q", d.Action)
+	}
+}
+
+func TestDefaultDecisionEngine_NoAutoConverge(t *testing.T) {
+	t.Parallel()
+	e := &defaultDecisionEngine{autoConverge: false}
+	state := &loop.LoopState{Iteration: 1, MaxIter: 10}
+	fb := &loop.Feedback{BuildSuccess: true, TestsFailed: 0, LintErrors: 0}
+
+	d, err := e.Decide(context.Background(), state, fb)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if d.Action != loop.ActionContinue {
+		t.Errorf("expected continue when autoConverge=false, got action=%q", d.Action)
+	}
+}

@@ -21,8 +21,6 @@ import (
 	"github.com/AngeleyesTrue/ae-adk/internal/hook/security"
 	"github.com/AngeleyesTrue/ae-adk/internal/loop"
 	lsphook "github.com/AngeleyesTrue/ae-adk/internal/lsp/hook"
-	"github.com/AngeleyesTrue/ae-adk/internal/ralph"
-	"github.com/AngeleyesTrue/ae-adk/internal/rank"
 	"github.com/AngeleyesTrue/ae-adk/internal/resilience"
 	"github.com/AngeleyesTrue/ae-adk/internal/update"
 	"github.com/AngeleyesTrue/ae-adk/pkg/version"
@@ -42,9 +40,6 @@ type Dependencies struct {
 	HookProtocol   hook.Protocol
 	UpdateChecker  update.Checker
 	UpdateOrch     update.Orchestrator
-	RankClient     rank.Client
-	RankCredStore  rank.CredentialStore
-	RankBrowser    rank.BrowserOpener
 	LoopController *loop.LoopController
 	Logger         *slog.Logger
 }
@@ -63,15 +58,15 @@ func InitDependencies() {
 	// Disable JSON logging for CLI commands by using a no-op logger
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 
-	// Initialize Ralph engine and loop controller.
-	ralphCfg := config.NewDefaultRalphConfig()
-	ralphEngine := ralph.NewRalphEngine(ralphCfg)
+	// Initialize loop controller with default decision engine.
+	loopCfg := config.NewDefaultLoopConfig()
+	decisionEngine := &defaultDecisionEngine{autoConverge: loopCfg.AutoConverge}
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		homeDir = os.TempDir()
 	}
 	loopStorage := loop.NewFileStorage(filepath.Join(homeDir, ".ae", "state", "loop"))
-	loopCtrl := loop.NewLoopController(loopStorage, ralphEngine, &noopFeedbackGenerator{}, ralphCfg.MaxIterations)
+	loopCtrl := loop.NewLoopController(loopStorage, decisionEngine, &noopFeedbackGenerator{}, loopCfg.MaxIterations)
 
 	// Initialize GitOpsManager based on the current working directory.
 	// If WorkDir is empty, GitManager uses os.Getwd() internally.
@@ -85,7 +80,6 @@ func InitDependencies() {
 		Config:         config.NewConfigManager(),
 		GitOpsManager:  gitOpsMgr,
 		HookProtocol:   hook.NewProtocol(),
-		RankCredStore:  rank.NewFileCredentialStore(""),
 		LoopController: loopCtrl,
 		Logger:         logger,
 	}
@@ -115,15 +109,6 @@ func InitDependencies() {
 	// Register default hook handlers
 	deps.HookRegistry.Register(hook.NewSessionStartHandler(deps.Config))
 	deps.HookRegistry.Register(hook.NewSessionEndHandler())
-
-	// Register rank session handler if credentials exist
-	rankHandler, err := hook.EnsureRankSessionHandler()
-	if err != nil {
-		logger.Warn("failed to initialize rank session handler", "error", err)
-	} else if rankHandler != nil {
-		deps.HookRegistry.Register(rankHandler)
-		logger.Info("rank session handler registered")
-	}
 
 	// Register auto-update handler for SessionStart
 	deps.HookRegistry.Register(hook.NewAutoUpdateHandler(buildAutoUpdateFunc()))
@@ -332,24 +317,17 @@ func (n *noopFeedbackGenerator) Collect(_ context.Context) (*loop.Feedback, erro
 	return &loop.Feedback{}, nil
 }
 
-// EnsureRank lazily initializes the Rank client.
-// It should be called before using RankClient.
-// Thread-safe: subsequent calls are no-ops if RankClient is already initialized.
-// Returns an error if RankCredStore is not initialized or has no API key.
-func (d *Dependencies) EnsureRank() error {
-	if d.RankClient != nil {
-		return nil
+// defaultDecisionEngine implements loop.DecisionEngine with basic auto-converge logic.
+type defaultDecisionEngine struct {
+	autoConverge bool
+}
+
+func (e *defaultDecisionEngine) Decide(_ context.Context, state *loop.LoopState, fb *loop.Feedback) (*loop.Decision, error) {
+	if fb != nil && e.autoConverge && fb.BuildSuccess && fb.TestsFailed == 0 && fb.LintErrors == 0 {
+		return &loop.Decision{Action: loop.ActionConverge, Converged: true, Reason: "quality gate passed"}, nil
 	}
-	if d.RankCredStore == nil {
-		return fmt.Errorf("RankCredStore not initialized")
+	if state.Iteration >= state.MaxIter {
+		return &loop.Decision{Action: loop.ActionAbort, Reason: "max iterations reached"}, nil
 	}
-	apiKey, err := d.RankCredStore.GetAPIKey()
-	if err != nil {
-		return fmt.Errorf("get API key: %w", err)
-	}
-	if apiKey == "" {
-		return fmt.Errorf("no API key configured")
-	}
-	d.RankClient = rank.NewClient(apiKey)
-	return nil
+	return &loop.Decision{Action: loop.ActionContinue}, nil
 }

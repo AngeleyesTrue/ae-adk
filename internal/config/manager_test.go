@@ -199,8 +199,8 @@ func TestConfigManagerGetSection(t *testing.T) {
 			_, ok := v.(PricingConfig)
 			return ok
 		}},
-		{"ralph", "ralph", func(v any) bool {
-			_, ok := v.(RalphConfig)
+		{"loop", "loop", func(v any) bool {
+			_, ok := v.(LoopConfig)
 			return ok
 		}},
 		{"workflow", "workflow", func(v any) bool {
@@ -299,7 +299,7 @@ func TestConfigManagerSetSectionAllTypes(t *testing.T) {
 		{"system", SystemConfig{LogLevel: "debug"}},
 		{"llm", LLMConfig{DefaultModel: "opus"}},
 		{"pricing", PricingConfig{TokenBudget: 100}},
-		{"ralph", RalphConfig{MaxIterations: 1}},
+		{"loop", LoopConfig{MaxIterations: 1}},
 		{"workflow", WorkflowConfig{PlanTokens: 1000}},
 	}
 
@@ -361,7 +361,7 @@ func TestConfigManagerSetSectionTypeMismatch(t *testing.T) {
 		{"system", false},
 		{"llm", []string{"wrong"}},
 		{"pricing", "wrong"},
-		{"ralph", 99},
+		{"loop", 99},
 		{"workflow", map[string]string{}},
 	}
 

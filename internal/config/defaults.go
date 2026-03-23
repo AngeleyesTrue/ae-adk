@@ -75,7 +75,7 @@ func NewDefaultConfig() *Config {
 		System:        NewDefaultSystemConfig(),
 		LLM:           NewDefaultLLMConfig(),
 		Pricing:       NewDefaultPricingConfig(),
-		Ralph:         NewDefaultRalphConfig(),
+		Loop:          NewDefaultLoopConfig(),
 		Workflow:      NewDefaultWorkflowConfig(),
 		State:         NewDefaultStateConfig(),
 	}
@@ -200,9 +200,9 @@ func NewDefaultPricingConfig() PricingConfig {
 	}
 }
 
-// NewDefaultRalphConfig returns a RalphConfig with default values.
-func NewDefaultRalphConfig() RalphConfig {
-	return RalphConfig{
+// NewDefaultLoopConfig returns a LoopConfig with default values.
+func NewDefaultLoopConfig() LoopConfig {
+	return LoopConfig{
 		MaxIterations: DefaultMaxIterations,
 		AutoConverge:  true,
 		HumanReview:   true,
