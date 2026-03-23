@@ -29,7 +29,7 @@ func TestConfigStructCreation(t *testing.T) {
 		Pricing: PricingConfig{
 			TokenBudget: 100000,
 		},
-		Ralph: RalphConfig{
+		Loop: LoopConfig{
 			MaxIterations: 3,
 		},
 		Workflow: WorkflowConfig{
@@ -61,8 +61,8 @@ func TestConfigStructCreation(t *testing.T) {
 	if cfg.Pricing.TokenBudget != 100000 {
 		t.Errorf("Pricing.TokenBudget: got %d, want %d", cfg.Pricing.TokenBudget, 100000)
 	}
-	if cfg.Ralph.MaxIterations != 3 {
-		t.Errorf("Ralph.MaxIterations: got %d, want %d", cfg.Ralph.MaxIterations, 3)
+	if cfg.Loop.MaxIterations != 3 {
+		t.Errorf("Ralph.MaxIterations: got %d, want %d", cfg.Loop.MaxIterations, 3)
 	}
 	if cfg.Workflow.PlanTokens != 30000 {
 		t.Errorf("Workflow.PlanTokens: got %d, want %d", cfg.Workflow.PlanTokens, 30000)
@@ -104,7 +104,7 @@ func TestIsValidSectionName(t *testing.T) {
 		{"system is valid", "system", true},
 		{"llm is valid", "llm", true},
 		{"pricing is valid", "pricing", true},
-		{"ralph is valid", "ralph", true},
+		{"ralph is valid", "loop", true},
 		{"workflow is valid", "workflow", true},
 		{"statusline is valid", "statusline", true},
 		{"empty string is invalid", "", false},
@@ -139,7 +139,7 @@ func TestValidSectionNames(t *testing.T) {
 	expected := map[string]bool{
 		"user": true, "language": true, "quality": true, "project": true,
 		"git_strategy": true, "git_convention": true, "system": true, "llm": true,
-		"pricing": true, "ralph": true, "workflow": true, "state": true,
+		"pricing": true, "loop": true, "workflow": true, "state": true,
 		"statusline": true,
 	}
 	for _, name := range names {
@@ -254,10 +254,10 @@ func TestPricingConfigFields(t *testing.T) {
 	}
 }
 
-func TestRalphConfigFields(t *testing.T) {
+func TestLoopConfigFields(t *testing.T) {
 	t.Parallel()
 
-	cfg := RalphConfig{
+	cfg := LoopConfig{
 		MaxIterations: 10,
 		AutoConverge:  true,
 		HumanReview:   false,

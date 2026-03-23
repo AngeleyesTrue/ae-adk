@@ -59,14 +59,14 @@ func InitDependencies() {
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 
 	// Initialize loop controller with default decision engine.
-	ralphCfg := config.NewDefaultRalphConfig()
-	decisionEngine := &defaultDecisionEngine{autoConverge: ralphCfg.AutoConverge}
+	loopCfg := config.NewDefaultLoopConfig()
+	decisionEngine := &defaultDecisionEngine{autoConverge: loopCfg.AutoConverge}
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		homeDir = os.TempDir()
 	}
 	loopStorage := loop.NewFileStorage(filepath.Join(homeDir, ".ae", "state", "loop"))
-	loopCtrl := loop.NewLoopController(loopStorage, decisionEngine, &noopFeedbackGenerator{}, ralphCfg.MaxIterations)
+	loopCtrl := loop.NewLoopController(loopStorage, decisionEngine, &noopFeedbackGenerator{}, loopCfg.MaxIterations)
 
 	// Initialize GitOpsManager based on the current working directory.
 	// If WorkDir is empty, GitManager uses os.Getwd() internally.

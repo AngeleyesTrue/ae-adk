@@ -1,8 +1,8 @@
-# Ralph Engine Settings
+# Loop Controller Settings
 # Automated feedback loop with LSP diagnostics and AST-grep integration
 
-ralph:
-  # Enable Ralph engine for automated quality improvement
+loop:
+  # Enable loop controller for automated quality improvement
   enabled: true
 
   # LSP Diagnostics Configuration

@@ -65,10 +65,10 @@ func TestNewDefaultConfigContainsAllSections(t *testing.T) {
 			cfg.Pricing.TokenBudget, DefaultTokenBudget)
 	}
 
-	// Ralph should have defaults
-	if cfg.Ralph.MaxIterations != DefaultMaxIterations {
+	// Loop should have defaults
+	if cfg.Loop.MaxIterations != DefaultMaxIterations {
 		t.Errorf("Ralph.MaxIterations: got %d, want %d",
-			cfg.Ralph.MaxIterations, DefaultMaxIterations)
+			cfg.Loop.MaxIterations, DefaultMaxIterations)
 	}
 
 	// Workflow should have defaults
@@ -290,10 +290,10 @@ func TestNewDefaultPricingConfig(t *testing.T) {
 	}
 }
 
-func TestNewDefaultRalphConfig(t *testing.T) {
+func TestNewDefaultLoopConfig(t *testing.T) {
 	t.Parallel()
 
-	cfg := NewDefaultRalphConfig()
+	cfg := NewDefaultLoopConfig()
 
 	if cfg.MaxIterations != DefaultMaxIterations {
 		t.Errorf("MaxIterations: got %d, want %d", cfg.MaxIterations, DefaultMaxIterations)

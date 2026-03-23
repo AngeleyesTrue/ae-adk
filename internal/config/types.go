@@ -19,7 +19,7 @@ type Config struct {
 	System        SystemConfig               `yaml:"system"`
 	LLM           LLMConfig                  `yaml:"llm"`
 	Pricing       PricingConfig              `yaml:"pricing"`
-	Ralph         RalphConfig                `yaml:"ralph"`
+	Loop          LoopConfig                `yaml:"loop"`
 	Workflow      WorkflowConfig             `yaml:"workflow"`
 	State         StateConfig                `yaml:"state"`
 	Statusline    models.StatuslineConfig    `yaml:"statusline"`
@@ -95,8 +95,8 @@ type PricingConfig struct {
 	CostTracking bool `yaml:"cost_tracking"`
 }
 
-// RalphConfig represents the Ralph engine configuration section.
-type RalphConfig struct {
+// LoopConfig represents the loop controller configuration section.
+type LoopConfig struct {
 	MaxIterations int  `yaml:"max_iterations"`
 	AutoConverge  bool `yaml:"auto_converge"`
 	HumanReview   bool `yaml:"human_review"`
