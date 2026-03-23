@@ -77,10 +77,6 @@ var (
 	ErrInvalidQuestion = errors.New("invalid question index")
 )
 
-// LangNameMap is an alias to the canonical language map in pkg/models.
-// Deprecated: Use models.LangNameMap directly.
-var LangNameMap = models.LangNameMap
-
 // GetLanguageName returns the full language name for a code.
 // Returns "English" if the code is not found.
 func GetLanguageName(code string) string {
