@@ -126,9 +126,9 @@ func TestRunTemplateSync_Timeout(t *testing.T) {
 	updateCmd.SetOut(buf)
 	updateCmd.SetErr(buf)
 
-	// Note: This is a smoke test to ensure the function completes normally
-	// For actual timeout testing with mock slow deployer, see integration tests
-	// or test manually by setting templateDeployTimeout to a very short duration
+	// Set --yes flag to skip interactive TUI confirmation in test/CI environments.
+	// Without this, template changes trigger ConfirmMerge TUI which hangs without a TTY.
+	_ = updateCmd.Flags().Set("yes", "true")
 
 	err = runTemplateSync(updateCmd)
 

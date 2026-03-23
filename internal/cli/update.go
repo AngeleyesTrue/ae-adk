@@ -155,7 +155,11 @@ func runUpdate(cmd *cobra.Command, _ []string) error {
 			return nil
 		}
 
-		ctx, cancel := context.WithTimeout(cmd.Context(), 30*time.Second)
+		cmdCtx := cmd.Context()
+		if cmdCtx == nil {
+			cmdCtx = context.Background()
+		}
+		ctx, cancel := context.WithTimeout(cmdCtx, 30*time.Second)
 		defer cancel()
 
 		info, err := deps.UpdateChecker.CheckLatest(ctx)
@@ -281,7 +285,11 @@ func runBinaryUpdateStep(cmd *cobra.Command) (updated bool, err error) {
 		return false, nil
 	}
 
-	ctx, cancel := context.WithTimeout(cmd.Context(), 120*time.Second)
+	cmdCtx2 := cmd.Context()
+	if cmdCtx2 == nil {
+		cmdCtx2 = context.Background()
+	}
+	ctx, cancel := context.WithTimeout(cmdCtx2, 120*time.Second)
 	defer cancel()
 
 	result, err := deps.UpdateOrch.Update(ctx)
@@ -342,6 +350,9 @@ func runTemplateSync(cmd *cobra.Command) error {
 func runTemplateSyncWithReporter(cmd *cobra.Command, reporter project.ProgressReporter, skipConfirm bool) error {
 	out := cmd.OutOrStdout()
 	ctx := cmd.Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
 
 	// Get flags for template sync
 	forceBackup := getBoolFlag(cmd, "force")
