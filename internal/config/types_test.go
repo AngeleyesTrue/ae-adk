@@ -104,7 +104,7 @@ func TestIsValidSectionName(t *testing.T) {
 		{"system is valid", "system", true},
 		{"llm is valid", "llm", true},
 		{"pricing is valid", "pricing", true},
-		{"ralph is valid", "loop", true},
+		{"loop is valid", "loop", true},
 		{"workflow is valid", "workflow", true},
 		{"statusline is valid", "statusline", true},
 		{"empty string is invalid", "", false},

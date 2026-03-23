@@ -151,7 +151,7 @@ type SyncGate struct {
 var sectionNames = []string{
 	"user", "language", "quality", "project",
 	"git_strategy", "git_convention", "system", "llm",
-	"pricing", "ralph", "workflow", "state", "statusline",
+	"pricing", "loop", "workflow", "state", "statusline",
 }
 
 // IsValidSectionName checks if the given name is a valid section name.
