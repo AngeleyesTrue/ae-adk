@@ -80,6 +80,10 @@ func TestUpdateCmd_DefaultIsTemplateSync(t *testing.T) {
 	if err := updateCmd.Flags().Set("check", "false"); err != nil {
 		t.Fatal(err)
 	}
+	// Set --yes to skip interactive TUI confirmation in test/CI environments
+	if err := updateCmd.Flags().Set("yes", "true"); err != nil {
+		t.Fatal(err)
+	}
 
 	err = updateCmd.RunE(updateCmd, []string{})
 
