@@ -69,20 +69,21 @@ func runPlatformCommand(cmd *cobra.Command, targetPlatform string) error {
 	// 3. PATH 재구성 (REQ-003)
 	smartPATH := template.BuildSmartPATH()
 
+	// PATH 검증 (1회만 수행, 결과를 diagnostics에 전달)
+	pathResults := platform.VerifyPaths(sys, smartPATH)
+
 	if flags.Auto {
 		smartPATH = platform.FilterExistingPaths(sys, smartPATH)
 	}
 
 	if flags.DryRun {
 		_, _ = fmt.Fprintln(out, "\n=== Dry Run: PATH Preview ===")
-		sep := string(os.PathListSeparator)
-		for _, entry := range strings.Split(smartPATH, sep) {
-			exists := sys.DirExists(entry)
+		for _, r := range pathResults {
 			icon := symSuccess()
-			if !exists {
+			if !r.Exists {
 				icon = symWarning()
 			}
-			_, _ = fmt.Fprintf(out, "  %s %s\n", icon, entry)
+			_, _ = fmt.Fprintf(out, "  %s %s\n", icon, r.Path)
 		}
 	} else if settingsPath != "" {
 		if err := updateSettingsPATH(sys, settingsPath, smartPATH); err != nil {
@@ -93,14 +94,17 @@ func runPlatformCommand(cmd *cobra.Command, targetPlatform string) error {
 	}
 
 	// 4-5. 플랫폼별 검증 (REQ-004, REQ-005)
-	profile, err := platform.RunDiagnostics(sys, targetPlatform, flags)
+	profile, err := platform.RunDiagnostics(sys, targetPlatform, smartPATH, pathResults)
 	if err != nil {
 		return fmt.Errorf("run diagnostics: %w", err)
 	}
 
 	// 6. 진단 결과 출력 (REQ-006)
 	if flags.JSON {
-		data, _ := json.MarshalIndent(profile, "", "  ")
+		data, err := json.MarshalIndent(profile, "", "  ")
+		if err != nil {
+			return fmt.Errorf("marshal profile: %w", err)
+		}
 		_, _ = fmt.Fprintln(out, string(data))
 	} else {
 		_, _ = fmt.Fprintln(out)

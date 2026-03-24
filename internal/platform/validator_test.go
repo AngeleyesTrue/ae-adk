@@ -773,38 +773,6 @@ func TestDarwinValidator_checkShellCompat(t *testing.T) {
 	}
 }
 
-// TestContains는 문자열 포함 여부 헬퍼를 테스트한다.
-func TestContains(t *testing.T) {
-	t.Parallel()
-
-	tests := []struct {
-		name   string
-		s      string
-		substr string
-		want   bool
-	}{
-		{"일치하는 부분 문자열", "Hello World", "World", true},
-		{"일치하지 않는 부분 문자열", "Hello World", "xyz", false},
-		{"빈 부분 문자열", "Hello", "", true},
-		{"빈 원본 문자열", "", "a", false},
-		{"둘 다 빈 문자열", "", "", true},
-		{"동일한 문자열", "abc", "abc", true},
-		{"부분 문자열이 더 긴 경우", "ab", "abcd", false},
-		{"숫자 포함", "code page: 65001", "65001", true},
-		{"레지스트리 값", "REG_DWORD    0x1", "0x1", true},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			got := contains(tt.s, tt.substr)
-			if got != tt.want {
-				t.Errorf("contains(%q, %q) = %v, want %v", tt.s, tt.substr, got, tt.want)
-			}
-		})
-	}
-}
-
 // TestValidatorInterface는 모든 Validator 구현체가 인터페이스를 충족하는지 확인한다.
 func TestValidatorInterface(t *testing.T) {
 	t.Parallel()

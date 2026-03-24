@@ -19,6 +19,16 @@ func NewValidator(sys SystemInfo, targetPlatform string) Validator {
 	}
 }
 
+// commonToolChecks는 모든 플랫폼에서 공통으로 실행하는 도구 버전 확인 목록이다.
+func commonToolChecks(sys SystemInfo) []PlatformCheck {
+	return []PlatformCheck{
+		checkToolVersion(sys, "Go", "go", "version"),
+		checkToolVersion(sys, "Node.js", "node", "--version"),
+		checkToolVersion(sys, "Git", "git", "--version"),
+		checkToolVersion(sys, "AE", "ae", "--version"),
+	}
+}
+
 // checkToolVersion는 도구 실행 가능 여부를 확인하는 공통 진단 항목이다.
 func checkToolVersion(sys SystemInfo, toolName string, cmd string, args ...string) PlatformCheck {
 	check := PlatformCheck{Name: toolName}
@@ -40,12 +50,7 @@ type GenericValidator struct {
 }
 
 func (v *GenericValidator) RunChecks() []PlatformCheck {
-	return []PlatformCheck{
-		checkToolVersion(v.sys, "Go", "go", "version"),
-		checkToolVersion(v.sys, "Node.js", "node", "--version"),
-		checkToolVersion(v.sys, "Git", "git", "--version"),
-		checkToolVersion(v.sys, "AE", "ae", "--version"),
-	}
+	return commonToolChecks(v.sys)
 }
 
 // WindowsValidator는 Windows 전용 검증기이다.
@@ -55,7 +60,7 @@ type WindowsValidator struct {
 
 // @MX:NOTE: [AUTO] Windows 전용 진단 항목 - UTF-8, MCP, Git Bash, WSL2, LongPath, Hook bash, 도구 버전
 func (v *WindowsValidator) RunChecks() []PlatformCheck {
-	var checks []PlatformCheck
+	checks := make([]PlatformCheck, 0, 14)
 
 	// REQ-004: Windows 전용 검증
 	checks = append(checks, v.checkUTF8CodePage())
@@ -66,10 +71,7 @@ func (v *WindowsValidator) RunChecks() []PlatformCheck {
 	checks = append(checks, v.checkHookBash())
 
 	// 공통 도구 버전
-	checks = append(checks, checkToolVersion(v.sys, "Go", "go", "version"))
-	checks = append(checks, checkToolVersion(v.sys, "Node.js", "node", "--version"))
-	checks = append(checks, checkToolVersion(v.sys, "Git", "git", "--version"))
-	checks = append(checks, checkToolVersion(v.sys, "AE", "ae", "--version"))
+	checks = append(checks, commonToolChecks(v.sys)...)
 
 	return checks
 }
@@ -82,7 +84,7 @@ func (v *WindowsValidator) checkUTF8CodePage() PlatformCheck {
 		check.Message = "코드 페이지 확인 불가"
 		return check
 	}
-	if contains(out, "65001") {
+	if strings.Contains(out, "65001") {
 		check.Status = StatusOK
 		check.Message = "UTF-8 (65001) 활성화됨"
 	} else {
@@ -103,7 +105,7 @@ func (v *WindowsValidator) checkMCPServerPaths() []PlatformCheck {
 		{"pwsh.exe", "pwsh.exe"},
 	}
 
-	var checks []PlatformCheck
+	checks := make([]PlatformCheck, 0, len(mcpTools))
 	for _, tool := range mcpTools {
 		check := PlatformCheck{Name: "MCP: " + tool.name}
 		_, err := v.sys.ExecCommand("where.exe", tool.path)
@@ -176,7 +178,7 @@ func (v *WindowsValidator) checkLongPathsEnabled() PlatformCheck {
 		check.Message = "레지스트리 확인 불가"
 		return check
 	}
-	if contains(out, "0x1") {
+	if strings.Contains(out, "0x1") {
 		check.Status = StatusOK
 		check.Message = "260자 제한 해제됨"
 	} else {
@@ -219,7 +221,7 @@ type DarwinValidator struct {
 
 // @MX:NOTE: [AUTO] macOS 전용 진단 항목 - Homebrew, symlink, shell, 도구 버전
 func (v *DarwinValidator) RunChecks() []PlatformCheck {
-	var checks []PlatformCheck
+	checks := make([]PlatformCheck, 0, 10)
 
 	// REQ-005: macOS 전용 검증
 	checks = append(checks, v.checkHomebrew())
@@ -227,10 +229,7 @@ func (v *DarwinValidator) RunChecks() []PlatformCheck {
 	checks = append(checks, v.checkShellCompat())
 
 	// 공통 도구 버전
-	checks = append(checks, checkToolVersion(v.sys, "Go", "go", "version"))
-	checks = append(checks, checkToolVersion(v.sys, "Node.js", "node", "--version"))
-	checks = append(checks, checkToolVersion(v.sys, "Git", "git", "--version"))
-	checks = append(checks, checkToolVersion(v.sys, "AE", "ae", "--version"))
+	checks = append(checks, commonToolChecks(v.sys)...)
 
 	return checks
 }
@@ -275,7 +274,7 @@ func (v *DarwinValidator) checkSymlinks() []PlatformCheck {
 		{"python3", "/usr/local/bin/python3"},
 	}
 
-	var checks []PlatformCheck
+	checks := make([]PlatformCheck, 0, len(tools))
 	for _, tool := range tools {
 		check := PlatformCheck{Name: "Symlink: " + tool.name}
 		out, err := v.sys.ExecCommand("readlink", "-f", tool.path)
@@ -301,15 +300,10 @@ func (v *DarwinValidator) checkShellCompat() PlatformCheck {
 	}
 	check.Status = StatusOK
 	check.Message = shell
-	if contains(shell, "zsh") {
+	if strings.Contains(shell, "zsh") {
 		check.Detail = "기본 셸 (macOS Catalina+)"
-	} else if contains(shell, "bash") {
+	} else if strings.Contains(shell, "bash") {
 		check.Detail = "Bash 셸"
 	}
 	return check
-}
-
-// contains는 문자열 포함 여부를 확인하는 헬퍼이다.
-func contains(s, substr string) bool {
-	return strings.Contains(s, substr)
 }

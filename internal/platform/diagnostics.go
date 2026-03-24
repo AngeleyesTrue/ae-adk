@@ -2,28 +2,21 @@ package platform
 
 import (
 	"fmt"
-	"os"
 	"strings"
+	"sync"
 	"time"
-
-	"github.com/AngeleyesTrue/ae-adk/internal/template"
 )
 
 // RunDiagnostics는 플랫폼 진단을 실행하고 PlatformProfile을 생성한다.
+// smartPATH는 외부에서 BuildSmartPATH()로 생성한 값을 전달받아 중복 호출을 방지한다.
 // @MX:ANCHOR: [AUTO] 플랫폼 진단의 핵심 오케스트레이션 함수
 // @MX:REASON: [AUTO] fan_in>=3, CLI platform_common/win/mac에서 호출
-func RunDiagnostics(sys SystemInfo, targetPlatform string, flags PlatformFlags) (*PlatformProfile, error) {
+func RunDiagnostics(sys SystemInfo, targetPlatform string, smartPATH string, pathResults []PathVerifyResult) (*PlatformProfile, error) {
 	validator := NewValidator(sys, targetPlatform)
 
 	checks := validator.RunChecks()
 
-	// PATH 구성
-	smartPATH := template.BuildSmartPATH()
-	sep := string(os.PathListSeparator)
-	pathEntries := strings.Split(smartPATH, sep)
-
-	// PATH 검증
-	pathResults := VerifyPaths(sys, smartPATH)
+	// PATH 검증 결과로 경고 추가
 	for _, r := range pathResults {
 		if !r.Exists {
 			checks = append(checks, PlatformCheck{
@@ -34,8 +27,11 @@ func RunDiagnostics(sys SystemInfo, targetPlatform string, flags PlatformFlags) 
 		}
 	}
 
-	// 도구 버전 수집
+	// 도구 버전 수집 (병렬)
 	toolVersions := collectToolVersions(sys)
+
+	// PATH 엔트리 분리
+	pathEntries := strings.Split(smartPATH, pathSep)
 
 	profile := &PlatformProfile{
 		Platform:     targetPlatform,
@@ -48,24 +44,39 @@ func RunDiagnostics(sys SystemInfo, targetPlatform string, flags PlatformFlags) 
 	return profile, nil
 }
 
-// collectToolVersions는 주요 도구들의 버전을 수집한다.
+// collectToolVersions는 주요 도구들의 버전을 병렬로 수집한다.
 func collectToolVersions(sys SystemInfo) map[string]string {
-	tools := map[string][]string{
-		"go":   {"go", "version"},
-		"node": {"node", "--version"},
-		"git":  {"git", "--version"},
-		"ae":   {"ae", "--version"},
+	type toolCmd struct {
+		name string
+		cmd  string
+		args []string
+	}
+	tools := []toolCmd{
+		{"go", "go", []string{"version"}},
+		{"node", "node", []string{"--version"}},
+		{"git", "git", []string{"--version"}},
+		{"ae", "ae", []string{"--version"}},
 	}
 
+	var mu sync.Mutex
+	var wg sync.WaitGroup
 	versions := make(map[string]string, len(tools))
-	for name, cmd := range tools {
-		out, err := sys.ExecCommand(cmd[0], cmd[1:]...)
-		if err != nil {
-			versions[name] = "not found"
-		} else {
-			versions[name] = strings.TrimSpace(out)
-		}
+
+	for _, t := range tools {
+		wg.Add(1)
+		go func(t toolCmd) {
+			defer wg.Done()
+			out, err := sys.ExecCommand(t.cmd, t.args...)
+			mu.Lock()
+			defer mu.Unlock()
+			if err != nil {
+				versions[t.name] = "not found"
+			} else {
+				versions[t.name] = strings.TrimSpace(out)
+			}
+		}(t)
 	}
+	wg.Wait()
 	return versions
 }
 

@@ -314,9 +314,8 @@ func TestRunDiagnostics(t *testing.T) {
 		mock.Commands["git --version"] = "git version 2.44.0"
 		mock.Commands["ae --version"] = "ae v1.0.0"
 
-		flags := PlatformFlags{}
 
-		profile, err := RunDiagnostics(mock, "linux", flags)
+		profile, err := RunDiagnostics(mock, "linux", "/usr/bin:/bin", nil)
 		if err != nil {
 			t.Fatalf("RunDiagnostics() error = %v", err)
 		}
@@ -359,8 +358,7 @@ func TestRunDiagnostics(t *testing.T) {
 		mock.Commands["git --version"] = "git version 2.44.0"
 		mock.Commands["ae --version"] = "ae v1.0.0"
 
-		flags := PlatformFlags{}
-		profile, err := RunDiagnostics(mock, "windows", flags)
+		profile, err := RunDiagnostics(mock, "windows", `C:\Windows\system32`, nil)
 		if err != nil {
 			t.Fatalf("RunDiagnostics() error = %v", err)
 		}
@@ -393,8 +391,7 @@ func TestRunDiagnostics(t *testing.T) {
 		mock.Commands["git --version"] = "git version 2.44.0"
 		mock.Commands["ae --version"] = "ae v1.0.0"
 
-		flags := PlatformFlags{}
-		profile, err := RunDiagnostics(mock, "darwin", flags)
+		profile, err := RunDiagnostics(mock, "darwin", "/opt/homebrew/bin:/usr/bin", nil)
 		if err != nil {
 			t.Fatalf("RunDiagnostics() error = %v", err)
 		}
@@ -419,7 +416,7 @@ func TestRunDiagnostics(t *testing.T) {
 		mock.Commands["git --version"] = "git 2.44"
 		mock.Commands["ae --version"] = "ae 1.0"
 
-		profile, err := RunDiagnostics(mock, "linux", PlatformFlags{})
+		profile, err := RunDiagnostics(mock, "linux", "/usr/bin:/bin", nil)
 		if err != nil {
 			t.Fatalf("RunDiagnostics() error = %v", err)
 		}

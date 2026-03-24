@@ -1,14 +1,12 @@
 package platform
 
 import (
-	"os"
 	"strings"
 )
 
 // VerifyPaths는 PATH 문자열의 각 경로가 실제로 존재하는지 검증한다.
 func VerifyPaths(sys SystemInfo, pathStr string) []PathVerifyResult {
-	sep := string(os.PathListSeparator)
-	entries := strings.Split(pathStr, sep)
+	entries := strings.Split(pathStr, pathSep)
 
 	results := make([]PathVerifyResult, 0, len(entries))
 	for _, entry := range entries {
@@ -26,10 +24,9 @@ func VerifyPaths(sys SystemInfo, pathStr string) []PathVerifyResult {
 
 // FilterExistingPaths는 실제 존재하는 경로만 필터링하여 새 PATH 문자열을 반환한다.
 func FilterExistingPaths(sys SystemInfo, pathStr string) string {
-	sep := string(os.PathListSeparator)
-	entries := strings.Split(pathStr, sep)
+	entries := strings.Split(pathStr, pathSep)
 
-	var existing []string
+	existing := make([]string, 0, len(entries))
 	for _, entry := range entries {
 		entry = strings.TrimSpace(entry)
 		if entry == "" {
@@ -39,7 +36,7 @@ func FilterExistingPaths(sys SystemInfo, pathStr string) string {
 			existing = append(existing, entry)
 		}
 	}
-	return strings.Join(existing, sep)
+	return strings.Join(existing, pathSep)
 }
 
 // CountMissing은 존재하지 않는 경로 수를 반환한다.

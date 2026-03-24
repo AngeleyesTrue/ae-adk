@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 	"time"
 )
@@ -57,9 +56,7 @@ func CleanupOldBackups(settingsPath string) error {
 		return nil
 	}
 
-	// 이름순 정렬 (타임스탬프 기반이므로 시간순과 동일)
-	sort.Strings(backups)
-
+	// os.ReadDir은 이미 이름순 정렬을 반환하므로 추가 정렬 불필요
 	// 오래된 백업 삭제
 	toDelete := backups[:len(backups)-maxBackups]
 	for _, path := range toDelete {

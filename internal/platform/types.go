@@ -60,6 +60,9 @@ type PlatformFlags struct {
 	SkipBackup bool
 }
 
+// pathSep는 PATH 구분자를 패키지 레벨에서 한 번만 변환한다.
+var pathSep = string(os.PathListSeparator)
+
 // PathVerifyResult는 PATH 검증 결과를 나타낸다.
 type PathVerifyResult struct {
 	Path   string `json:"path"`
@@ -94,6 +97,9 @@ func (d *DefaultSystemInfo) HomeDir() string {
 	}
 	if home == "" {
 		home = os.Getenv("USERPROFILE")
+	}
+	if home == "" {
+		home = os.TempDir()
 	}
 	return home
 }
