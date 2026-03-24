@@ -14,7 +14,7 @@ var profileCmd = &cobra.Command{
 	Long: `Manage Claude configuration profiles stored in ~/.ae/claude-profiles/.
 
 Each profile is an isolated Claude configuration directory (CLAUDE_CONFIG_DIR).
-Use -p/--profile with cc, cg, or glm to switch between profiles.
+Use -p/--profile to switch between profiles.
 
 Run 'ae profile setup [name]' to configure per-profile preferences
 (identity, languages, model settings, display).`,
