@@ -2,6 +2,7 @@ package platform
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -18,10 +19,8 @@ func RunDiagnostics(sys SystemInfo, targetPlatform string, flags PlatformFlags) 
 
 	// PATH 구성
 	smartPATH := template.BuildSmartPATH()
-	pathEntries := strings.Split(smartPATH, string(';'))
-	if sys.GOOS() != "windows" {
-		pathEntries = strings.Split(smartPATH, string(':'))
-	}
+	sep := string(os.PathListSeparator)
+	pathEntries := strings.Split(smartPATH, sep)
 
 	// PATH 검증
 	pathResults := VerifyPaths(sys, smartPATH)

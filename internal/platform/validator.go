@@ -1,5 +1,7 @@
 package platform
 
+import "strings"
+
 // Validator는 플랫폼별 검증 로직 인터페이스이다.
 type Validator interface {
 	RunChecks() []PlatformCheck
@@ -309,14 +311,5 @@ func (v *DarwinValidator) checkShellCompat() PlatformCheck {
 
 // contains는 문자열 포함 여부를 확인하는 헬퍼이다.
 func contains(s, substr string) bool {
-	return len(s) >= len(substr) && containsLower(s, substr)
-}
-
-func containsLower(s, substr string) bool {
-	for i := 0; i <= len(s)-len(substr); i++ {
-		if s[i:i+len(substr)] == substr {
-			return true
-		}
-	}
-	return false
+	return strings.Contains(s, substr)
 }

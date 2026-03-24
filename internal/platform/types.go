@@ -1,6 +1,7 @@
 package platform
 
 import (
+	"context"
 	"os"
 	"os/exec"
 	"runtime"
@@ -112,7 +113,9 @@ func (d *DefaultSystemInfo) DirExists(path string) bool {
 }
 
 func (d *DefaultSystemInfo) ExecCommand(name string, args ...string) (string, error) {
-	cmd := exec.Command(name, args...)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, name, args...)
 	out, err := cmd.Output()
 	return strings.TrimSpace(string(out)), err
 }
