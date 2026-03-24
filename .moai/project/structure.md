@@ -41,6 +41,7 @@ ae-adk/
 │   │   └── hook/                    # LSP hook 연동
 │   ├── manifest/                    # 매니페스트 관리
 │   ├── merge/                       # merge 워크플로우
+│   ├── platform/                    # 플랫폼 진단/프로필/PATH 검증
 │   ├── profile/                     # 프로파일 관리
 │   ├── resilience/                  # 재시도/서킷브레이커
 │   ├── shell/                       # 셸 감지 및 실행
@@ -74,6 +75,7 @@ cmd/ae
         ├── hook.go          → internal/hook
         ├── init.go          → internal/core/project, internal/config
         ├── update.go        → internal/update, internal/manifest
+        ├── platform_*.go    → internal/platform, internal/template
         └── wizard/          → internal/i18n, internal/defs
 
 internal/hook
@@ -109,13 +111,25 @@ internal/update
 | `internal/cli/launcher.go` | 런처 통합 로직 - cc/glm/cg 삭제와 함께 제거 |
 | `session_end.go` GLM 관련 함수 | GLM 모드 전용 정리 로직 |
 
+## 신규 추가 (SPEC-PLATFORM-001)
+
+| 파일/패키지 | 용도 |
+|------------|------|
+| `internal/platform/types.go` | SystemInfo 인터페이스, PlatformProfile/PlatformCheck 타입 |
+| `internal/platform/profile.go` | 프로필 저장/로드/비교 (~/.ae/platform-profile.json) |
+| `internal/platform/backup.go` | settings.json 백업 (타임스탬프 기반, 최근 5개 유지) |
+| `internal/platform/path_verifier.go` | BuildSmartPATH 출력 경로 검증 |
+| `internal/platform/diagnostics.go` | 진단 엔진 및 결과 포맷팅 |
+| `internal/platform/validator.go` | Windows/macOS/Generic 플랫폼 검증기 |
+| `internal/cli/platform_common.go` | 공통 플래그, 실행 흐름, settings.json PATH 업데이트 |
+| `internal/cli/platform_win.go` | `ae win` Cobra 명령어 |
+| `internal/cli/platform_mac.go` | `ae mac` Cobra 명령어 |
+
 ## 신규 예정
 
 | 파일/패키지 | SPEC | 용도 |
 |------------|------|------|
 | `internal/update/upstream.go` | SPEC-UPDATE-001 | moai-adk 업스트림 릴리즈 추적 |
-| `internal/cli/platform_*.go` | SPEC-PLATFORM-001 | ae win / ae mac 명령어 |
-| `internal/platform/` | SPEC-PLATFORM-001 | 플랫폼 진단/프로필 비즈니스 로직 |
 | `.claude/skills/ae-lang-csharp/` | SPEC-SKILL-001 | C# 전용 스킬 (19파일) |
 
 ## 상수 관리 정책

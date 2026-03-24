@@ -32,10 +32,11 @@ AE-ADK(AngelEyes Agent Development Kit)는 moai-adk를 포크하여 **Angeleyes 
 - **멀티 언어 지원 (i18n)**: 한국어/영어/일본어/중국어
 - **Windows/Unix 크로스 플랫폼**: Git Bash, PowerShell, zsh 지원
 
+- **ae win / ae mac** (SPEC-PLATFORM-001): 플랫폼 전환 시 PATH 자동 재구성 및 환경 진단
+
 ### 계획 중 (SPEC 작성 완료)
 
 - **업스트림 모니터링** (SPEC-UPDATE-001): moai-adk 릴리즈 추적, 선택적 템플릿 동기화
-- **ae win / ae mac** (SPEC-PLATFORM-001): 플랫폼 전환 시 PATH 자동 재구성 및 환경 진단
 - **C# 스킬 고도화** (SPEC-SKILL-001): Wolverine/Mapster/AwesomeAssertions 기반 16모듈 스킬
 - **E2E/Git규칙/나노스킬** (SPEC-PLATFORM-002): 테스트 인프라, 커밋 규칙 최적화, 소형 스킬
 
