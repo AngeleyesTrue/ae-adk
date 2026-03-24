@@ -130,9 +130,6 @@ func TestRefactor002_DeletedFilesDoNotExist(t *testing.T) {
 // ============================================================================
 
 func TestRefactor002_RootHelpText_NoLaunchCommands(t *testing.T) {
-	t.Parallel()
-
-	// UsageString()은 전역 상태를 변경하지 않으므로 병렬 안전하다
 	output := rootCmd.UsageString()
 
 	// "ae cc", "ae glm", "ae cg" 문자열이 usage에 없어야 한다
@@ -153,8 +150,6 @@ func TestRefactor002_RootHelpText_NoLaunchCommands(t *testing.T) {
 }
 
 func TestRefactor002_RootHelpText_NoLaunchCommandsGroup(t *testing.T) {
-	t.Parallel()
-
 	output := rootCmd.UsageString()
 
 	// "Launch Commands" 그룹이 더 이상 존재하지 않아야 한다
@@ -164,8 +159,6 @@ func TestRefactor002_RootHelpText_NoLaunchCommandsGroup(t *testing.T) {
 }
 
 func TestRefactor002_RootHelpText_RetainsExistingGroups(t *testing.T) {
-	t.Parallel()
-
 	output := rootCmd.UsageString()
 
 	// 기존 커맨드 그룹이 여전히 존재해야 한다
@@ -185,8 +178,6 @@ func TestRefactor002_RootHelpText_RetainsExistingGroups(t *testing.T) {
 }
 
 func TestRefactor002_RootHelpText_NoGLMSpecificTerms(t *testing.T) {
-	t.Parallel()
-
 	output := strings.ToLower(rootCmd.UsageString())
 
 	// GLM/CG 관련 용어가 usage 텍스트에 없어야 한다
@@ -211,8 +202,6 @@ func TestRefactor002_RootHelpText_NoGLMSpecificTerms(t *testing.T) {
 // ============================================================================
 
 func TestRefactor002_RemovedCommandsNotRegistered(t *testing.T) {
-	t.Parallel()
-
 	// 제거된 커맨드 이름 목록
 	removedCommands := []string{"cc", "glm", "cg"}
 
@@ -232,8 +221,6 @@ func TestRefactor002_RemovedCommandsNotRegistered(t *testing.T) {
 }
 
 func TestRefactor002_ExistingCommandsStillRegistered(t *testing.T) {
-	t.Parallel()
-
 	// 유지되어야 하는 핵심 커맨드 목록
 	expectedCommands := []struct {
 		name string
@@ -265,8 +252,6 @@ func TestRefactor002_ExistingCommandsStillRegistered(t *testing.T) {
 }
 
 func TestRefactor002_CommandCount_Reasonable(t *testing.T) {
-	t.Parallel()
-
 	count := len(rootCmd.Commands())
 
 	// cc, glm, cg 3개가 제거되었으므로 최소 8개 이상이어야 한다
@@ -455,8 +440,6 @@ func TestRefactor002_MoaiADKBoundary_NoMoaiConfigModified(t *testing.T) {
 // ============================================================================
 
 func TestRefactor002_RootCmd_StillFunctional(t *testing.T) {
-	t.Parallel()
-
 	// rootCmd가 nil이 아니고 기본 속성이 설정되어 있어야 한다
 	if rootCmd == nil {
 		t.Fatal("rootCmd가 nil — 리팩토링으로 인해 루트 커맨드가 손상됨")
@@ -472,8 +455,6 @@ func TestRefactor002_RootCmd_StillFunctional(t *testing.T) {
 }
 
 func TestRefactor002_NoLaunchGroupInRootGroups(t *testing.T) {
-	t.Parallel()
-
 	groups := rootCmd.Groups()
 	for _, g := range groups {
 		if strings.Contains(strings.ToLower(g.Title), "launch") {
@@ -486,8 +467,6 @@ func TestRefactor002_NoLaunchGroupInRootGroups(t *testing.T) {
 }
 
 func TestRefactor002_RequiredGroupsExist(t *testing.T) {
-	t.Parallel()
-
 	groups := rootCmd.Groups()
 	groupIDs := make(map[string]bool)
 	for _, g := range groups {
@@ -504,8 +483,6 @@ func TestRefactor002_RequiredGroupsExist(t *testing.T) {
 }
 
 func TestRefactor002_GroupCount_NoLaunchGroup(t *testing.T) {
-	t.Parallel()
-
 	groups := rootCmd.Groups()
 
 	// project + tools = 2개 그룹만 있어야 한다 (launch 그룹 제거됨)
@@ -522,16 +499,11 @@ func TestRefactor002_GroupCount_NoLaunchGroup(t *testing.T) {
 }
 
 func TestRefactor002_RemovedCommandsNotResolvable(t *testing.T) {
-	t.Parallel()
-
 	// 제거된 커맨드 이름이 rootCmd에서 찾을 수 없어야 한다
-	// rootCmd.Execute()는 전역 상태를 변경하므로 병렬 안전한 방법을 사용한다
 	removedNames := []string{"cc", "glm", "cg"}
 
 	for _, name := range removedNames {
 		t.Run(name+"_해석불가_확인", func(t *testing.T) {
-			t.Parallel()
-
 			for _, cmd := range rootCmd.Commands() {
 				if cmd.Name() == name || cmd.HasAlias(name) {
 					t.Errorf("제거된 커맨드 %q가 rootCmd.Commands()에서 발견됨 (Name=%q, Aliases=%v)",
@@ -557,9 +529,6 @@ func TestRefactor002_StatuslineCmd_UsesProjectFindProjectRoot(t *testing.T) {
 }
 
 func TestRefactor002_HelpOutput_DoesNotMentionLauncher(t *testing.T) {
-	t.Parallel()
-
-	// UsageString()은 rootCmd 상태를 변경하지 않으므로 병렬 안전하다
 	output := strings.ToLower(rootCmd.UsageString())
 
 	// "launcher" 관련 용어가 헬프에 없어야 한다
