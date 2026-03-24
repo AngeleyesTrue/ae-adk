@@ -73,8 +73,8 @@ func collectToolVersions(sys SystemInfo) map[string]string {
 func FormatDiagnostics(profile *PlatformProfile, verbose bool) string {
 	var sb strings.Builder
 
-	sb.WriteString(fmt.Sprintf("Platform: %s\n", profile.Platform))
-	sb.WriteString(fmt.Sprintf("Timestamp: %s\n\n", profile.Timestamp.Format(time.RFC3339)))
+	fmt.Fprintf(&sb, "Platform: %s\n", profile.Platform)
+	fmt.Fprintf(&sb, "Timestamp: %s\n\n", profile.Timestamp.Format(time.RFC3339))
 
 	// 진단 결과
 	sb.WriteString("=== Diagnostics ===\n")
@@ -88,7 +88,7 @@ func FormatDiagnostics(profile *PlatformProfile, verbose bool) string {
 	okCount, warnCount, failCount := 0, 0, 0
 	for _, c := range profile.Checks {
 		icon := statusIconText(c.Status)
-		sb.WriteString(fmt.Sprintf("%s %-*s  %s\n", icon, maxLabel, c.Name, c.Message))
+		fmt.Fprintf(&sb, "%s %-*s  %s\n", icon, maxLabel, c.Name, c.Message)
 		if verbose && c.Detail != "" {
 			sb.WriteString(fmt.Sprintf("    %s\n", c.Detail))
 		}

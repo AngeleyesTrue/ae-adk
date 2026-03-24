@@ -325,18 +325,7 @@ func TestFindSettingsJSON_Exists(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := os.Chdir(tmpDir); err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		if chErr := os.Chdir(origDir); chErr != nil {
-			t.Logf("작업 디렉터리 복원 실패: %v", chErr)
-		}
-	}()
+	t.Chdir(tmpDir)
 
 	result := findSettingsJSON()
 	if result == "" {
@@ -349,19 +338,7 @@ func TestFindSettingsJSON_Exists(t *testing.T) {
 
 func TestFindSettingsJSON_NotExists(t *testing.T) {
 	tmpDir := t.TempDir()
-
-	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := os.Chdir(tmpDir); err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		if chErr := os.Chdir(origDir); chErr != nil {
-			t.Logf("작업 디렉터리 복원 실패: %v", chErr)
-		}
-	}()
+	t.Chdir(tmpDir)
 
 	result := findSettingsJSON()
 	if result != "" {
@@ -376,19 +353,7 @@ func TestFindSettingsJSON_DirExistsButNoFile(t *testing.T) {
 		t.Fatal(err)
 	}
 	// .claude 디렉터리는 있지만 settings.json은 없음
-
-	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := os.Chdir(tmpDir); err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		if chErr := os.Chdir(origDir); chErr != nil {
-			t.Logf("작업 디렉터리 복원 실패: %v", chErr)
-		}
-	}()
+	t.Chdir(tmpDir)
 
 	result := findSettingsJSON()
 	if result != "" {
@@ -624,18 +589,7 @@ func TestRunPlatformCommand_DryRunDoesNotModifyFiles(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := os.Chdir(tmpDir); err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		if chErr := os.Chdir(origDir); chErr != nil {
-			t.Logf("작업 디렉터리 복원 실패: %v", chErr)
-		}
-	}()
+	t.Chdir(tmpDir)
 
 	cmd := newTestCmdWithFlags()
 	buf := new(bytes.Buffer)
@@ -644,8 +598,7 @@ func TestRunPlatformCommand_DryRunDoesNotModifyFiles(t *testing.T) {
 	cmd.SetArgs([]string{"--dry-run", "--force"})
 	_ = cmd.Execute()
 
-	err = runPlatformCommand(cmd, runtime.GOOS)
-	if err != nil {
+	if err := runPlatformCommand(cmd, runtime.GOOS); err != nil {
 		t.Fatalf("dry-run 실행 실패: %v", err)
 	}
 
@@ -719,18 +672,7 @@ func TestRunPlatformCommand_SkipBackup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := os.Chdir(tmpDir); err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		if chErr := os.Chdir(origDir); chErr != nil {
-			t.Logf("작업 디렉터리 복원 실패: %v", chErr)
-		}
-	}()
+	t.Chdir(tmpDir)
 
 	cmd := newTestCmdWithFlags()
 	buf := new(bytes.Buffer)
@@ -739,8 +681,7 @@ func TestRunPlatformCommand_SkipBackup(t *testing.T) {
 	cmd.SetArgs([]string{"--force", "--skip-backup"})
 	_ = cmd.Execute()
 
-	err = runPlatformCommand(cmd, runtime.GOOS)
-	if err != nil {
+	if err := runPlatformCommand(cmd, runtime.GOOS); err != nil {
 		t.Fatalf("--skip-backup 실행 실패: %v", err)
 	}
 
@@ -767,18 +708,7 @@ func TestRunPlatformCommand_BackupCreated(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := os.Chdir(tmpDir); err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		if chErr := os.Chdir(origDir); chErr != nil {
-			t.Logf("작업 디렉터리 복원 실패: %v", chErr)
-		}
-	}()
+	t.Chdir(tmpDir)
 
 	cmd := newTestCmdWithFlags()
 	buf := new(bytes.Buffer)
@@ -788,8 +718,7 @@ func TestRunPlatformCommand_BackupCreated(t *testing.T) {
 	cmd.SetArgs([]string{"--force"})
 	_ = cmd.Execute()
 
-	err = runPlatformCommand(cmd, runtime.GOOS)
-	if err != nil {
+	if err := runPlatformCommand(cmd, runtime.GOOS); err != nil {
 		t.Fatalf("백업 포함 실행 실패: %v", err)
 	}
 
