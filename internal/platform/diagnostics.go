@@ -90,7 +90,7 @@ func FormatDiagnostics(profile *PlatformProfile, verbose bool) string {
 		icon := statusIconText(c.Status)
 		fmt.Fprintf(&sb, "%s %-*s  %s\n", icon, maxLabel, c.Name, c.Message)
 		if verbose && c.Detail != "" {
-			sb.WriteString(fmt.Sprintf("    %s\n", c.Detail))
+			fmt.Fprintf(&sb, "    %s\n", c.Detail)
 		}
 		switch c.Status {
 		case StatusOK:
@@ -102,12 +102,12 @@ func FormatDiagnostics(profile *PlatformProfile, verbose bool) string {
 		}
 	}
 
-	sb.WriteString(fmt.Sprintf("\n%d passed / %d warnings / %d failed\n", okCount, warnCount, failCount))
+	fmt.Fprintf(&sb, "\n%d passed / %d warnings / %d failed\n", okCount, warnCount, failCount)
 
 	// 도구 버전
 	sb.WriteString("\n=== Tool Versions ===\n")
 	for tool, ver := range profile.ToolVersions {
-		sb.WriteString(fmt.Sprintf("  %-8s %s\n", tool+":", ver))
+		fmt.Fprintf(&sb, "  %-8s %s\n", tool+":", ver)
 	}
 
 	return sb.String()
@@ -125,25 +125,25 @@ func FormatDiff(diff *ProfileDiff) string {
 	if len(diff.AddedPaths) > 0 {
 		sb.WriteString("\nAdded paths:\n")
 		for _, p := range diff.AddedPaths {
-			sb.WriteString(fmt.Sprintf("  + %s\n", p))
+			fmt.Fprintf(&sb, "  + %s\n", p)
 		}
 	}
 	if len(diff.RemovedPaths) > 0 {
 		sb.WriteString("\nRemoved paths:\n")
 		for _, p := range diff.RemovedPaths {
-			sb.WriteString(fmt.Sprintf("  - %s\n", p))
+			fmt.Fprintf(&sb, "  - %s\n", p)
 		}
 	}
 	if len(diff.ChangedTools) > 0 {
 		sb.WriteString("\nChanged tools:\n")
 		for tool, versions := range diff.ChangedTools {
-			sb.WriteString(fmt.Sprintf("  %s: %s -> %s\n", tool, versions[0], versions[1]))
+			fmt.Fprintf(&sb, "  %s: %s -> %s\n", tool, versions[0], versions[1])
 		}
 	}
 	if len(diff.StatusDiffs) > 0 {
 		sb.WriteString("\nStatus changes:\n")
 		for _, d := range diff.StatusDiffs {
-			sb.WriteString(fmt.Sprintf("  %s: %s -> %s\n", d.Name, d.OldStatus, d.NewStatus))
+			fmt.Fprintf(&sb, "  %s: %s -> %s\n", d.Name, d.OldStatus, d.NewStatus)
 		}
 	}
 
