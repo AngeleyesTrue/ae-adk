@@ -1,0 +1,9 @@
+llm:
+    performance_tier: medium
+    claude_models:
+        high: opus
+        medium: sonnet
+        low: haiku
+    default_model: sonnet
+    quality_model: opus
+    speed_model: haiku

@@ -22,28 +22,12 @@ llm:
 			wantMode: "cc",
 		},
 		{
-			name: "glm mode",
+			name: "cc mode explicit",
 			content: `
 llm:
-    team_mode: "glm"
+    team_mode: "cc"
 `,
-			wantMode: "glm",
-		},
-		{
-			name: "cg mode",
-			content: `
-llm:
-    team_mode: "cg"
-`,
-			wantMode: "cg",
-		},
-		{
-			name: "no quotes",
-			content: `
-llm:
-    team_mode: glm
-`,
-			wantMode: "glm",
+			wantMode: "cc",
 		},
 	}
 
@@ -85,40 +69,7 @@ func TestGetActiveMode_Default(t *testing.T) {
 	}
 }
 
-// TestBuildTmuxSessionConfig_GLMMode tests GLM env var loading.
-func TestBuildTmuxSessionConfig_GLMMode(t *testing.T) {
-	tempDir := t.TempDir()
-
-	// Create llm.yaml with glm mode
-	llmContent := `
-llm:
-    team_mode: "glm"
-`
-	configDir := filepath.Join(tempDir, ".ae", "config", "sections")
-	if err := os.MkdirAll(configDir, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	llmPath := filepath.Join(configDir, "llm.yaml")
-	if err := os.WriteFile(llmPath, []byte(llmContent), 0o644); err != nil {
-		t.Fatal(err)
-	}
-
-	cfg, err := BuildTmuxSessionConfig("test-project", "SPEC-TEST-001", "/worktree", tempDir)
-	if err != nil {
-		t.Fatalf("BuildTmuxSessionConfig() error = %v", err)
-	}
-
-	if cfg.ActiveMode != "glm" {
-		t.Errorf("ActiveMode = %v, want glm", cfg.ActiveMode)
-	}
-
-	// Check that GLMEnvVars map is created (may be empty if no .env.glm exists)
-	if cfg.GLMEnvVars == nil {
-		t.Error("GLMEnvVars map not created")
-	}
-}
-
-// TestBuildTmuxSessionConfig_CCMode tests that CC mode has no GLM env vars.
+// TestBuildTmuxSessionConfig_CCMode tests that CC mode builds config correctly.
 func TestBuildTmuxSessionConfig_CCMode(t *testing.T) {
 	tempDir := t.TempDir()
 
@@ -145,7 +96,15 @@ llm:
 		t.Errorf("ActiveMode = %v, want cc", cfg.ActiveMode)
 	}
 
-	if len(cfg.GLMEnvVars) != 0 {
-		t.Errorf("GLMEnvVars should be empty in CC mode, got %d vars", len(cfg.GLMEnvVars))
+	if cfg.ProjectName != "test-project" {
+		t.Errorf("ProjectName = %v, want test-project", cfg.ProjectName)
+	}
+
+	if cfg.SpecID != "SPEC-TEST-001" {
+		t.Errorf("SpecID = %v, want SPEC-TEST-001", cfg.SpecID)
+	}
+
+	if cfg.WorktreePath != "/worktree" {
+		t.Errorf("WorktreePath = %v, want /worktree", cfg.WorktreePath)
 	}
 }

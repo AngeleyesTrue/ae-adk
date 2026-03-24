@@ -113,7 +113,7 @@ logs/
 # ===========================================
 # Backups
 # ===========================================
-.ae-backups/
+.moai-backups/
 *.backup/
 *-backup/
 *_backup_*/
@@ -178,8 +178,9 @@ secret-*.*
 # ===========================================
 # Local-Only Files (never sync via git pull)
 # ===========================================
-.ae/memory/
-.ae/worktrees/
+.moai/status_line.sh
+.moai/memory/
+.moai/worktrees/
 
 # ===========================================
 # Node.js (for docs/Nextra)
@@ -204,7 +205,10 @@ dist-ssr/
 .netlify/
 .firebase/
 
-# User Custom Patterns (preserved by ae update)
+# User Custom Patterns (preserved by moai update)
+.ae-backups/
+.ae/memory/
+.ae/worktrees/
 /ae
 /ae_test
 tests/

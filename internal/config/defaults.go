@@ -37,16 +37,6 @@ const (
 	DefaultBranchPrefix = "ae/"
 	DefaultCommitStyle  = "conventional"
 
-	DefaultGLMEnvVar  = "GLM_API_KEY"
-	DefaultGLMBaseURL = "https://api.z.ai/api/anthropic"
-	// GLM model tiers
-	DefaultGLMHigh   = "glm-5"
-	DefaultGLMMedium = "glm-4.7"
-	DefaultGLMLow    = "glm-4.5-air"
-	// Legacy GLM model names (map to tiers)
-	DefaultGLMHaiku  = "glm-4.5-air"
-	DefaultGLMSonnet = "glm-4.7"
-	DefaultGLMOpus   = "glm-5"
 	// Default performance tier
 	DefaultPerformanceTier = "medium"
 
@@ -168,7 +158,6 @@ func NewDefaultSystemConfig() SystemConfig {
 // NewDefaultLLMConfig returns a LLMConfig with default values.
 func NewDefaultLLMConfig() LLMConfig {
 	return LLMConfig{
-		GLMEnvVar:       DefaultGLMEnvVar,
 		PerformanceTier: DefaultPerformanceTier,
 		ClaudeModels: ClaudeTierModels{
 			High:   "opus",
@@ -178,18 +167,6 @@ func NewDefaultLLMConfig() LLMConfig {
 		DefaultModel: DefaultModel,
 		QualityModel: DefaultQualModel,
 		SpeedModel:   DefaultSpeedModel,
-		GLM: GLMSettings{
-			BaseURL: DefaultGLMBaseURL,
-			Models: GLMModels{
-				High:   DefaultGLMHigh,
-				Medium: DefaultGLMMedium,
-				Low:    DefaultGLMLow,
-				// Legacy fields for backward compatibility
-				Opus:   DefaultGLMOpus,
-				Sonnet: DefaultGLMSonnet,
-				Haiku:  DefaultGLMHaiku,
-			},
-		},
 	}
 }
 

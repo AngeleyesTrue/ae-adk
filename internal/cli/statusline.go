@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/AngeleyesTrue/ae-adk/internal/core/project"
 	"github.com/AngeleyesTrue/ae-adk/internal/statusline"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
@@ -27,7 +28,7 @@ func runStatusline(cmd *cobra.Command, _ []string) error {
 	ctx := context.Background()
 
 	// Get project root for git and version detection (error ignored: empty root is valid)
-	projectRoot, _ := findProjectRootFn() //nolint:errcheck // empty root is acceptable fallback
+	projectRoot, _ := project.FindProjectRoot() //nolint:errcheck // empty root is acceptable fallback
 
 	// Load full statusline config from statusline.yaml
 	statuslineCfg := loadStatuslineFileConfig(projectRoot)

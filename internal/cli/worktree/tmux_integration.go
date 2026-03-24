@@ -27,18 +27,13 @@ type TmuxSessionConfig struct {
 	// WorktreePath is the absolute path to the worktree
 	WorktreePath string
 
-	// ActiveMode is the current LLM mode (cc, glm, cg)
+	// ActiveMode is the current LLM mode (cc)
 	ActiveMode string
-
-	// GLMEnvVars holds the environment variables to inject in GLM/CG mode.
-	// Must be empty in CC mode.
-	GLMEnvVars map[string]string
 }
 
 // CreateTmuxSession creates a tmux session for the worktree.
 //
 // R5.1: Session name pattern: ae-{ProjectName}-{SPEC-ID}
-// R5.2-5.3: Inject environment variables in GLM/CG mode; no injection in CC mode
 // R5.4: After session creation, cd to worktree and execute /ae run command
 //
 // @MX:ANCHOR: Core entry point for the worktree-based development workflow
@@ -71,15 +66,6 @@ func CreateTmuxSession(ctx context.Context, cfg *TmuxSessionConfig, tmuxMgr tmux
 	result, err := tmuxMgr.Create(ctx, sessionCfg)
 	if err != nil {
 		return fmt.Errorf("create tmux session: %w", err)
-	}
-
-	// R5.2-5.3: Inject environment variables in GLM/CG mode
-	if cfg.ActiveMode == "glm" || cfg.ActiveMode == "cg" {
-		if len(cfg.GLMEnvVars) > 0 {
-			if err := tmuxMgr.InjectEnv(ctx, cfg.GLMEnvVars); err != nil {
-				return fmt.Errorf("inject GLM env: %w", err)
-			}
-		}
 	}
 
 	// Print log output
@@ -118,7 +104,7 @@ func IsTmuxAvailable() bool {
 // GetActiveMode reads the current active mode from .ae/config/sections/llm.yaml.
 // R1.1: active mode detection.
 //
-// Returns: "cc" (default/empty), "glm", or "cg"
+// Returns: "cc" (default/empty)
 //
 // @MX:NOTE: SPEC-WORKTREE-002 R1.1 implementation - LLM mode detection
 // @MX:SPEC: SPEC-WORKTREE-002
@@ -172,42 +158,6 @@ func BuildTmuxSessionConfig(projectName, specID, worktreePath, projectRoot strin
 		SpecID:       specID,
 		WorktreePath: worktreePath,
 		ActiveMode:   activeMode,
-		GLMEnvVars:   make(map[string]string),
-	}
-
-	// R5.2-5.3: Set environment variables in GLM/CG mode
-	if activeMode == "glm" || activeMode == "cg" {
-		// Load GLM environment variables from ~/.ae/.env.glm
-		homeDir, _ := os.UserHomeDir()
-		glmEnvPath := filepath.Join(homeDir, ".ae", ".env.glm")
-		if data, err := os.ReadFile(glmEnvPath); err == nil {
-			// Parse KEY=VALUE lines
-			for _, line := range strings.Split(string(data), "\n") {
-				line = strings.TrimSpace(line)
-				if line == "" || strings.HasPrefix(line, "#") {
-					continue
-				}
-				parts := strings.SplitN(line, "=", 2)
-				if len(parts) == 2 {
-					key := strings.TrimSpace(parts[0])
-					value := strings.TrimSpace(parts[1])
-					// Only include ANTHROPIC_* vars
-					if strings.HasPrefix(key, "ANTHROPIC_") {
-						cfg.GLMEnvVars[key] = value
-					}
-				}
-			}
-		}
-		// Fallback to current environment if .env.glm doesn't have them
-		if cfg.GLMEnvVars["ANTHROPIC_DEFAULT_HAIKU_MODEL"] == "" {
-			cfg.GLMEnvVars["ANTHROPIC_DEFAULT_HAIKU_MODEL"] = os.Getenv("ANTHROPIC_DEFAULT_HAIKU_MODEL")
-		}
-		if cfg.GLMEnvVars["ANTHROPIC_DEFAULT_SONNET_MODEL"] == "" {
-			cfg.GLMEnvVars["ANTHROPIC_DEFAULT_SONNET_MODEL"] = os.Getenv("ANTHROPIC_DEFAULT_SONNET_MODEL")
-		}
-		if cfg.GLMEnvVars["ANTHROPIC_DEFAULT_OPUS_MODEL"] == "" {
-			cfg.GLMEnvVars["ANTHROPIC_DEFAULT_OPUS_MODEL"] = os.Getenv("ANTHROPIC_DEFAULT_OPUS_MODEL")
-		}
 	}
 
 	return cfg, nil
