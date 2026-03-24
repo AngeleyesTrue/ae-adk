@@ -37,7 +37,7 @@ func TestExecute_InitsDeps(t *testing.T) {
 func TestRootCmd_AllCommandsRegistered(t *testing.T) {
 	expected := []string{
 		"init", "doctor", "status", "version",
-		"update", "hook", "cc", "glm",
+		"update", "hook",
 		"worktree", "statusline",
 	}
 

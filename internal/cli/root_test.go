@@ -54,9 +54,12 @@ func TestRootCmd_HelpOutput(t *testing.T) {
 
 	output := buf.String()
 
-	// Root command should show command groups
-	if !strings.Contains(output, "Launch Commands") {
-		t.Error("root --help should show Launch Commands group")
+	// Verify launch commands are removed
+	if strings.Contains(output, "Launch Commands") {
+		t.Error("root --help should not show Launch Commands group (cc/glm/cg removed)")
+	}
+	if strings.Contains(output, "ae cc") || strings.Contains(output, "ae glm") || strings.Contains(output, "ae cg") {
+		t.Error("root --help should not contain cc/glm/cg references")
 	}
 
 	// Verify core subcommands are registered

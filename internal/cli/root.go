@@ -17,9 +17,7 @@ var rootCmd = &cobra.Command{
 that serves as the runtime backbone for the AE framework within Claude Code.
 
 It provides CLI tooling, configuration management, LSP integration,
-Git operations, quality gates, and autonomous development loop capabilities.
-
-Use 'ae cc', 'ae cg', or 'ae glm' to launch Claude Code.`,
+Git operations, quality gates, and autonomous development loop capabilities.`,
 	Version: version.GetVersion(),
 	Run: func(cmd *cobra.Command, args []string) {
 		PrintBanner(version.GetVersion())
@@ -41,7 +39,6 @@ func init() {
 
 	// Command groups
 	rootCmd.AddGroup(
-		&cobra.Group{ID: "launch", Title: "Launch Commands:"},
 		&cobra.Group{ID: "project", Title: "Project Commands:"},
 		&cobra.Group{ID: "tools", Title: "Tools:"},
 	)
