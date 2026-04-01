@@ -1,0 +1,56 @@
+version: 2
+
+project_name: ae-adk
+
+before:
+  hooks:
+    - go mod tidy
+    - go vet ./...
+
+builds:
+  - id: ae
+    main: ./cmd/ae
+    binary: ae
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/AngeleyesTrue/ae-adk/pkg/version.Version={{.Version}}
+      - -X github.com/AngeleyesTrue/ae-adk/pkg/version.Commit={{.Commit}}
+      - -X github.com/AngeleyesTrue/ae-adk/pkg/version.Date={{.Date}}
+
+archives:
+  - id: ae-archive
+    builds:
+      - ae
+    name_template: "ae-adk_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+      - "^chore:"
+
+release:
+  github:
+    owner: AngeleyesTrue
+    name: ae-adk
+  draft: false
+  prerelease: auto
+  name_template: "AE-ADK v{{.Version}}"
