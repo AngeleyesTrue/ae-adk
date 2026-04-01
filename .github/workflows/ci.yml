@@ -52,6 +52,8 @@ jobs:
       - name: Run E2E tests
         if: matrix.os == 'ubuntu-latest'
         shell: bash
+        env:
+          AE_SKIP_BINARY_UPDATE: "1"
         run: |
           export PATH="$(pwd):$PATH"
           chmod +x scripts/e2e-test.sh
