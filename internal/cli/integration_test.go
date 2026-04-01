@@ -39,6 +39,7 @@ func TestRootCmd_AllCommandsRegistered(t *testing.T) {
 		"init", "doctor", "status", "version",
 		"update", "hook",
 		"worktree", "statusline",
+		"github", "loop", "profile",
 	}
 
 	registered := make(map[string]bool)
@@ -183,6 +184,19 @@ func TestDoctorCmd_ExportFlag(t *testing.T) {
 	output := buf.String()
 	if !strings.Contains(output, "exported") {
 		t.Errorf("output should mention export, got %q", output)
+	}
+}
+
+func TestRootCmd_AllCommandsHaveMetadata(t *testing.T) {
+	// rootCmd에 등록된 모든 커맨드가 Use와 Short 필드를 갖고 있는지 검증
+	for _, cmd := range rootCmd.Commands() {
+		name := cmd.Name()
+		if cmd.Use == "" {
+			t.Errorf("command %q has empty Use field", name)
+		}
+		if cmd.Short == "" {
+			t.Errorf("command %q has empty Short field", name)
+		}
 	}
 }
 
