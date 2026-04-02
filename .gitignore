@@ -212,7 +212,8 @@ dist-ssr/
 
 # .claude/ - exclude agent definitions, skills, rules, hooks (MoAI orchestration layer)
 .claude/agents/
-.claude/skills/
+.claude/skills/*
+!.claude/skills/ae-lang-csharp/
 .claude/rules/
 .claude/hooks/
 .claude/output-styles/
