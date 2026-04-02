@@ -16,13 +16,45 @@ workflow:
         max_retries_per_operation: 3
     team:
         role_profiles:
-            researcher: { mode: plan, model: haiku, isolation: none }
-            analyst: { mode: plan, model: sonnet, isolation: none }
-            architect: { mode: plan, model: sonnet, isolation: none }
-            implementer: { mode: acceptEdits, model: sonnet, isolation: worktree }
-            tester: { mode: acceptEdits, model: sonnet, isolation: worktree }
-            designer: { mode: acceptEdits, model: sonnet, isolation: worktree }
-            reviewer: { mode: plan, model: haiku, isolation: none }
+            researcher:
+                mode: plan
+                model: haiku
+                isolation: none
+                tools: "Read,Grep,Glob,Bash"
+                skills: "ae-foundation-thinking"
+            analyst:
+                mode: plan
+                model: sonnet
+                isolation: none
+                tools: "Read,Grep,Glob,Bash"
+            architect:
+                mode: plan
+                model: sonnet
+                isolation: none
+                tools: "Read,Grep,Glob,Bash"
+            implementer:
+                mode: acceptEdits
+                model: sonnet
+                isolation: worktree
+                tools: "Read,Write,Edit,Bash,Grep,Glob"
+            tester:
+                mode: acceptEdits
+                model: sonnet
+                isolation: worktree
+                tools: "Read,Write,Edit,Bash,Grep,Glob"
+                skills: "ae-workflow-testing,ae-foundation-quality"
+            designer:
+                mode: acceptEdits
+                model: sonnet
+                isolation: worktree
+                tools: "Read,Write,Edit,Bash,Grep,Glob"
+                skills: "ae-domain-uiux,ae-design-tools"
+            reviewer:
+                mode: plan
+                model: haiku
+                isolation: none
+                tools: "Read,Grep,Glob,Bash"
+                skills: "ae-foundation-quality"
         auto_selection:
             min_complexity_score: 7
             min_domains_for_team: 3
@@ -81,9 +113,9 @@ workflow:
         teammate_display: auto
     worktree:
         auto_create: true
-        auto_merge: true
+        auto_merge: false
         auto_cleanup: true
-        tmux_preferred: true
+        tmux_preferred: false
         session_name_pattern: "ae-{ProjectName}-{SPEC-ID}"
     token_budget:
         plan: 30000

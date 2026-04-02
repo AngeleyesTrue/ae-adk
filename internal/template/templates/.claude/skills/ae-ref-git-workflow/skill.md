@@ -18,11 +18,11 @@ metadata:
 progressive_disclosure:
   enabled: true
   level1_tokens: 100
-  level2_tokens: 3000
+  level2_tokens: 900
 
 # AE Extension: Triggers
 triggers:
-  keywords: ["git", "commit", "branch", "pr", "merge", "rebase"]
+  keywords: ["git workflow", "branch strategy", "conventional commit", "pr template", "merge strategy"]
   agents: ["manager-git"]
   phases: ["run", "sync"]
 ---

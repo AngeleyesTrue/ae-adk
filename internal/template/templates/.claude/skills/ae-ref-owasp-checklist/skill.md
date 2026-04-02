@@ -18,11 +18,11 @@ metadata:
 progressive_disclosure:
   enabled: true
   level1_tokens: 100
-  level2_tokens: 3000
+  level2_tokens: 900
 
 # AE Extension: Triggers
 triggers:
-  keywords: ["owasp", "security", "vulnerability", "injection", "xss", "csrf", "auth"]
+  keywords: ["owasp checklist", "security audit", "vulnerability scan", "auth security", "http security headers"]
   agents: ["expert-security", "expert-backend"]
   phases: ["run"]
 ---

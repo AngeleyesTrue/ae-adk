@@ -18,11 +18,11 @@ metadata:
 progressive_disclosure:
   enabled: true
   level1_tokens: 100
-  level2_tokens: 3000
+  level2_tokens: 900
 
 # AE Extension: Triggers
 triggers:
-  keywords: ["test", "coverage", "tdd", "unit test", "integration", "e2e"]
+  keywords: ["test pyramid", "test strategy", "coverage target", "tdd workflow", "test patterns"]
   agents: ["expert-testing", "manager-tdd"]
   phases: ["run"]
 ---

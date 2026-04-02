@@ -18,11 +18,11 @@ metadata:
 progressive_disclosure:
   enabled: true
   level1_tokens: 100
-  level2_tokens: 3000
+  level2_tokens: 900
 
 # AE Extension: Triggers
 triggers:
-  keywords: ["react", "component", "nextjs", "frontend", "ui", "state"]
+  keywords: ["react patterns", "component design", "state management", "nextjs structure", "react performance"]
   agents: ["expert-frontend"]
   phases: ["run"]
 ---

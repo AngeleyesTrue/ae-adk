@@ -107,7 +107,7 @@ agent, skill, plugin
 
 Agent Teams teammates are spawned dynamically using `Agent(subagent_type: "general-purpose")` with runtime parameter overrides from `workflow.yaml` role profiles. No static team agent definitions are used.
 
-Role profiles (in `workflow.yaml`): researcher, analyst, architect, implementer, tester, designer, reviewer. Each profile specifies mode, model, and isolation.
+Role profiles (in `workflow.yaml`): researcher, analyst, architect, implementer, tester, designer, reviewer. Each profile specifies mode, model, isolation, tools, and skills.
 
 Requires: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` env var AND `workflow.team.enabled: true` in workflow.yaml.
 
@@ -392,7 +392,7 @@ TeammateIdle (exit 2 = keep working), TaskCompleted (exit 2 = reject completion)
 
 ### Dynamic Team Generation
 
-Teammates are spawned dynamically using `Agent(subagent_type: "general-purpose")` with runtime parameter overrides. Role profiles in `workflow.yaml` define mode, model, and isolation per role type. No static team agent definition files are used.
+Teammates are spawned dynamically using `Agent(subagent_type: "general-purpose")` with runtime parameter overrides. Role profiles in `workflow.yaml` define mode, model, isolation, tools, and skills per role type. No static team agent definition files are used.
 
 For complete Agent Teams documentation including team API reference, role profiles, file ownership strategy, team workflows, and configuration, see .claude/rules/ae/workflow/spec-workflow.md and .ae/config/sections/workflow.yaml.
 

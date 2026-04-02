@@ -19,11 +19,11 @@ metadata:
 progressive_disclosure:
   enabled: true
   level1_tokens: 100
-  level2_tokens: 3000
+  level2_tokens: 900
 
 # AE Extension: Triggers
 triggers:
-  keywords: ["api", "endpoint", "rest", "graphql", "route", "handler"]
+  keywords: ["api design", "api patterns", "rest endpoint", "graphql endpoint", "api versioning", "error response format"]
   agents: ["expert-backend"]
   phases: ["run"]
 ---
