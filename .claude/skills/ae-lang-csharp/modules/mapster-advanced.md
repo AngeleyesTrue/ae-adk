@@ -7,7 +7,7 @@ category: infrastructure
 
 # Mapster Advanced Mapping
 
-Mapster 7.x IMapFrom&lt;T&gt;, TypeAdapterConfig, EF Core Projection.
+Mapster 7.x IRegister, TypeAdapterConfig, EF Core Projection.
 
 ## Quick Reference
 
@@ -15,8 +15,8 @@ Mapster 7.x IMapFrom&lt;T&gt;, TypeAdapterConfig, EF Core Projection.
 // 단순 매핑
 var dto = order.Adapt<OrderDto>();
 
-// IMapFrom<T> 인터페이스
-public class OrderDto : IMapFrom<Order> { ... }
+// IRegister 인터페이스로 매핑 등록
+public class OrderMappingRegister : IRegister { ... }
 
 // EF Core Projection
 var projected = await db.Orders.ProjectToType<OrderDto>().ToListAsync(ct);
@@ -30,18 +30,13 @@ config.NewConfig<Order, OrderDto>()
 
 ## Detailed Patterns
 
-### IMapFrom&lt;T&gt; Interface
+### IRegister Interface
 
 ```csharp
-// DTO에 매핑 설정을 함께 정의
-public class OrderDto : IMapFrom<Order>
+// IRegister 인터페이스로 매핑 설정을 별도 클래스에 정의
+public class OrderMappingRegister : IRegister
 {
-    public Guid Id { get; init; }
-    public string CustomerName { get; init; } = default!;
-    public decimal TotalAmount { get; init; }
-    public string StatusDisplay { get; init; } = default!;
-
-    public void ConfigureMapping(TypeAdapterConfig config)
+    public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<Order, OrderDto>()
             .Map(dest => dest.CustomerName, src => src.Customer.FullName)
@@ -124,14 +119,10 @@ var lookup = orders.Adapt<Dictionary<Guid, OrderDto>>();
 ### Nested Object Mapping
 
 ```csharp
-public class OrderDetailDto : IMapFrom<Order>
+// IRegister로 중첩 객체 매핑 설정
+public class OrderDetailMappingRegister : IRegister
 {
-    public Guid Id { get; init; }
-    public CustomerDto Customer { get; init; } = default!;
-    public List<OrderLineDto> Lines { get; init; } = [];
-    public AddressDto ShippingAddress { get; init; } = default!;
-
-    public void ConfigureMapping(TypeAdapterConfig config)
+    public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<Order, OrderDetailDto>()
             .Map(dest => dest.Customer, src => src.Customer)
@@ -154,8 +145,8 @@ public static IServiceCollection AddMapsterConfig(this IServiceCollection servic
 {
     var config = TypeAdapterConfig.GlobalSettings;
 
-    // IMapFrom<T> 인터페이스를 구현한 모든 타입 자동 스캔
-    config.Scan(typeof(OrderDto).Assembly);
+    // IRegister 인터페이스를 구현한 모든 타입 자동 스캔
+    config.Scan(typeof(OrderMappingRegister).Assembly);
 
     // 추가 설정
     MappingConfig.Configure();
@@ -175,9 +166,10 @@ public static IServiceCollection AddMapsterConfig(this IServiceCollection servic
 
 ```csharp
 // 양방향 매핑
+// TwoWays()는 단순 1:1 속성에만 사용. 복합 매핑은 별도 역방향 설정 필요
 TypeAdapterConfig<Order, OrderDto>.NewConfig()
     .TwoWays()
-    .Map(dest => dest.CustomerName, src => src.Customer.FullName);
+    .Map(dest => dest.Name, src => src.Name);
 ```
 
 ### Conditional Mapping
@@ -201,12 +193,14 @@ TypeAdapterConfig<Order, OrderDto>.NewConfig()
 ### Compiled Mapping (Performance)
 
 ```csharp
-// 컴파일된 매핑 함수로 성능 최적화
-var mapper = TypeAdapterConfig<Order, OrderDto>.NewConfig()
-    .CompileProjection();
+// 컴파일된 매핑 함수
+var compiledMapper = TypeAdapterConfig<Order, OrderDto>
+    .NewConfig()
+    .Compile();
+var dto = compiledMapper(order);
 
-// LINQ Projection에 직접 사용
-var items = await db.Orders
-    .Select(mapper.Projection)
-    .ToListAsync(ct);
+// EF Core 프로젝션
+var dtos = await db.Orders
+    .ProjectToType<OrderDto>()
+    .ToListAsync();
 ```

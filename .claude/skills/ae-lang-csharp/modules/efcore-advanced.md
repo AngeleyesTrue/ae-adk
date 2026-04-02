@@ -120,7 +120,7 @@ public class SlowQueryInterceptor(ILogger logger) : DbCommandInterceptor
     {
         if (eventData.Duration.TotalMilliseconds > 200)
         {
-            logger.Warning(
+            logger.LogWarning(
                 "Slow query ({Duration}ms): {CommandText}",
                 eventData.Duration.TotalMilliseconds,
                 command.CommandText);

@@ -23,6 +23,9 @@ public record CreateOrder(string CustomerId, List<OrderLineDto> Lines);
 public record OrderCreated(Guid OrderId, DateTimeOffset CreatedAt);
 
 // Handler - static method, 파라미터로 DI 주입
+// 참고: 간결성을 위해 AppDbContext를 직접 사용합니다.
+// Clean Architecture에서는 IOrderRepository 추상화를 권장합니다.
+// 상세 패턴: clean-architecture.md 참조.
 public static class CreateOrderHandler
 {
     public static async Task<OrderCreated> Handle(
@@ -39,7 +42,7 @@ public static class CreateOrderHandler
         db.Orders.Add(order);
         await db.SaveChangesAsync(ct);
 
-        logger.Information("Order {OrderId} created for customer {CustomerId}",
+        logger.LogInformation("Order {OrderId} created for customer {CustomerId}",
             order.Id, command.CustomerId);
 
         return new OrderCreated(order.Id, order.CreatedAt);
@@ -80,7 +83,7 @@ public static class UpdateOrderStatusHandler
             throw new DomainException(result.Errors);
 
         await db.SaveChangesAsync(ct);
-        logger.Information("Order {OrderId} status updated to {Status}",
+        logger.LogInformation("Order {OrderId} status updated to {Status}",
             command.OrderId, command.NewStatus);
     }
 }
@@ -154,7 +157,7 @@ public static class OrderPlacedHandler
         ILogger logger,
         CancellationToken ct)
     {
-        logger.Information("Processing OrderPlaced for {OrderId}", @event.OrderId);
+        logger.LogInformation("Processing OrderPlaced for {OrderId}", @event.OrderId);
         await notifications.SendOrderConfirmationAsync(@event.OrderId, ct);
     }
 }
@@ -251,3 +254,6 @@ builder.Host.UseWolverine(opts =>
         .UseDurableInbox();
 });
 ```
+
+---
+**관련 모듈**: [Wolverine Middleware](wolverine-middleware.md) | [Clean Architecture](clean-architecture.md) | [Domain Events](domain-events.md)

@@ -15,8 +15,8 @@ Publish-after-save 패턴과 Wolverine 연동 도메인 이벤트.
 // 도메인 이벤트 = POCO record (인터페이스 없음)
 public record OrderPlaced(Guid OrderId, string CustomerId, decimal TotalAmount);
 
-// AggregateRoot에서 이벤트 등록
-order._domainEvents.Add(new OrderPlaced(order.Id, customerId, order.TotalAmount));
+// Order 엔티티 내부 (Factory Method에서)
+AddDomainEvent(new OrderPlaced(Id, customerId, TotalAmount));
 
 // SaveChanges 후 자동 발행 (DomainEventInterceptor)
 // Wolverine Event Handler로 처리
@@ -34,10 +34,12 @@ public static class OrderPlacedHandler
 ### AggregateRoot Base Class
 
 ```csharp
+// AggregateRoot 전체 정의: [Aggregate Patterns](aggregate-patterns.md) 참조
 public abstract class AggregateRoot : BaseEntity
 {
     private readonly List<object> _domainEvents = [];
     public IReadOnlyList<object> DomainEvents => _domainEvents.AsReadOnly();
+    public byte[] RowVersion { get; private set; } = []; // 낙관적 동시성
 
     protected void AddDomainEvent(object domainEvent) => _domainEvents.Add(domainEvent);
     public void ClearDomainEvents() => _domainEvents.Clear();
@@ -59,9 +61,10 @@ public record OrderCancelled(Guid OrderId, string Reason);
 ```csharp
 public class Order : AggregateRoot
 {
-    private readonly List<object> _domainEvents = [];
-    public IReadOnlyList<object> DomainEvents => _domainEvents.AsReadOnly();
+    // _domainEvents, DomainEvents, AddDomainEvent(), ClearDomainEvents()는
+    // AggregateRoot에서 상속 (aggregate-patterns.md 참조)
 
+    // 간소화 버전 - 전체 패턴은 rich-domain-modeling.md의 Result<Order> 반환 참조
     public static Order Create(string customerId, List<OrderLineDto> lines)
     {
         var order = new Order
@@ -73,7 +76,7 @@ public class Order : AggregateRoot
         };
 
         order.AddLines(lines);
-        order._domainEvents.Add(new OrderPlaced(order.Id, customerId, order.TotalAmount));
+        order.AddDomainEvent(new OrderPlaced(order.Id, customerId, order.TotalAmount));
 
         return order;
     }
@@ -84,11 +87,9 @@ public class Order : AggregateRoot
             return Result.Error($"Cannot confirm order in {Status} status");
 
         Status = OrderStatus.Confirmed;
-        _domainEvents.Add(new OrderConfirmed(Id, DateTimeOffset.UtcNow));
+        AddDomainEvent(new OrderConfirmed(Id, DateTimeOffset.UtcNow));
         return Result.Success();
     }
-
-    public void ClearDomainEvents() => _domainEvents.Clear();
 }
 ```
 
@@ -151,7 +152,7 @@ public static class OrderPlacedHandler
         ILogger logger,
         CancellationToken ct)
     {
-        logger.Information("Processing OrderPlaced event for {OrderId}", @event.OrderId);
+        logger.LogInformation("Processing OrderPlaced event for {OrderId}", @event.OrderId);
         await notifications.SendOrderConfirmationAsync(@event.OrderId, ct);
     }
 }
@@ -231,7 +232,7 @@ public static class OrderPlacedHandler
         // 중복 체크
         if (await db.ProcessedEvents.AnyAsync(e => e.EventId == @event.EventId, ct))
         {
-            logger.Warning("Duplicate event {EventId} skipped", @event.EventId);
+            logger.LogWarning("Duplicate event {EventId} skipped", @event.EventId);
             return;
         }
 
@@ -241,3 +242,6 @@ public static class OrderPlacedHandler
     }
 }
 ```
+
+---
+**관련 모듈**: [Wolverine Middleware](wolverine-middleware.md) | [Aggregate Patterns](aggregate-patterns.md) | [Rich Domain Modeling](rich-domain-modeling.md)

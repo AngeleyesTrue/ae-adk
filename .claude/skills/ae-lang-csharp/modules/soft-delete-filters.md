@@ -151,7 +151,7 @@ public class SoftDeleteAuditInterceptor(
                 entry.Entity.DeletedAt = DateTimeOffset.UtcNow;
                 entry.Entity.DeletedBy = currentUser.UserId;
 
-                logger.Information(
+                logger.LogInformation(
                     "Soft deleted {EntityType} {EntityId} by {UserId}",
                     entry.Entity.GetType().Name,
                     ((BaseEntity)entry.Entity).Id,
@@ -229,7 +229,7 @@ public static class RestoreOrderHandler
         order.DeletedBy = null;
 
         await db.SaveChangesAsync(ct);
-        logger.Information("Order {OrderId} restored", command.OrderId);
+        logger.LogInformation("Order {OrderId} restored", command.OrderId);
     }
 }
 ```

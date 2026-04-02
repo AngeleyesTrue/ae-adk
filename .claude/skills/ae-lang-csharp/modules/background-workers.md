@@ -36,7 +36,7 @@ public class DataSyncWorker(
 {
     protected override async Task ExecuteAsync(CancellationToken ct)
     {
-        logger.Information("DataSyncWorker 시작");
+        logger.LogInformation("DataSyncWorker 시작");
 
         while (!ct.IsCancellationRequested)
         {
@@ -47,7 +47,7 @@ public class DataSyncWorker(
                     .GetRequiredService<IDataSyncService>();
 
                 await syncService.SyncAsync(ct);
-                logger.Information("데이터 동기화 완료");
+                logger.LogInformation("데이터 동기화 완료");
             }
             catch (OperationCanceledException) when (ct.IsCancellationRequested)
             {
@@ -55,13 +55,13 @@ public class DataSyncWorker(
             }
             catch (Exception ex)
             {
-                logger.Error(ex, "데이터 동기화 실패");
+                logger.LogError(ex, "데이터 동기화 실패");
             }
 
             await Task.Delay(TimeSpan.FromMinutes(30), ct);
         }
 
-        logger.Information("DataSyncWorker 종료");
+        logger.LogInformation("DataSyncWorker 종료");
     }
 }
 
@@ -90,7 +90,7 @@ public static class CleanupExpiredSessionsHandler
             .Where(s => s.LastActivity < cutoff)
             .ExecuteDeleteAsync(ct);
 
-        logger.Information("Cleaned up {Count} expired sessions", expired);
+        logger.LogInformation("Cleaned up {Count} expired sessions", expired);
     }
 }
 
@@ -134,7 +134,7 @@ public class QueueProcessorService(
             }
             catch (Exception ex)
             {
-                logger.Error(ex, "Failed to process work item {ItemId}", item.Id);
+                logger.LogError(ex, "Failed to process work item {ItemId}", item.Id);
             }
         }
     }
@@ -169,7 +169,7 @@ public class GracefulWorker(ILogger logger) : BackgroundService
     {
         // CancellationToken을 존중하여 정상 종료
         ct.Register(() =>
-            logger.Information("Shutdown requested, finishing current work..."));
+            logger.LogInformation("Shutdown requested, finishing current work..."));
 
         while (!ct.IsCancellationRequested)
         {
@@ -180,9 +180,9 @@ public class GracefulWorker(ILogger logger) : BackgroundService
 
     public override async Task StopAsync(CancellationToken ct)
     {
-        logger.Information("GracefulWorker stopping...");
+        logger.LogInformation("GracefulWorker stopping...");
         await base.StopAsync(ct);
-        logger.Information("GracefulWorker stopped");
+        logger.LogInformation("GracefulWorker stopped");
     }
 }
 ```

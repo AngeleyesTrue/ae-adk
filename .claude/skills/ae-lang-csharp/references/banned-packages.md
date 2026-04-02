@@ -52,7 +52,7 @@ category: reference
 ### 금지 API 목록
 
 - `using AutoMapper`
-- `IMapper` (AutoMapper context)
+- `AutoMapper.IMapper` (AutoMapper 전용; `MapsterMapper.IMapper`는 Mapster 대체이므로 허용)
 - `CreateMap<TSource, TDestination>()`
 - `Profile` (AutoMapper mapping profile)
 - `ForMember()`, `MapFrom()` (AutoMapper context)
@@ -63,10 +63,10 @@ category: reference
 | 금지 패턴 | Mapster 대체 |
 |---|---|
 | `IMapper.Map<T>()` | `source.Adapt<T>()` |
-| `CreateMap<S,D>()` | `IMapFrom<T>.ConfigureMapping()` |
+| `CreateMap<S,D>()` | `IRegister.Register()` |
 | `Profile` (AutoMapper) | `IRegister` (Mapster) |
 | `ForMember().MapFrom()` | `TypeAdapterConfig` fluent API |
-| `services.AddAutoMapper()` | `services.AddMapster()` |
+| `services.AddAutoMapper()` | `services.AddMapster()` (Mapster.DependencyInjection 패키지 필요) 또는 수동 등록: `services.AddSingleton(TypeAdapterConfig.GlobalSettings); services.AddScoped<IMapper, ServiceMapper>();` |
 
 ---
 
@@ -114,3 +114,7 @@ Moq는 기존 프로젝트에서 허용하되, 신규 프로젝트에서는 NSub
 | 금지 패턴 (신규 프로젝트) | 대체 패턴 |
 |---|---|
 | `UseInMemoryDatabase()` | `Testcontainers.MsSql` / `Testcontainers.PostgreSql` |
+
+---
+
+> **참고**: `FluentValidation`은 금지 대상이 아닙니다. `FluentAssertions`와 이름이 유사하지만 별개 라이브러리입니다.

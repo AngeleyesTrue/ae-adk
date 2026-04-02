@@ -229,3 +229,6 @@ public async Task Database_IntegrationTest() { }
 // 실행: dotnet test --filter "Category=Unit"
 // 실행: dotnet test --filter "Category=Integration"
 ```
+
+---
+**관련 모듈**: [Testing Wolverine](testing-wolverine.md) | [Testing Infrastructure](testing-infrastructure.md)

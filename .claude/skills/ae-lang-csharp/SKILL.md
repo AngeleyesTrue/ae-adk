@@ -1,9 +1,9 @@
 ---
 name: ae-lang-csharp
 description: >
-  Angeleyes 전용 C# 개발 스킬 - Wolverine 3.x CQRS, Mapster 7.x 매핑,
-  AwesomeAssertions 테스트, NSubstitute 모킹, Clean Architecture 4-layer,
-  Rich Domain Model, .NET 10 / C# 13-14 기반 엔터프라이즈 개발 가이드.
+  Angeleyes-specific C# development specialist - Wolverine 3.x CQRS, Mapster 7.x mapping,
+  AwesomeAssertions testing, NSubstitute mocking, Clean Architecture 4-layer,
+  Rich Domain Model, enterprise development guide targeting .NET 10 / C# 13-14.
 license: Apache-2.0
 compatibility: Designed for Claude Code
 allowed-tools: Read, Grep, Glob, mcp__context7__resolve-library-id, mcp__context7__get-library-docs
@@ -17,7 +17,7 @@ metadata:
   tags: "language, csharp, dotnet, wolverine, mapster, clean-architecture, ddd"
   context7-libraries: "/dotnet/aspnetcore, /dotnet/efcore, /dotnet/runtime, /wolverine, /mapster"
   author: "Angeleyes"
-  replaces: "moai-lang-csharp"
+  extends: "moai-lang-csharp"
   target_framework: "net10.0"
   language_version: "C# 13/14"
   related-skills: "moai-lang-csharp"
@@ -37,7 +37,7 @@ triggers:
 # Angeleyes C# Development Specialist
 
 Wolverine 3.x / Mapster 7.x / AwesomeAssertions 기반 엔터프라이즈 C# 개발 가이드.
-.NET 10 LTS / C# 13-14 타겟. Clean Architecture 4-layer + Rich Domain Model.
+.NET 10 (Preview) / C# 13-14 타겟. Clean Architecture 4-layer + Rich Domain Model.
 
 ## Quick Reference
 
@@ -53,8 +53,8 @@ Core Stack:
 | Mocking | NSubstitute | latest |
 | Guard Clauses | Ardalis.GuardClauses | latest |
 | Logging | Serilog | latest |
-| Runtime | .NET 10 LTS | net10.0 |
-| Language | C# 13/14 | latest |
+| Runtime | .NET 10 (Preview) | net10.0 |
+| Language | C# 13/14 (Preview) | latest |
 | Test Framework | xUnit v3 (기존) / TUnit (신규 권장) | latest |
 | Integration Test | Testcontainers + Respawn | latest |
 | Architecture Test | NetArchTest | latest |
@@ -112,7 +112,7 @@ Quick Commands:
 
 ### Mapping
 
-- [Mapster Advanced](modules/mapster-advanced.md) - IMapFrom, TypeAdapterConfig, Projection
+- [Mapster Advanced](modules/mapster-advanced.md) - IRegister, TypeAdapterConfig, Projection
 
 ### Web
 

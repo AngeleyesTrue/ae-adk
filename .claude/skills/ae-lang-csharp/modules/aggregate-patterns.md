@@ -75,6 +75,7 @@ public class Order : AggregateRoot
 
     private Order() { }
 
+    // 간소화 버전 - 전체 Factory Method 패턴은 rich-domain-modeling.md 참조
     public static Result<Order> Create(string customerId)
     {
         Guard.Against.NullOrWhiteSpace(customerId, nameof(customerId));
@@ -100,14 +101,7 @@ public class Order : AggregateRoot
         if (_lines.Any(l => l.Sku == sku))
             return Result.Error($"SKU {sku} already exists in this order");
 
-        _lines.Add(new OrderLine
-        {
-            Id = Guid.CreateVersion7(),
-            OrderId = Id,
-            Sku = sku,
-            Quantity = quantity,
-            UnitPrice = unitPrice
-        });
+        _lines.Add(OrderLine.Create(Id, sku, quantity, unitPrice));
 
         UpdatedAt = DateTimeOffset.UtcNow;
         return Result.Success();
@@ -150,10 +144,15 @@ public class Order : AggregateRoot
 // 내부 Entity - Aggregate 밖에서 직접 접근 불가
 public class OrderLine : BaseEntity
 {
-    public Guid OrderId { get; init; }
-    public string Sku { get; init; } = default!;
+    internal OrderLine() { } // EF Core용
+
+    public Guid OrderId { get; private set; }
+    public string Sku { get; private set; } = default!;
     public int Quantity { get; private set; }
-    public decimal UnitPrice { get; init; }
+    public decimal UnitPrice { get; private set; }
+
+    internal static OrderLine Create(Guid orderId, string sku, int quantity, decimal unitPrice)
+        => new() { Id = Guid.CreateVersion7(), OrderId = orderId, Sku = sku, Quantity = quantity, UnitPrice = unitPrice };
 
     internal void UpdateQuantity(int newQuantity) => Quantity = newQuantity;
 }
@@ -222,7 +221,7 @@ public static class UpdateOrderHandler
         }
         catch (DbUpdateConcurrencyException)
         {
-            logger.Warning("Concurrency conflict on Order {OrderId}", command.OrderId);
+            logger.LogWarning("Concurrency conflict on Order {OrderId}", command.OrderId);
             throw; // Wolverine 재시도 정책이 처리
         }
     }
@@ -282,3 +281,6 @@ public static class OrderConfirmedHandler
     }
 }
 ```
+
+---
+**관련 모듈**: [Domain Events](domain-events.md) | [EF Core Conventions](efcore-conventions.md) | [Rich Domain Modeling](rich-domain-modeling.md)

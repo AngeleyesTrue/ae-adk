@@ -17,10 +17,10 @@ Wolverine 미들웨어 체인 패턴. Before/After 컨벤션 기반 파이프라
 public class LoggingMiddleware
 {
     public static void Before(ILogger logger, Envelope envelope)
-        => logger.Information("Handling {MessageType}", envelope.MessageType);
+        => logger.LogInformation("Handling {MessageType}", envelope.MessageType);
 
     public static void After(ILogger logger, Envelope envelope)
-        => logger.Information("Handled {MessageType}", envelope.MessageType);
+        => logger.LogInformation("Handled {MessageType}", envelope.MessageType);
 }
 
 // 등록
@@ -98,7 +98,7 @@ public class DetailedLoggingMiddleware
 {
     public static void Before(ILogger logger, Envelope envelope)
     {
-        logger.Information(
+        logger.LogInformation(
             "==> Handling {MessageType} (CorrelationId: {CorrelationId})",
             envelope.MessageType,
             envelope.CorrelationId);
@@ -106,7 +106,7 @@ public class DetailedLoggingMiddleware
 
     public static void After(ILogger logger, Envelope envelope)
     {
-        logger.Information(
+        logger.LogInformation(
             "<== Handled {MessageType} (CorrelationId: {CorrelationId})",
             envelope.MessageType,
             envelope.CorrelationId);
@@ -117,7 +117,7 @@ public class DetailedLoggingMiddleware
     {
         if (ex is not null)
         {
-            logger.Error(ex,
+            logger.LogError(ex,
                 "!!! Error handling {MessageType}: {Error}",
                 envelope.MessageType, ex.Message);
         }
@@ -127,16 +127,21 @@ public class DetailedLoggingMiddleware
 
 ### Transaction Middleware
 
+> **주의**: Wolverine의 `opts.Policies.AutoApplyTransactions()` 사용 시 이 수동 트랜잭션 미들웨어와 충돌할 수 있습니다.
+> 수동 트랜잭션 관리가 필요한 경우에만 사용하고, Wolverine 자동 트랜잭션은 비활성화하세요.
+
 ```csharp
 // DbContext 트랜잭션 래핑
 public class TransactionMiddleware
 {
-    public static async Task<IResult> BeforeAsync(
+    // Before 미들웨어에서 null 반환 시 Wolverine이 핸들러를 계속 실행한다.
+    // non-null 반환 시 핸들러 실행을 중단하고 해당 값을 응답으로 사용한다.
+    public static async Task<IResult?> BeforeAsync(
         AppDbContext db,
         CancellationToken ct)
     {
         await db.Database.BeginTransactionAsync(ct);
-        return Continue(); // 핸들러 계속 실행
+        return null; // null 반환 = 핸들러 계속 실행 (Wolverine Before 컨벤션)
     }
 
     public static async Task AfterAsync(AppDbContext db, CancellationToken ct)
@@ -151,8 +156,6 @@ public class TransactionMiddleware
             await db.Database.RollbackTransactionAsync();
         }
     }
-
-    private static IResult Continue() => null!; // Wolverine 컨벤션
 }
 ```
 
@@ -165,18 +168,18 @@ public class ExceptionHandlingMiddleware
     {
         if (ex is DomainException domainEx)
         {
-            logger.Warning("Domain exception in {MessageType}: {Errors}",
+            logger.LogWarning("Domain exception in {MessageType}: {Errors}",
                 envelope.MessageType,
                 string.Join(", ", domainEx.Errors));
         }
         else if (ex is NotFoundException notFoundEx)
         {
-            logger.Warning("Not found in {MessageType}: {Message}",
+            logger.LogWarning("Not found in {MessageType}: {Message}",
                 envelope.MessageType, notFoundEx.Message);
         }
         else if (ex is not null)
         {
-            logger.Error(ex, "Unhandled exception in {MessageType}",
+            logger.LogError(ex, "Unhandled exception in {MessageType}",
                 envelope.MessageType);
         }
     }
@@ -232,10 +235,13 @@ public class PerformanceMiddleware
         sw.Stop();
         if (sw.ElapsedMilliseconds > 500)
         {
-            logger.Warning(
+            logger.LogWarning(
                 "Slow handler: {MessageType} took {Elapsed}ms",
                 envelope.MessageType, sw.ElapsedMilliseconds);
         }
     }
 }
 ```
+
+---
+**관련 모듈**: [Wolverine CQRS](wolverine-cqrs.md) | [Domain Events](domain-events.md)

@@ -97,17 +97,17 @@ public class GraphUserService(GraphServiceClient graphClient, ILogger logger)
         }
         catch (ServiceException ex) when (ex.ResponseStatusCode == 404)
         {
-            logger.Warning("Graph user {UserId} not found", userId);
+            logger.LogWarning("Graph user {UserId} not found", userId);
             return Result<GraphUser>.NotFound($"User {userId} not found");
         }
         catch (ServiceException ex) when (ex.ResponseStatusCode == 429)
         {
-            logger.Warning("Graph API throttled for user {UserId}", userId);
+            logger.LogWarning("Graph API throttled for user {UserId}", userId);
             return Result<GraphUser>.Error("Rate limited. Please retry later.");
         }
         catch (ServiceException ex)
         {
-            logger.Error(ex, "Graph API error for user {UserId}", userId);
+            logger.LogError(ex, "Graph API error for user {UserId}", userId);
             return Result<GraphUser>.Error($"Graph API error: {ex.Message}");
         }
     }
@@ -141,7 +141,7 @@ public class GraphUserService(GraphServiceClient graphClient, ILogger logger)
         }
         catch (ServiceException ex)
         {
-            logger.Error(ex, "Failed to get group {GroupId} members", groupId);
+            logger.LogError(ex, "Failed to get group {GroupId} members", groupId);
             return Result<IReadOnlyList<GraphUser>>.Error(ex.Message);
         }
     }
@@ -212,7 +212,7 @@ public class GraphRetryHandler(ILogger logger) : DelegatingHandler
 
             if (response.Headers.RetryAfter?.Delta is { } delay)
             {
-                logger.Warning("Throttled, retrying after {Delay}s", delay.TotalSeconds);
+                logger.LogWarning("Throttled, retrying after {Delay}s", delay.TotalSeconds);
                 await Task.Delay(delay, ct);
             }
 

@@ -15,7 +15,7 @@ Factory Method, Value Object, Entity 패턴. Result&lt;T&gt; 기반 도메인 �
 - **Factory Method**: `static Create()` - 불변식을 보장하는 유일한 생성 경로
 - **Value Object**: 불변, 동등성 비교, `GetEqualityComponents()`
 - **Entity**: private setter, 상태 전이 메서드, 비즈니스 규칙 캡슐화
-- **Result&lt;T&gt;**: 예외 대신 명시적 결과 반환
+- **Result&lt;T&gt;**: 예외 대신 명시적 결과 반환 (Ardalis.Result 패키지 또는 프로젝트 자체 구현)
 - **Guard.Against**: 입력 검증에 Ardalis.GuardClauses 사용
 
 ---
@@ -119,8 +119,8 @@ public class Order : AggregateRoot
     private readonly List<OrderLine> _lines = [];
     public IReadOnlyList<OrderLine> Lines => _lines.AsReadOnly();
 
-    private readonly List<object> _domainEvents = [];
-    public IReadOnlyList<object> DomainEvents => _domainEvents.AsReadOnly();
+    // _domainEvents, DomainEvents, AddDomainEvent(), ClearDomainEvents()는
+    // AggregateRoot에서 상속 (aggregate-patterns.md 참조)
 
     private Order() { } // EF Core용 private 생성자
 
@@ -159,7 +159,7 @@ public class Order : AggregateRoot
             return Result.Error($"Cannot confirm order in {Status} status");
 
         Status = OrderStatus.Confirmed;
-        _domainEvents.Add(new OrderConfirmed(Id, DateTimeOffset.UtcNow));
+        AddDomainEvent(new OrderConfirmed(Id, DateTimeOffset.UtcNow));
         return Result.Success();
     }
 
@@ -171,7 +171,7 @@ public class Order : AggregateRoot
             return Result.Error($"Cannot ship order in {Status} status");
 
         Status = OrderStatus.Shipped;
-        _domainEvents.Add(new OrderShipped(Id, trackingNumber));
+        AddDomainEvent(new OrderShipped(Id, trackingNumber));
         return Result.Success();
     }
 
@@ -181,7 +181,7 @@ public class Order : AggregateRoot
             return Result.Error("Cannot cancel shipped or delivered order");
 
         Status = OrderStatus.Cancelled;
-        _domainEvents.Add(new OrderCancelled(Id, reason));
+        AddDomainEvent(new OrderCancelled(Id, reason));
         return Result.Success();
     }
 
@@ -207,7 +207,6 @@ public class Order : AggregateRoot
             (sum, line) => sum.Add(
                 Money.Create(line.UnitPrice.Amount * line.Quantity, "KRW")));
 
-    public void ClearDomainEvents() => _domainEvents.Clear();
 }
 ```
 
@@ -314,3 +313,6 @@ public abstract class BaseEntity : IEquatable<BaseEntity>
         => !Equals(left, right);
 }
 ```
+
+---
+**관련 모듈**: [Aggregate Patterns](aggregate-patterns.md) | [Domain Events](domain-events.md) | [Clean Architecture](clean-architecture.md)

@@ -119,14 +119,14 @@ public class RequestLoggingMiddleware(RequestDelegate next, ILogger logger)
         var requestId = Guid.CreateVersion7().ToString("N")[..8];
         using (LogContext.PushProperty("RequestId", requestId))
         {
-            logger.Information("HTTP {Method} {Path} started",
+            logger.LogInformation("HTTP {Method} {Path} started",
                 context.Request.Method, context.Request.Path);
 
             var sw = Stopwatch.StartNew();
             await next(context);
             sw.Stop();
 
-            logger.Information("HTTP {Method} {Path} completed {StatusCode} in {Elapsed}ms",
+            logger.LogInformation("HTTP {Method} {Path} completed {StatusCode} in {Elapsed}ms",
                 context.Request.Method, context.Request.Path,
                 context.Response.StatusCode, sw.ElapsedMilliseconds);
         }

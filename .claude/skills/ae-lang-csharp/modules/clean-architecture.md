@@ -108,7 +108,7 @@ public static class CreateOrderHandler
 
         await repo.AddAsync(result.Value, ct);
 
-        logger.Information("Order {OrderId} created for {CustomerId}",
+        logger.LogInformation("Order {OrderId} created for {CustomerId}",
             result.Value.Id, command.CustomerId);
 
         return new OrderCreated(result.Value.Id, result.Value.CreatedAt);
@@ -132,10 +132,8 @@ public class OrderRepository(AppDbContext db) : IOrderRepository
             .FirstOrDefaultAsync(o => o.Id == id, ct);
 
     public async Task AddAsync(Order order, CancellationToken ct)
-    {
-        db.Orders.Add(order);
-        await db.SaveChangesAsync(ct);
-    }
+        => await db.Orders.AddAsync(order, ct);
+    // SaveChangesAsync는 Wolverine/UnitOfWork가 처리 (aggregate-patterns.md 참조)
 }
 
 // MyApp.Infrastructure/DependencyInjection.cs
@@ -230,10 +228,12 @@ src/MyApp.Application/
 // MyApp.SharedKernel 프로젝트
 namespace MyApp.SharedKernel;
 
+// AggregateRoot 전체 정의: [Aggregate Patterns](aggregate-patterns.md) 참조
 public abstract class AggregateRoot : BaseEntity
 {
     private readonly List<object> _domainEvents = [];
     public IReadOnlyList<object> DomainEvents => _domainEvents.AsReadOnly();
+    public byte[] RowVersion { get; private set; } = []; // 낙관적 동시성
 
     protected void AddDomainEvent(object domainEvent) => _domainEvents.Add(domainEvent);
     public void ClearDomainEvents() => _domainEvents.Clear();
@@ -254,3 +254,6 @@ public abstract class ValueObject
             .Aggregate(0, (hash, component) => HashCode.Combine(hash, component));
 }
 ```
+
+---
+**관련 모듈**: [Rich Domain Modeling](rich-domain-modeling.md) | [Wolverine CQRS](wolverine-cqrs.md) | [Service Abstractions](service-abstractions.md)

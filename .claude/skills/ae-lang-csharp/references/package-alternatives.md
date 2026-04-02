@@ -19,7 +19,7 @@ category: reference
 | `INotification` | Wolverine Event (POCO record) | 인터페이스 불필요 |
 | `INotificationHandler<T>` | `static Task Handle(TEvent, ...)` | POCO handler |
 | `IMapper.Map<T>()` | `source.Adapt<T>()` | Mapster extension |
-| `CreateMap<S,D>()` | `IMapFrom<T>.ConfigureMapping()` | Mapster interface |
+| `CreateMap<S,D>()` | `IRegister.Register()` | Mapster interface |
 | `Profile` (AutoMapper) | `IRegister` (Mapster) | 매핑 등록 |
 | `ForMember().MapFrom()` | `TypeAdapterConfig` fluent API | Mapster config |
 | `using FluentAssertions` | `using AwesomeAssertions` | Drop-in replacement |
@@ -60,7 +60,7 @@ public static class CreateOrderHandler
         db.Orders.Add(order);
         await db.SaveChangesAsync(ct);
 
-        logger.Information("Order {OrderId} created", order.Id);
+        logger.LogInformation("Order {OrderId} created", order.Id);
         return new OrderCreated(order.Id, order.CreatedAt);
     }
 }
@@ -76,14 +76,10 @@ var result = await bus.InvokeAsync<OrderCreated>(new CreateOrder("cust-1", lines
 ### After (Mapster)
 
 ```csharp
-// DTO with IMapFrom<T>
-public class OrderDto : IMapFrom<Order>
+// IRegister로 매핑 등록
+public class OrderMappingRegister : IRegister
 {
-    public Guid Id { get; init; }
-    public string CustomerName { get; init; } = default!;
-    public decimal TotalAmount { get; init; }
-
-    public void ConfigureMapping(TypeAdapterConfig config)
+    public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<Order, OrderDto>()
             .Map(dest => dest.CustomerName, src => src.Customer.FullName)

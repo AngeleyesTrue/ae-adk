@@ -152,10 +152,12 @@ builder.OwnsOne(o => o.TotalAmount, money =>
 
 ```csharp
 // Global Query Filter로 소프트 삭제 구현
+// 전체 정의는 [Soft Delete Filters](soft-delete-filters.md) 참조
 public interface ISoftDeletable
 {
     bool IsDeleted { get; set; }
     DateTimeOffset? DeletedAt { get; set; }
+    string? DeletedBy { get; set; }
 }
 
 // OnModelCreating에서 필터 적용
@@ -222,3 +224,6 @@ public class Order : AggregateRoot
 builder.Property(o => o.RowVersion)
     .IsRowVersion();
 ```
+
+---
+**관련 모듈**: [EF Core Advanced](efcore-advanced.md) | [Soft Delete Filters](soft-delete-filters.md) | [Aggregate Patterns](aggregate-patterns.md)

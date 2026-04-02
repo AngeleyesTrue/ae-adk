@@ -85,6 +85,7 @@ public static class PresentationDependencyInjection
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
 
+        // ⚠️ 개발 환경 전용. 프로덕션에서는 특정 Origin만 허용할 것
         services.AddCors(opts =>
             opts.AddDefaultPolicy(policy =>
                 policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
@@ -129,11 +130,8 @@ public class ConfigurableService(IOptionsSnapshot<FeatureFlags> flags)
 // 사용 - IOptionsMonitor<T> (Singleton, 변경 감지)
 public class MonitoredService(IOptionsMonitor<AppSettings> monitor)
 {
-    public MonitoredService()
-    {
-        monitor.OnChange(settings =>
-            Log.Information("Settings changed: {Setting}", settings.SomeValue));
-    }
+    private readonly IDisposable? _changeToken = monitor.OnChange(settings =>
+        Log.Information("Settings changed: {Setting}", settings.SomeValue));
 }
 ```
 
