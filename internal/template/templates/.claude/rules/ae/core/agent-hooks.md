@@ -55,9 +55,9 @@ Actions follow the naming pattern `{agent}-{phase}`:
 | manager-quality | - | - | quality-completion |
 | manager-spec | - | - | spec-completion |
 | manager-docs | - | docs-verification | docs-completion |
-| team-coder | - | team-coder-verification | - |
-| team-tester | - | team-testing-verification | team-testing-completion |
-| team-validator | - | - | team-quality-completion |
+| implementer | - | implementer-verification | - |
+| tester | - | tester-verification | tester-completion |
+| reviewer | - | - | reviewer-completion |
 
 ## Hook Command Interface
 

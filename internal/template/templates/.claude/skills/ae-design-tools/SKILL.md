@@ -29,7 +29,7 @@ progressive_disclosure:
 # AE Extension: Triggers
 triggers:
   keywords: ["figma", "pencil", "design to code", "design export", "render dna", "pen frame", "react from design", "tailwind from design", "design context", "ui implementation", "design fetching", "figma mcp", "pencil mcp", "component from design", "layout from design"]
-  agents: ["expert-frontend", "team-designer"]
+  agents: ["expert-frontend", "designer"]
   phases: ["run"]
 ---
 

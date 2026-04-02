@@ -22,7 +22,7 @@ progressive_disclosure:
 # AE Extension: Triggers
 triggers:
   keywords: ["team plan", "parallel research", "team spec"]
-  agents: ["team-reader"]
+  agents: ["researcher", "analyst", "architect"]
   phases: ["plan"]
 ---
 # Workflow: Team Plan - Agent Teams SPEC Creation
@@ -56,16 +56,17 @@ See .claude/rules/ae/workflow/spec-workflow.md for team mode prerequisites.
 
 ## Phase 1: Spawn Research Team
 
-Spawn 3 teammates using the **team-reader** profile with role-specific prompts and model overrides. All spawns MUST use Agent() with `team_name` and `name` parameters. Launch all three in a single response for parallel execution:
+Spawn 3 teammates using **general-purpose** agent type with role-specific parameters from workflow.yaml role_profiles. All spawns MUST use Agent() with `team_name` and `name` parameters. Launch all three in a single response for parallel execution:
 
 ```
 Agent(
-  subagent_type: "team-reader",
+  subagent_type: "general-purpose",
   team_name: "ae-plan-{feature-slug}",
   name: "researcher",
   model: "haiku",
   mode: "plan",
-  prompt: "You are a codebase researcher on team ae-plan-{feature-slug}.
+  prompt: "Role: researcher. Tools: Read,Grep,Glob,Bash. Skills: ae-foundation-thinking.
+    You are a codebase researcher on team ae-plan-{feature-slug}.
     Explore the codebase for {feature_description}.
     Read target code areas IN DEPTH — understand deeply how each module works, its intricacies and side effects.
     Study cross-module interactions IN GREAT DETAIL — trace data flow through the system.
@@ -77,12 +78,13 @@ Agent(
 )
 
 Agent(
-  subagent_type: "team-reader",
+  subagent_type: "general-purpose",
   team_name: "ae-plan-{feature-slug}",
   name: "analyst",
   model: "sonnet",
   mode: "plan",
-  prompt: "You are a requirements analyst on team ae-plan-{feature-slug}.
+  prompt: "Role: analyst. Tools: Read,Grep,Glob,Bash.
+    You are a requirements analyst on team ae-plan-{feature-slug}.
     Analyze requirements for {feature_description}.
     Identify user stories, acceptance criteria, edge cases, risks, and constraints.
     Define acceptance criteria using EARS format.
@@ -91,12 +93,13 @@ Agent(
 )
 
 Agent(
-  subagent_type: "team-reader",
+  subagent_type: "general-purpose",
   team_name: "ae-plan-{feature-slug}",
   name: "architect",
   model: "opus",
   mode: "plan",
-  prompt: "You are a technical architect on team ae-plan-{feature-slug}.
+  prompt: "Role: architect. Tools: Read,Grep,Glob,Bash.
+    You are a technical architect on team ae-plan-{feature-slug}.
     Design the technical approach for {feature_description}.
     Evaluate implementation alternatives, assess trade-offs, propose architecture.
     Consider existing patterns found by the researcher — build on reference implementations rather than designing from scratch.
@@ -197,4 +200,4 @@ If team creation fails or AGENT_TEAMS not enabled:
 
 ---
 
-Version: 3.0.0 (Dynamic team-reader profiles + Annotation Cycle)
+Version: 3.1.0 (Dynamic general-purpose profiles + Annotation Cycle)

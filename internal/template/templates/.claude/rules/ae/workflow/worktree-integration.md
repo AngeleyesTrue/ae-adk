@@ -68,19 +68,19 @@ For agents that need isolated execution (v2.1.49+):
 
 ```yaml
 ---
-name: team-coder
+name: backend-dev  # Uses implementer role profile (subagent_type: general-purpose)
 isolation: worktree   # Agent runs in its own isolated worktree
 background: true      # Agent runs without blocking main conversation
 ---
 ```
 
 When to use `isolation: worktree`:
-- Implementation agents that write files (team-coder, team-tester, team-designer)
+- Implementation agents that write files (implementer, tester, designer roles)
 - Prevents file conflicts between parallel teammates
 - Each agent gets its own clean worktree at `.claude/worktrees/<auto-name>/`
 
 When NOT to use `isolation: worktree`:
-- Read-only agents (team-reader, team-validator)
+- Read-only agents (researcher, analyst, architect, reviewer roles)
 - `permissionMode: plan` already prevents writes; adding isolation adds overhead without benefit
 
 ### `background: true` in Agent Frontmatter
@@ -89,7 +89,7 @@ Run agent without blocking the main conversation (v2.1.46+):
 
 ```yaml
 ---
-name: team-coder
+name: backend-dev  # Uses implementer role profile (subagent_type: general-purpose)
 background: true   # Returns immediately; results delivered on next turn
 ---
 ```
@@ -124,8 +124,8 @@ Is this a one-shot sub-agent task?
 
 ### HARD Rules
 
-- [HARD] Implementation agents in team mode (team-backend-dev, team-frontend-dev, team-tester, team-designer) MUST use `isolation: "worktree"` when spawned via Task()
-- [HARD] Read-only agents (team-researcher, team-analyst, team-architect, team-quality) MUST NOT use `isolation: "worktree"` — their `permissionMode: plan` already prevents writes
+- [HARD] Implementation teammates (backend-dev, frontend-dev, tester, designer names; spawned as general-purpose with implementer/tester/designer role profiles) MUST use `isolation: "worktree"` when spawned via Agent()
+- [HARD] Read-only teammates (researcher, analyst, architect, quality names; spawned as general-purpose with researcher/analyst/architect/reviewer role profiles) MUST NOT use `isolation: "worktree"` — their `permissionMode: plan` already prevents writes
 - [HARD] One-shot sub-agents that write files (expert-backend, expert-frontend, manager-ddd, manager-tdd) SHOULD use `isolation: "worktree"` when making cross-file changes
 - [HARD] GitHub workflow agents (fixer agents in /ae github issues) MUST use `isolation: "worktree"` for branch isolation
 
@@ -173,7 +173,7 @@ SYNC PHASE
 ### Implementation Agents (isolation: worktree + background: true)
 
 ```yaml
-# team-coder, team-tester, team-designer
+# implementer, tester, designer (general-purpose role profiles)
 isolation: worktree   # Isolated worktree per agent
 background: true      # Non-blocking parallel execution
 permissionMode: acceptEdits
@@ -182,7 +182,7 @@ permissionMode: acceptEdits
 ### Research/Analysis Agents (no isolation needed)
 
 ```yaml
-# team-reader, team-validator
+# researcher, analyst, architect, reviewer (general-purpose role profiles)
 # No isolation: worktree (read-only, permissionMode: plan prevents writes)
 permissionMode: plan  # Read-only mode already provides safety
 ```

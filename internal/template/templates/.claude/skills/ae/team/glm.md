@@ -166,11 +166,11 @@ Agent model mapping in CG mode:
 | Agent | Pane | API | Model |
 |-------|------|-----|-------|
 | Leader (AE) | Original | Claude | User's choice (Opus/Sonnet) |
-| team-coder | New pane | Z.AI | glm-5 / glm-4.7 |
-| team-tester | New pane | Z.AI | glm-5 / glm-4.7 |
-| team-designer | New pane | Z.AI | glm-5 / glm-4.7 |
-| team-reader | New pane | Z.AI | glm-4.7-flashx |
-| team-validator | New pane | Z.AI | glm-4.7-flashx |
+| implementer | New pane | Z.AI | glm-5 / glm-4.7 |
+| tester | New pane | Z.AI | glm-5 / glm-4.7 |
+| designer | New pane | Z.AI | glm-5 / glm-4.7 |
+| researcher | New pane | Z.AI | glm-4.7-flashx |
+| reviewer | New pane | Z.AI | glm-4.7-flashx |
 
 ## Error Recovery
 

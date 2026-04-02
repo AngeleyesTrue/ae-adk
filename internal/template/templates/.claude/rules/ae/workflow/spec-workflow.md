@@ -133,8 +133,8 @@ When team mode is enabled (workflow.team.enabled and AGENT_TEAMS env), phases ca
 
 | Phase | Sub-agent Mode | Team Mode | Condition |
 |-------|---------------|-----------|-----------|
-| Plan | manager-spec (single) | team-reader (researcher) + team-reader (analyst) + team-reader (architect) (parallel) | Complexity >= threshold |
-| Run | manager-ddd/tdd (sequential) | team-coder (backend) + team-coder (frontend) + team-tester (parallel) | Domains >= 3 or files >= 10 |
+| Plan | manager-spec (single) | researcher + analyst + architect (general-purpose, parallel) | Complexity >= threshold |
+| Run | manager-ddd/tdd (sequential) | implementer (backend) + implementer (frontend) + tester (general-purpose, parallel) | Domains >= 3 or files >= 10 |
 | Sync | manager-docs (single) | manager-docs (always sub-agent) | N/A |
 
 ### Team Mode Plan Phase

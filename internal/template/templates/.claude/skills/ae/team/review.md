@@ -22,7 +22,7 @@ progressive_disclosure:
 # AE Extension: Triggers
 triggers:
   keywords: ["team review", "multi-perspective review", "parallel review"]
-  agents: ["team-validator"]
+  agents: ["reviewer"]
   phases: ["review"]
 ---
 # Workflow: Team Review - Multi-Perspective Code Review
@@ -59,11 +59,13 @@ Use the review team pattern. All spawns MUST use Agent() with `team_name` and `n
 
 ```
 Agent(
-  subagent_type: "team-validator",
+  subagent_type: "general-purpose",
   team_name: "ae-review-{target}",
   name: "security-reviewer",
+  model: "haiku",
   mode: "plan",
-  prompt: "You are a security reviewer on team ae-review-{target}.
+  prompt: "Role: reviewer. Tools: Read,Grep,Glob,Bash. Skills: ae-foundation-quality.
+    You are a security reviewer on team ae-review-{target}.
     Review the following changes for security issues.
     Check OWASP Top 10 compliance, input validation, authentication/authorization,
     secrets exposure, injection risks.
@@ -72,11 +74,13 @@ Agent(
 )
 
 Agent(
-  subagent_type: "team-validator",
+  subagent_type: "general-purpose",
   team_name: "ae-review-{target}",
   name: "perf-reviewer",
+  model: "haiku",
   mode: "plan",
-  prompt: "You are a performance reviewer on team ae-review-{target}.
+  prompt: "Role: reviewer. Tools: Read,Grep,Glob,Bash. Skills: ae-foundation-quality.
+    You are a performance reviewer on team ae-review-{target}.
     Review the following changes for performance issues.
     Check algorithmic complexity, database query efficiency, memory usage,
     caching opportunities, bundle size impact.
@@ -85,11 +89,13 @@ Agent(
 )
 
 Agent(
-  subagent_type: "team-validator",
+  subagent_type: "general-purpose",
   team_name: "ae-review-{target}",
   name: "quality-reviewer",
+  model: "haiku",
   mode: "plan",
-  prompt: "You are a code quality reviewer on team ae-review-{target}.
+  prompt: "Role: reviewer. Tools: Read,Grep,Glob,Bash. Skills: ae-foundation-quality.
+    You are a code quality reviewer on team ae-review-{target}.
     Review the following changes for code quality.
     Check TRUST 5 compliance, naming conventions, error handling,
     test coverage, documentation, consistency with project patterns.
@@ -98,11 +104,13 @@ Agent(
 )
 
 Agent(
-  subagent_type: "team-validator",
+  subagent_type: "general-purpose",
   team_name: "ae-review-{target}",
   name: "ux-reviewer",
+  model: "haiku",
   mode: "plan",
-  prompt: "You are a UX reviewer on team ae-review-{target}.
+  prompt: "Role: reviewer. Tools: Read,Grep,Glob,Bash. Skills: ae-foundation-quality.
+    You are a UX reviewer on team ae-review-{target}.
     Review the following changes for user experience impact.
     Validate user flows remain functional, check error states and edge cases
     from the user's perspective, verify accessibility compliance,
