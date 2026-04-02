@@ -45,6 +45,20 @@ jobs:
         continue-on-error: true
         run: go test -race -timeout 300s ./...
 
+      - name: Build binary for E2E
+        if: matrix.os == 'ubuntu-latest'
+        run: go build -o ./ae ./cmd/ae/
+
+      - name: Run E2E tests
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        env:
+          AE_SKIP_BINARY_UPDATE: "1"
+        run: |
+          export PATH="$(pwd):$PATH"
+          chmod +x scripts/e2e-test.sh
+          bash scripts/e2e-test.sh
+
       - name: Upload coverage to Codecov
         if: matrix.os == 'ubuntu-latest'
         uses: codecov/codecov-action@v5
