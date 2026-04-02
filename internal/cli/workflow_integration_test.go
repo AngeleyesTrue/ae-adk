@@ -37,6 +37,7 @@ func resetDoctorFlags() {
 // TestWorkflow_Init_CreatesProjectStructure 는 init 명령이
 // 올바른 프로젝트 디렉터리 구조(.ae/, 설정 파일 등)를 생성하는지 검증한다.
 func TestWorkflow_Init_CreatesProjectStructure(t *testing.T) {
+	// 주의: Cobra 전역 플래그 상태를 공유하므로 t.Parallel() 사용 불가
 	defer resetInitFlags()
 
 	root := t.TempDir()
@@ -106,6 +107,7 @@ func TestWorkflow_Init_CreatesProjectStructure(t *testing.T) {
 
 // TestWorkflow_Init_ThenDoctor 는 init 실행 후 doctor 명령이
 // 에러 없이 완료되는지 검증하는 워크플로우 통합 테스트이다.
+// 주의: os.Chdir()로 프로세스 전역 cwd를 변경하므로 t.Parallel() 사용 불가.
 func TestWorkflow_Init_ThenDoctor(t *testing.T) {
 	defer resetInitFlags()
 	defer resetDoctorFlags()
@@ -185,6 +187,7 @@ func TestWorkflow_Init_ThenDoctor(t *testing.T) {
 // TestWorkflow_Init_IdempotentReinit 는 같은 디렉터리에서 init 을 두 번 실행해도
 // 에러가 발생하지 않거나 정상적으로 처리되는지 검증한다.
 func TestWorkflow_Init_IdempotentReinit(t *testing.T) {
+	// 주의: Cobra 전역 플래그 상태를 공유하므로 t.Parallel() 사용 불가
 	defer resetInitFlags()
 
 	root := t.TempDir()

@@ -2,11 +2,11 @@
 # scripts/e2e-test.sh
 # ae CLI E2E 테스트 스크립트
 # SPEC-TEST-001 T-04: 핵심 CLI 워크플로우를 검증하는 E2E 테스트
-set -e
+set -euo pipefail
 
 TEST_DIR=$(mktemp -d)
-# 종료 시 임시 디렉토리 정리
-trap "rm -rf $TEST_DIR" EXIT
+# 종료 시 임시 디렉토리 정리 (싱글 쿼트로 trap 실행 시점에 변수 확장)
+trap 'rm -rf "$TEST_DIR"' EXIT
 
 PASS_COUNT=0
 FAIL_COUNT=0
