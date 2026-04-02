@@ -62,6 +62,14 @@ public static class GraphDependencyInjection
 //     "ClientSecret": "your-client-secret" // -> Azure Key Vault 사용 권장
 //   }
 // }
+
+// 프로덕션: Azure Key Vault 사용
+// builder.Configuration.AddAzureKeyVault(
+//     new Uri("https://your-vault.vault.azure.net/"),
+//     new DefaultAzureCredential());
+
+// 개발 환경: User Secrets 사용
+// dotnet user-secrets set "MicrosoftGraph:ClientSecret" "your-secret"
 ```
 
 ### Service Abstraction with Result Pattern
@@ -95,17 +103,17 @@ public class GraphUserService(GraphServiceClient graphClient, ILogger logger)
 
             return Result<GraphUser>.Success(user.Adapt<GraphUser>());
         }
-        catch (ServiceException ex) when (ex.ResponseStatusCode == 404)
+        catch (ODataError ex) when (ex.ResponseStatusCode == 404)
         {
             logger.LogWarning("Graph user {UserId} not found", userId);
             return Result<GraphUser>.NotFound($"User {userId} not found");
         }
-        catch (ServiceException ex) when (ex.ResponseStatusCode == 429)
+        catch (ODataError ex) when (ex.ResponseStatusCode == 429)
         {
             logger.LogWarning("Graph API throttled for user {UserId}", userId);
             return Result<GraphUser>.Error("Rate limited. Please retry later.");
         }
-        catch (ServiceException ex)
+        catch (ODataError ex)
         {
             logger.LogError(ex, "Graph API error for user {UserId}", userId);
             return Result<GraphUser>.Error($"Graph API error: {ex.Message}");
@@ -139,7 +147,7 @@ public class GraphUserService(GraphServiceClient graphClient, ILogger logger)
 
             return Result<IReadOnlyList<GraphUser>>.Success(members.AsReadOnly());
         }
-        catch (ServiceException ex)
+        catch (ODataError ex)
         {
             logger.LogError(ex, "Failed to get group {GroupId} members", groupId);
             return Result<IReadOnlyList<GraphUser>>.Error(ex.Message);

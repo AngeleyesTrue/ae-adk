@@ -43,6 +43,9 @@ public class CreateOrderHandlerTests
         // Arrange
         var db = Substitute.For<IApplicationDbContext>();
         var orders = new List<Order>();
+        // ToAsyncDbSet(): DbSet<T> 비동기 모킹용 확장 메서드
+        // NuGet: MockQueryable.NSubstitute 패키지 또는 프로젝트 자체 구현 필요
+        // See: https://github.com/romantitov/MockQueryable
         db.Orders.Returns(orders.ToAsyncDbSet());
 
         var command = new CreateOrder("customer-1", [new OrderLineDto("SKU-001", 2)]);
@@ -165,7 +168,7 @@ public class OrderWorkflowTests : IAsyncLifetime
 }
 ```
 
-### Handler Stubbing (v5.1+)
+### Handler Stubbing
 
 ```csharp
 using AwesomeAssertions;

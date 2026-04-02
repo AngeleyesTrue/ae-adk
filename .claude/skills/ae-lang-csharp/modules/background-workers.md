@@ -7,7 +7,7 @@ category: infrastructure
 
 # Background Workers
 
-BackgroundService, IHostedService, Wolverine Scheduled Jobs.
+BackgroundService, IHostedService, Wolverine Scheduled/Recurring Messages.
 
 ## Quick Reference
 
@@ -18,9 +18,20 @@ public class DataSyncWorker : BackgroundService { ... }
 // IHostedService (시작/종료 시 실행)
 public class StartupInitializer : IHostedService { ... }
 
-// Wolverine Scheduled Job (크론 기반)
-opts.Publish(pub => pub.Message<CleanupJob>()
-    .ScheduledAt(new CronExpression("0 0 2 * * ?")));
+// Wolverine 반복 작업 (BackgroundService + IMessageBus)
+public class ScheduledCleanupService(IServiceScopeFactory scopeFactory) : BackgroundService
+{
+    protected override async Task ExecuteAsync(CancellationToken ct)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromHours(1));
+        while (await timer.WaitForNextTickAsync(ct))
+        {
+            using var scope = scopeFactory.CreateScope();
+            var bus = scope.ServiceProvider.GetRequiredService<IMessageBus>();
+            await bus.PublishAsync(new CleanupJob());
+        }
+    }
+}
 ```
 
 ---
@@ -69,13 +80,16 @@ public class DataSyncWorker(
 builder.Services.AddHostedService<DataSyncWorker>();
 ```
 
-### Wolverine Scheduled Jobs
+### Wolverine Scheduled / Recurring Messages
+
+Wolverine 3.x는 내장 크론 스케줄러가 없다. 반복 작업은 `BackgroundService` + `IMessageBus` 조합을 사용한다.
 
 ```csharp
-// Job 메시지 정의
+// 1. Job 메시지 정의
 public record CleanupExpiredSessions;
+public record GenerateDailyReport;
 
-// Handler
+// 2. Handler (Wolverine가 자동 라우팅)
 public static class CleanupExpiredSessionsHandler
 {
     public static async Task Handle(
@@ -94,22 +108,42 @@ public static class CleanupExpiredSessionsHandler
     }
 }
 
-// 스케줄 등록
-builder.Host.UseWolverine(opts =>
+// 3. 반복 실행: BackgroundService + IMessageBus
+public class ScheduledCleanupService(IServiceScopeFactory scopeFactory) : BackgroundService
 {
-    opts.Publish(pub =>
+    protected override async Task ExecuteAsync(CancellationToken ct)
     {
-        pub.Message<CleanupExpiredSessions>()
-            .ScheduledAt(new CronExpression("0 0 2 * * ?"));  // 매일 02:00
-    });
+        // 매일 02:00까지 대기 후 실행하거나, 단순 주기 사용
+        using var timer = new PeriodicTimer(TimeSpan.FromHours(24));
+        while (await timer.WaitForNextTickAsync(ct))
+        {
+            using var scope = scopeFactory.CreateScope();
+            var bus = scope.ServiceProvider.GetRequiredService<IMessageBus>();
+            await bus.PublishAsync(new CleanupExpiredSessions());
+        }
+    }
+}
 
-    // 다른 스케줄
-    opts.Publish(pub =>
+public class ScheduledReportService(IServiceScopeFactory scopeFactory) : BackgroundService
+{
+    protected override async Task ExecuteAsync(CancellationToken ct)
     {
-        pub.Message<GenerateDailyReport>()
-            .ScheduledAt(new CronExpression("0 0 6 * * ?"));  // 매일 06:00
-    });
-});
+        using var timer = new PeriodicTimer(TimeSpan.FromHours(24));
+        while (await timer.WaitForNextTickAsync(ct))
+        {
+            using var scope = scopeFactory.CreateScope();
+            var bus = scope.ServiceProvider.GetRequiredService<IMessageBus>();
+            await bus.PublishAsync(new GenerateDailyReport());
+        }
+    }
+}
+
+// 4. 등록
+builder.Services.AddHostedService<ScheduledCleanupService>();
+builder.Services.AddHostedService<ScheduledReportService>();
+
+// 5. 일회성 지연 발행 (Wolverine 내장 지원)
+await bus.ScheduleAsync(new SendReminder(orderId), DateTimeOffset.UtcNow.AddHours(24));
 ```
 
 ### Channel-Based Producer/Consumer
@@ -215,14 +249,12 @@ public class WorkerHealthCheck(DataSyncWorker worker) : IHealthCheck
 builder.Host.UseWolverine(opts =>
 {
     opts.PersistMessagesWithSqlServer(connectionString);
-
-    // 스케줄된 작업도 Durable
-    opts.Publish(pub =>
-    {
-        pub.Message<CleanupExpiredSessions>()
-            .ScheduledAt(new CronExpression("0 0 2 * * ?"));
-    });
-
     opts.Policies.UseDurableLocalQueues();
 });
+
+// Durable 환경에서 일회성 지연 메시지 (서버 재시작 후에도 보존)
+await bus.ScheduleAsync(new CleanupExpiredSessions(), DateTimeOffset.UtcNow.AddHours(2));
+
+// 반복 작업은 BackgroundService로 분리 (위 'Wolverine Scheduled / Recurring Messages' 참조)
+builder.Services.AddHostedService<ScheduledCleanupService>();
 ```
