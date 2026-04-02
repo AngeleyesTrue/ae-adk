@@ -120,30 +120,30 @@ Create new AE components:
 - builder-skill: New skill creation
 - builder-plugin: Plugin creation
 
-### Team Agents (5) - Experimental
+### Dynamic Team Generation (Experimental)
 
-**Architecture**: team-* agents are sub-agent DEFINITIONS (`.claude/agents/`) used as ROLE TEMPLATES for Agent Teams teammates. They are NOT invoked as standalone subagents.
+**Architecture**: Agent Teams teammates are spawned dynamically using `Agent(subagent_type: "general-purpose")` with runtime parameter overrides from `workflow.yaml` role profiles. No static team agent definition files are used.
 
 **Key distinction from regular subagents**:
 - Regular subagents: spawned from main conversation, return results, cannot communicate with each other
-- team-* as teammates: spawned with `team_name` + `name` parameters, get Agent Teams tools (SendMessage, TaskList etc.) automatically injected by the framework
+- dynamic teammates: spawned with `subagent_type: "general-purpose"` + `team_name` + `name` parameters, get Agent Teams tools (SendMessage, TaskList etc.) automatically injected by the framework
 
 **Spawn pattern** (Agent Teams only):
 ```
-Agent(subagent_type: "team-reader", team_name: "...", name: "researcher", model: "haiku")
+Agent(subagent_type: "general-purpose", team_name: "...", name: "researcher", model: "haiku")
 ```
 
-**DO NOT** invoke team-* agents without `team_name` parameter. They reference SendMessage/TaskList in their body which are only available in Agent Teams context.
+**DO NOT** invoke general-purpose teammates without `team_name` parameter. They reference SendMessage/TaskList in their body which are only available in Agent Teams context.
 
 Requires: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in settings.json env
 
-| Agent | Default Model | Phase | Mode | Isolation | Background | Purpose |
+| Role | Default Model | Phase | Mode | Isolation | Background | Purpose |
 |-------|---------------|-------|------|-----------|------------|---------|
-| team-reader | sonnet | plan | plan (read-only) | none | true | Codebase exploration, requirements analysis, technical design (role via prompt) |
-| team-coder | sonnet | run | acceptEdits | worktree | true | Backend, frontend, or full-stack implementation (role via prompt) |
-| team-tester | sonnet | run | acceptEdits | worktree | true | Test creation with exclusive test file ownership |
-| team-designer | sonnet | run | acceptEdits | worktree | true | UI/UX design with Pencil/Figma MCP (requires Pencil MCP server) |
-| team-validator | haiku | run | plan (read-only) | none | true | TRUST 5 quality validation |
+| researcher/analyst/architect | sonnet | plan | plan (read-only) | none | true | Codebase exploration, requirements analysis, technical design (role via name param) |
+| implementer | sonnet | run | acceptEdits | worktree | true | Backend, frontend, or full-stack implementation (role via name param) |
+| tester | sonnet | run | acceptEdits | worktree | true | Test creation with exclusive test file ownership |
+| designer | sonnet | run | acceptEdits | worktree | true | UI/UX design with Pencil/Figma MCP (requires Pencil MCP server) |
+| reviewer | haiku | run | plan (read-only) | none | true | TRUST 5 quality validation |
 
 ## Rules
 

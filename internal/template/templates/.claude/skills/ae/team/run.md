@@ -23,7 +23,7 @@ progressive_disclosure:
 # AE Extension: Triggers
 triggers:
   keywords: ["team run", "glm worker", "parallel implementation"]
-  agents: ["team-coder", "team-tester"]
+  agents: ["implementer", "tester"]
   phases: ["run"]
 ---
 # Workflow: Team Run - Implementation with Agent Teams
@@ -115,12 +115,13 @@ from the tmux session, routing them through Z.AI API.
 
 ```
 Agent(
-  subagent_type: "team-coder",
+  subagent_type: "general-purpose",
   team_name: "ae-run-SPEC-XXX",
   name: "backend-dev",
   isolation: "worktree",
   mode: "acceptEdits",
-  prompt: "You are backend-dev on team ae-run-SPEC-XXX.
+  prompt: "Role: implementer. Tools: Read,Write,Edit,Bash,Grep,Glob.
+    You are backend-dev on team ae-run-SPEC-XXX.
     Implement backend tasks from the shared task list.
     SPEC: .ae/specs/SPEC-XXX/spec.md
     File ownership: server-side files (*.go excluding *_test.go), API handlers, models, database code.
@@ -129,12 +130,13 @@ Agent(
 )
 
 Agent(
-  subagent_type: "team-coder",
+  subagent_type: "general-purpose",
   team_name: "ae-run-SPEC-XXX",
   name: "frontend-dev",
   isolation: "worktree",
   mode: "acceptEdits",
-  prompt: "You are frontend-dev on team ae-run-SPEC-XXX.
+  prompt: "Role: implementer. Tools: Read,Write,Edit,Bash,Grep,Glob.
+    You are frontend-dev on team ae-run-SPEC-XXX.
     Implement frontend tasks from the shared task list.
     SPEC: .ae/specs/SPEC-XXX/spec.md
     File ownership: client-side files (components, pages, styles, assets).
@@ -143,12 +145,13 @@ Agent(
 )
 
 Agent(
-  subagent_type: "team-tester",
+  subagent_type: "general-purpose",
   team_name: "ae-run-SPEC-XXX",
   name: "tester",
   isolation: "worktree",
   mode: "acceptEdits",
-  prompt: "You are tester on team ae-run-SPEC-XXX.
+  prompt: "Role: tester. Tools: Read,Write,Edit,Bash,Grep,Glob. Skills: ae-workflow-testing, ae-foundation-quality.
+    You are tester on team ae-run-SPEC-XXX.
     Write tests for implemented features.
     SPEC: .ae/specs/SPEC-XXX/spec.md
     Own all test files (*_test.go, *.test.*, __tests__/) exclusively.
@@ -274,9 +277,9 @@ When `team_mode == "agent-teams"` in llm.yaml, use parallel teammates all on the
 Spawn teammates with file ownership boundaries and worktree isolation:
 
 ```
-Task(subagent_type: "team-coder", team_name: "ae-run-SPEC-XXX", name: "backend-dev", isolation: "worktree", mode: "acceptEdits", prompt: "Backend role. File ownership: server-side code. ...")
-Task(subagent_type: "team-coder", team_name: "ae-run-SPEC-XXX", name: "frontend-dev", isolation: "worktree", mode: "acceptEdits", prompt: "Frontend role. File ownership: client-side code. ...")
-Task(subagent_type: "team-tester", team_name: "ae-run-SPEC-XXX", name: "tester", isolation: "worktree", mode: "acceptEdits", prompt: "Testing role. File ownership: test files exclusively. ...")
+Task(subagent_type: "general-purpose", team_name: "ae-run-SPEC-XXX", name: "backend-dev", isolation: "worktree", mode: "acceptEdits", prompt: "Role: implementer. Tools: Read,Write,Edit,Bash,Grep,Glob. Backend role. File ownership: server-side code. ...")
+Task(subagent_type: "general-purpose", team_name: "ae-run-SPEC-XXX", name: "frontend-dev", isolation: "worktree", mode: "acceptEdits", prompt: "Role: implementer. Tools: Read,Write,Edit,Bash,Grep,Glob. Frontend role. File ownership: client-side code. ...")
+Task(subagent_type: "general-purpose", team_name: "ae-run-SPEC-XXX", name: "tester", isolation: "worktree", mode: "acceptEdits", prompt: "Role: tester. Tools: Read,Write,Edit,Bash,Grep,Glob. Skills: ae-workflow-testing, ae-foundation-quality. Testing role. File ownership: test files exclusively. ...")
 ```
 
 [HARD] All implementation teammates MUST use `isolation: "worktree"` for parallel file safety.
@@ -319,7 +322,7 @@ SendMessage(type: "plan_approval_response", request_id: "{id}", recipient: "{nam
 
 ### Phase 5: Quality and Shutdown
 
-1. Assign quality validation task to team-validator (or use manager-quality subagent)
+1. Assign quality validation task to reviewer role (general-purpose with reviewer profile) or use manager-quality subagent
 2. After all tasks complete, shutdown teammates:
    ```
    SendMessage(type: "shutdown_request", recipient: "backend-dev", content: "Phase complete")

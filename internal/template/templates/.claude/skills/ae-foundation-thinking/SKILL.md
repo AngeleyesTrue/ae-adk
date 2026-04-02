@@ -32,7 +32,9 @@ triggers:
   agents:
     - "manager-strategy"
     - "manager-spec"
-    - "team-reader"
+    - "researcher"
+    - "analyst"
+    - "architect"
   phases:
     - "plan"
 ---
@@ -186,9 +188,9 @@ Run Phase (/ae run):
 - Apply Deep Questioning when encountering unexpected complexity
 
 Agent Teams:
-- team-reader (analyst role): Primary user of Deep Questioning framework
-- team-reader (architect role): Primary user of Critical Evaluation framework
-- team-reader (researcher role): Uses all three for comprehensive analysis
+- analyst: Primary user of Deep Questioning framework
+- architect: Primary user of Critical Evaluation framework
+- researcher: Uses all three for comprehensive analysis
 
 ---
 
@@ -197,8 +199,8 @@ Agent Teams:
 Agents:
 - manager-strategy: Combined with Philosopher for full decision framework
 - manager-spec: Deep Questioning during requirement analysis
-- team-reader (analyst role): Primary consumer for plan phase analysis
-- team-reader (researcher role): Comprehensive research methodology
+- analyst: Primary consumer for plan phase analysis
+- researcher: Comprehensive research methodology
 
 Skills:
 - ae-foundation-philosopher: Complementary (Philosopher = strategic decisions, Thinking = creative analysis)

@@ -28,7 +28,7 @@ Standard MCP servers in AE-ADK:
 
 - context7: Library documentation lookup
 - sequential-thinking: Complex problem analysis
-- pencil: .pen file design editing. Used by expert-frontend (sub-agent mode) and team-designer (team mode).
+- pencil: .pen file design editing. Used by expert-frontend (sub-agent mode) and designer teammates (team mode).
 - claude-in-chrome: Browser automation
 
 MCP tools are deferred and must be loaded before use:

@@ -118,9 +118,9 @@ When --team flag is used, the methodology applies at the teammate level:
 
 Team-specific rules:
 - Methodology is shared across all teammates via the SPEC document
-- team-validator agent validates methodology compliance after all implementation completes
+- reviewer validates methodology compliance after all implementation completes
 - File ownership prevents cross-teammate conflicts during parallel development
-- team-tester exclusively owns test files regardless of methodology
+- tester exclusively owns test files regardless of methodology
 
 ## MX Tag Integration
 
