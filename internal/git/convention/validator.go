@@ -108,14 +108,14 @@ func extractScope(header string, delim string) string {
 	if delim == "" {
 		delim = "()"
 	}
-	open := delim[0]
-	close := delim[1]
+	openByte := delim[0]
+	closeByte := delim[1]
 
-	start := strings.IndexByte(header, open)
+	start := strings.IndexByte(header, openByte)
 	if start < 0 {
 		return ""
 	}
-	end := strings.IndexByte(header[start:], close)
+	end := strings.IndexByte(header[start:], closeByte)
 	if end < 0 {
 		return ""
 	}
