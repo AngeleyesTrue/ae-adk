@@ -84,7 +84,9 @@ func SyncToProjectConfig(projectRoot string, prefs ProfilePreferences) error {
 		policy := template.ModelPolicy(prefs.ModelPolicy)
 		if template.IsValidModelPolicy(prefs.ModelPolicy) {
 			manifestMgr := manifest.NewManager()
-			if _, loadErr := manifestMgr.Load(projectRoot); loadErr == nil {
+			if _, loadErr := manifestMgr.Load(projectRoot); loadErr != nil {
+				fmt.Fprintf(os.Stderr, "Warning: could not load manifest for model policy: %v\n", loadErr)
+			} else {
 				if err := template.ApplyModelPolicy(projectRoot, policy, manifestMgr); err != nil {
 					return fmt.Errorf("apply model policy: %w", err)
 				}

@@ -8,7 +8,7 @@ Claude Code hooks for extending functionality with custom scripts.
 
 ## Hook Events
 
-All 17 available hook event types:
+All 24 available hook event types:
 
 | Event | Matcher | Can Block | Description |
 |-------|---------|-----------|-------------|
@@ -16,25 +16,32 @@ All 17 available hook event types:
 | SessionStart | No | No | Runs when a new session begins |
 | Setup | No | No | Runs via --init, --init-only, or --maintenance flags (v2.1.10+) |
 | PreCompact | No | No | Runs before context compaction |
+| PostCompact | No | No | Runs after context compaction completes |
 | PreToolUse | Tool name | Yes | Runs before a tool executes |
 | PostToolUse | Tool name | No | Runs after a tool completes successfully |
 | PostToolUseFailure | Tool name | No | Runs after a tool execution fails |
 | PermissionRequest | Tool name | Yes | Runs when permission dialog appears |
+| PermissionDenied | Tool name | No | Runs when user denies a permission request (v2.1.89+) |
 | Notification | Type | No | Runs when Claude Code sends notifications |
 | InstructionsLoaded | No | No | Runs when CLAUDE.md or .claude/rules/*.md files are loaded (v2.1.69+) |
 | SubagentStart | Agent type | No | Runs when a subagent spawns |
 | SubagentStop | No | No | Runs when a subagent terminates |
 | Stop | No | No | Runs when conversation stops |
+| StopFailure | No | No | Runs when conversation stop fails |
 | TeammateIdle | No | Yes | Runs when agent team teammate is about to go idle |
 | TaskCompleted | No | Yes | Runs when a task is being marked complete |
 | SessionEnd | Reason | No | Runs when session terminates |
 | ConfigChange | No | No | Runs when settings.json is modified (v2.1.49+) |
+| CwdChanged | No | No | Runs when working directory changes |
+| FileChanged | No | No | Runs when a watched file changes |
+| Elicitation | No | No | Runs when an elicitation dialog is shown |
+| ElicitationResult | No | No | Runs when an elicitation dialog result is received |
 
 ### Event Categories
 
-**Lifecycle Events**: SessionStart, Setup, SessionEnd, Stop, PreCompact, ConfigChange, InstructionsLoaded
+**Lifecycle Events**: SessionStart, Setup, SessionEnd, Stop, StopFailure, PreCompact, PostCompact, ConfigChange, InstructionsLoaded, CwdChanged, FileChanged
 
-**Prompt Events**: UserPromptSubmit, PermissionRequest, Notification
+**Prompt Events**: UserPromptSubmit, PermissionRequest, PermissionDenied, Notification, Elicitation, ElicitationResult
 
 **Tool Events**: PreToolUse, PostToolUse, PostToolUseFailure
 
