@@ -313,6 +313,15 @@ func TestExtractScope_BracketDelimiter(t *testing.T) {
 		{"paren scope", "feat(auth): msg", "()", "auth"},
 		{"empty delim defaults to paren", "feat(auth): msg", "", "auth"},
 		{"empty delim ignores brackets", "feat: [Web] msg", "", ""},
+		// M-2: description 내 bracket은 scope로 추출하지 않아야 함
+		{"bracket in description only", "feat: description [note]", "[]", ""},
+		{"bracket late in text", "fix: resolve issue [see #123]", "[]", ""},
+		{"bracket after normal text", "docs: update guide [draft]", "[]", ""},
+		// M-2: ": " 없는 경우
+		{"bracket no colon space", "feat:[Web] no space", "[]", ""},
+		{"bracket no colon at all", "feat[Web] desc", "[]", ""},
+		// M-2: ": " 중복 케이스
+		{"bracket colon in desc", "feat: [Web] desc: more info", "[]", "Web"},
 	}
 
 	for _, tt := range tests {

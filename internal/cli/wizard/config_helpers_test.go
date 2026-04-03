@@ -3,6 +3,7 @@ package wizard
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"gopkg.in/yaml.v3"
@@ -136,6 +137,139 @@ func TestSaveScopesToConfig_PreservesExistingFields(t *testing.T) {
 	scopes := scopesRaw.([]any)
 	if len(scopes) != 2 {
 		t.Fatalf("commit_scopes length = %d, want 2", len(scopes))
+	}
+}
+
+func TestSaveScopesToConfig_PreservesComments(t *testing.T) {
+	dir := t.TempDir()
+	sectionsDir := filepath.Join(dir, ".ae", "config", "sections")
+	if err := os.MkdirAll(sectionsDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	// 주석이 포함된 git-strategy.yaml 생성
+	initial := `# Git Strategy Configuration
+git_strategy:
+  mode: "manual" # 운영 모드
+  provider: "github"
+  # 브랜치 설정
+  auto_merge: true
+`
+	gitStrategyPath := filepath.Join(sectionsDir, "git-strategy.yaml")
+	if err := os.WriteFile(gitStrategyPath, []byte(initial), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	err := SaveScopesToConfig(dir, []string{"Web", "Auth"})
+	if err != nil {
+		t.Fatalf("SaveScopesToConfig: %v", err)
+	}
+
+	data, err := os.ReadFile(gitStrategyPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	content := string(data)
+
+	// 주석이 보존되었는지 확인
+	if !strings.Contains(content, "# Git Strategy Configuration") {
+		t.Error("top-level comment should be preserved")
+	}
+	if !strings.Contains(content, "# 운영 모드") {
+		t.Error("inline comment should be preserved")
+	}
+	if !strings.Contains(content, "# 브랜치 설정") {
+		t.Error("section comment should be preserved")
+	}
+
+	// scope도 정상 저장되었는지 확인
+	var parsed map[string]any
+	if err := yaml.Unmarshal(data, &parsed); err != nil {
+		t.Fatal(err)
+	}
+	gs := parsed["git_strategy"].(map[string]any)
+	scopesRaw, ok := gs["commit_scopes"]
+	if !ok {
+		t.Fatal("commit_scopes not found")
+	}
+	scopes := scopesRaw.([]any)
+	if len(scopes) != 2 {
+		t.Fatalf("commit_scopes length = %d, want 2", len(scopes))
+	}
+}
+
+func TestSaveScopesToConfig_NoGitStrategyKey(t *testing.T) {
+	dir := t.TempDir()
+	sectionsDir := filepath.Join(dir, ".ae", "config", "sections")
+	if err := os.MkdirAll(sectionsDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	// git_strategy 키가 없는 YAML
+	initial := `other_section:
+  key: value
+`
+	gitStrategyPath := filepath.Join(sectionsDir, "git-strategy.yaml")
+	if err := os.WriteFile(gitStrategyPath, []byte(initial), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	err := SaveScopesToConfig(dir, []string{"Web"})
+	if err == nil {
+		t.Fatal("expected error when git_strategy key is missing")
+	}
+	if !strings.Contains(err.Error(), "git_strategy section not found") {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+func TestSaveScopesToConfig_EmptyFile(t *testing.T) {
+	dir := t.TempDir()
+	sectionsDir := filepath.Join(dir, ".ae", "config", "sections")
+	if err := os.MkdirAll(sectionsDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	gitStrategyPath := filepath.Join(sectionsDir, "git-strategy.yaml")
+	if err := os.WriteFile(gitStrategyPath, []byte(""), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	err := SaveScopesToConfig(dir, []string{"Web"})
+	if err == nil {
+		t.Fatal("expected error for empty file")
+	}
+}
+
+func TestSaveScopesToConfig_FlowStyleOutput(t *testing.T) {
+	dir := t.TempDir()
+	sectionsDir := filepath.Join(dir, ".ae", "config", "sections")
+	if err := os.MkdirAll(sectionsDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	initial := `git_strategy:
+  mode: "manual"
+`
+	gitStrategyPath := filepath.Join(sectionsDir, "git-strategy.yaml")
+	if err := os.WriteFile(gitStrategyPath, []byte(initial), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	err := SaveScopesToConfig(dir, []string{"Web", "Auth"})
+	if err != nil {
+		t.Fatalf("SaveScopesToConfig: %v", err)
+	}
+
+	data, err := os.ReadFile(gitStrategyPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	content := string(data)
+
+	// FlowStyle이면 인라인 형식이어야 함: [Web, Auth]
+	if !strings.Contains(content, "[Web, Auth]") {
+		t.Errorf("expected flow-style sequence [Web, Auth], got:\n%s", content)
 	}
 }
 

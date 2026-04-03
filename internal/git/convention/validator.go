@@ -102,15 +102,34 @@ func extractType(header string) string {
 }
 
 // extractScope는 헤더에서 scope를 추출한다.
-// delim이 "[]"이면 대괄호, "()"이면 소괄호에서 추출.
+// delim이 "[]"이면 "type!?: " 직후 위치에서만 대괄호 scope를 추출하고,
+// "()"이면 type 직후 소괄호에서 추출한다.
 // 빈 문자열이면 기본값 "()" 사용 (하위호환).
 func extractScope(header string, delim string) string {
 	if delim == "" {
 		delim = "()"
 	}
+
+	// bracket-scope: "type!?: [Scope] desc" — ": " 직후에서만 추출
+	if delim == "[]" {
+		colonSpace := strings.Index(header, ": ")
+		if colonSpace < 0 {
+			return ""
+		}
+		afterColon := colonSpace + 2
+		if afterColon >= len(header) || header[afterColon] != '[' {
+			return ""
+		}
+		end := strings.IndexByte(header[afterColon:], ']')
+		if end < 0 {
+			return ""
+		}
+		return header[afterColon+1 : afterColon+end]
+	}
+
+	// conventional: "type(scope): desc" — 첫 번째 소괄호에서 추출
 	openByte := delim[0]
 	closeByte := delim[1]
-
 	start := strings.IndexByte(header, openByte)
 	if start < 0 {
 		return ""
