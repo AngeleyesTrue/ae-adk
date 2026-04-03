@@ -477,6 +477,7 @@ func TestValidateGitConventionName(t *testing.T) {
 		{"angular is valid", "angular", false},
 		{"karma is valid", "karma", false},
 		{"custom is valid", "custom", false},
+		{"bracket-scope is valid", "bracket-scope", false},
 		{"empty is valid (defaults applied)", "", false},
 		{"invalid convention", "gitmoji", true},
 		{"uppercase is invalid", "AUTO", true},

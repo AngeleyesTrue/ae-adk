@@ -72,7 +72,8 @@ func readUserField(projectRoot, field string) string {
 }
 
 // SaveScopesToConfig는 commit scope 목록을 git-strategy.yaml에 저장한다.
-// 기존 파일 내용은 보존하고 commit_style.scopes 필드만 추가/업데이트한다.
+// git_strategy 최상위의 commit_scopes와 각 모드(manual/personal/team)의
+// commit_style.scopes 필드를 모두 업데이트한다.
 func SaveScopesToConfig(projectRoot string, scopes []string) error {
 	if len(scopes) == 0 {
 		return nil
@@ -96,6 +97,20 @@ func SaveScopesToConfig(projectRoot string, scopes []string) error {
 
 	// commit_scopes를 git_strategy 최상위에 저장
 	gsSection["commit_scopes"] = scopes
+
+	// 각 모드의 commit_style.scopes도 동기화
+	for _, mode := range []string{"manual", "personal", "team"} {
+		modeSection, ok := gsSection[mode].(map[string]any)
+		if !ok {
+			continue
+		}
+		commitStyle, ok := modeSection["commit_style"].(map[string]any)
+		if !ok {
+			continue
+		}
+		commitStyle["scopes"] = scopes
+	}
+
 	parsed["git_strategy"] = gsSection
 
 	out, err := yaml.Marshal(parsed)

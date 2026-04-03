@@ -138,3 +138,71 @@ func TestSaveScopesToConfig_PreservesExistingFields(t *testing.T) {
 		t.Fatalf("commit_scopes length = %d, want 2", len(scopes))
 	}
 }
+
+func TestSaveScopesToConfig_SyncsToModeCommitStyle(t *testing.T) {
+	dir := t.TempDir()
+	sectionsDir := filepath.Join(dir, ".ae", "config", "sections")
+	if err := os.MkdirAll(sectionsDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	// 모드별 commit_style.scopes가 있는 git-strategy.yaml 생성
+	initial := `git_strategy:
+  mode: "personal"
+  manual:
+    commit_style:
+      format: bracket-scope
+      scopes: []
+  personal:
+    commit_style:
+      format: bracket-scope
+      scopes: []
+  team:
+    commit_style:
+      format: bracket-scope
+      scopes: []
+`
+	gitStrategyPath := filepath.Join(sectionsDir, "git-strategy.yaml")
+	if err := os.WriteFile(gitStrategyPath, []byte(initial), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	err := SaveScopesToConfig(dir, []string{"Web", "Auth"})
+	if err != nil {
+		t.Fatalf("SaveScopesToConfig: %v", err)
+	}
+
+	data, err := os.ReadFile(gitStrategyPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var parsed map[string]any
+	if err := yaml.Unmarshal(data, &parsed); err != nil {
+		t.Fatal(err)
+	}
+
+	gs := parsed["git_strategy"].(map[string]any)
+
+	// commit_scopes 최상위 확인
+	topScopes := gs["commit_scopes"].([]any)
+	if len(topScopes) != 2 {
+		t.Fatalf("top-level commit_scopes length = %d, want 2", len(topScopes))
+	}
+
+	// 각 모드의 commit_style.scopes 동기화 확인
+	for _, mode := range []string{"manual", "personal", "team"} {
+		modeSection := gs[mode].(map[string]any)
+		commitStyle := modeSection["commit_style"].(map[string]any)
+		modeScopes := commitStyle["scopes"].([]any)
+		if len(modeScopes) != 2 {
+			t.Errorf("%s.commit_style.scopes length = %d, want 2", mode, len(modeScopes))
+		}
+		if modeScopes[0].(string) != "Web" {
+			t.Errorf("%s.commit_style.scopes[0] = %q, want %q", mode, modeScopes[0], "Web")
+		}
+		if modeScopes[1].(string) != "Auth" {
+			t.Errorf("%s.commit_style.scopes[1] = %q, want %q", mode, modeScopes[1], "Auth")
+		}
+	}
+}

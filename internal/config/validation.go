@@ -120,6 +120,7 @@ var validGitConventionNames = map[string]bool{
 	"conventional-commits": true,
 	"angular":              true,
 	"karma":                true,
+	"bracket-scope":        true,
 	"custom":               true,
 }
 
@@ -130,7 +131,7 @@ func validateGitConventionConfig(gc *models.GitConventionConfig) []ValidationErr
 	if gc.Convention != "" && !validGitConventionNames[gc.Convention] {
 		errs = append(errs, ValidationError{
 			Field:   "git_convention.convention",
-			Message: "must be one of: auto, conventional-commits, angular, karma, custom",
+			Message: "must be one of: auto, conventional-commits, angular, karma, bracket-scope, custom",
 			Value:   gc.Convention,
 			Wrapped: ErrInvalidConfig,
 		})
