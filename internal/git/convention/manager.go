@@ -15,13 +15,13 @@ func NewManager(repoPath string) *Manager {
 
 // LoadConvention loads a convention by name (built-in) or from config.
 // If name is "auto", it auto-detects from the repository history and
-// falls back to conventional-commits on failure.
+// falls back to bracket-scope on failure.
 func (m *Manager) LoadConvention(name string) error {
 	if name == "auto" {
 		result, err := Detect(m.repoPath, 100)
 		if err != nil {
-			// Fallback to conventional-commits.
-			conv, parseErr := ParseBuiltin("conventional-commits")
+			// Fallback to defaultFallback 컨벤션
+			conv, parseErr := ParseBuiltin(defaultFallback)
 			if parseErr != nil {
 				return fmt.Errorf("load convention: auto-detect failed and fallback failed: %w", parseErr)
 			}

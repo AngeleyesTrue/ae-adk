@@ -52,6 +52,7 @@ func TestQuestionOrder(t *testing.T) {
 		"project_name",
 		"development_mode",
 		"git_mode",
+		"commit_scopes",
 		"git_provider",
 		"gitlab_instance_url",
 		"github_username",
@@ -114,6 +115,86 @@ func TestDevelopmentModeTranslationsExist(t *testing.T) {
 	}
 }
 
+// TestDefaultQuestions_ContainsCommitScopes verifies commit_scopes question exists with correct attributes.
+func TestDefaultQuestions_ContainsCommitScopes(t *testing.T) {
+	questions := DefaultQuestions("/test")
+
+	found := false
+	for _, q := range questions {
+		if q.ID == "commit_scopes" {
+			found = true
+			if q.Type != QuestionTypeInput {
+				t.Errorf("commit_scopes type = %v, want QuestionTypeInput", q.Type)
+			}
+			if q.Required {
+				t.Error("commit_scopes should not be required")
+			}
+			break
+		}
+	}
+	if !found {
+		t.Error("commit_scopes question not found in DefaultQuestions")
+	}
+}
+
+// TestDefaultQuestions_ScopeQuestionHasDefaultDescription verifies commit_scopes has a non-empty description.
+func TestDefaultQuestions_ScopeQuestionHasDefaultDescription(t *testing.T) {
+	questions := DefaultQuestions("/test")
+	q := QuestionByID(questions, "commit_scopes")
+	if q == nil {
+		t.Fatal("commit_scopes question not found")
+	}
+	// description에 기본 scope 목록이 포함되어야 함
+	if q.Description == "" {
+		t.Error("commit_scopes description should not be empty")
+	}
+}
+
+// TestSaveAnswerCommitScopes verifies saveAnswer stores commit_scopes correctly.
+func TestSaveAnswerCommitScopes(t *testing.T) {
+	result := &WizardResult{}
+	locale := ""
+
+	saveAnswer("commit_scopes", "Web,Auth,DB", result, &locale)
+	if len(result.CommitScopes) != 3 {
+		t.Fatalf("expected 3 scopes, got %d", len(result.CommitScopes))
+	}
+	expected := []string{"Web", "Auth", "DB"}
+	for i, s := range result.CommitScopes {
+		if s != expected[i] {
+			t.Errorf("scope[%d] = %q, want %q", i, s, expected[i])
+		}
+	}
+}
+
+// TestSaveAnswerCommitScopes_Empty verifies saveAnswer handles empty value for commit_scopes.
+func TestSaveAnswerCommitScopes_Empty(t *testing.T) {
+	result := &WizardResult{}
+	locale := ""
+
+	saveAnswer("commit_scopes", "", result, &locale)
+	if len(result.CommitScopes) != 0 {
+		t.Errorf("expected 0 scopes for empty input, got %d", len(result.CommitScopes))
+	}
+}
+
+// TestSaveAnswerCommitScopes_WithSpaces verifies saveAnswer trims spaces around scopes.
+func TestSaveAnswerCommitScopes_WithSpaces(t *testing.T) {
+	result := &WizardResult{}
+	locale := ""
+
+	saveAnswer("commit_scopes", "  Web , Auth ,  DB  ", result, &locale)
+	if len(result.CommitScopes) != 3 {
+		t.Fatalf("expected 3 scopes, got %d", len(result.CommitScopes))
+	}
+	expected := []string{"Web", "Auth", "DB"}
+	for i, s := range result.CommitScopes {
+		if s != expected[i] {
+			t.Errorf("scope[%d] = %q, want %q", i, s, expected[i])
+		}
+	}
+}
+
 // TestRemovedQuestionsAbsent verifies that removed user-level questions are no longer present.
 func TestRemovedQuestionsAbsent(t *testing.T) {
 	questions := DefaultQuestions("/tmp/test-project")
@@ -150,6 +231,7 @@ func TestQuestionsAllPresent(t *testing.T) {
 		"project_name",
 		"development_mode",
 		"git_mode",
+		"commit_scopes",
 		"git_provider",
 		"gitlab_instance_url",
 		"github_username",

@@ -396,7 +396,7 @@ func TestDefaultConstants(t *testing.T) {
 		{"DefaultGitConvention", DefaultGitConvention, "auto"},
 		{"DefaultGitConventionSampleSize", DefaultGitConventionSampleSize, 100},
 		{"DefaultGitConventionConfidenceThreshold", DefaultGitConventionConfidenceThreshold, 0.5},
-		{"DefaultGitConventionFallback", DefaultGitConventionFallback, "conventional-commits"},
+		{"DefaultGitConventionFallback", DefaultGitConventionFallback, "bracket-scope"},
 		{"DefaultGitConventionMaxLength", DefaultGitConventionMaxLength, 100},
 	}
 

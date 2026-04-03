@@ -2,6 +2,7 @@ package convention
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 	"testing"
 )
@@ -153,6 +154,88 @@ func TestDetect_DefaultSampleSize(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("Detect returned nil")
+	}
+}
+
+// setupTempGitRepo는 임시 git 저장소를 생성하고 커밋 메시지들을 추가한다.
+func setupTempGitRepo(t *testing.T, messages []string) string {
+	t.Helper()
+	dir := t.TempDir()
+
+	// git init
+	cmd := exec.Command("git", "-C", dir, "init")
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("git init: %v\n%s", err, out)
+	}
+
+	// git config (CI 호환)
+	for _, c := range [][]string{
+		{"config", "user.name", "test"},
+		{"config", "user.email", "test@test.com"},
+	} {
+		cmd := exec.Command("git", append([]string{"-C", dir}, c...)...)
+		if out, err := cmd.CombinedOutput(); err != nil {
+			t.Fatalf("git %v: %v\n%s", c, err, out)
+		}
+	}
+
+	// git commit --allow-empty
+	for _, msg := range messages {
+		cmd := exec.Command("git", "-C", dir, "commit", "--allow-empty", "-m", msg)
+		if out, err := cmd.CombinedOutput(); err != nil {
+			t.Fatalf("git commit %q: %v\n%s", msg, err, out)
+		}
+	}
+
+	return dir
+}
+
+func TestDetect_TieBreaking_Deterministic(t *testing.T) {
+	// scopeless 커밋만 생성 — bracket-scope와 conventional-commits 모두 매치
+	repo := setupTempGitRepo(t, []string{
+		"feat: add new feature",
+		"fix: resolve bug",
+		"docs: update readme",
+		"chore: update deps",
+		"refactor: simplify code",
+	})
+
+	// 10회 반복하여 결정적 결과 검증
+	for i := 0; i < 10; i++ {
+		result, err := Detect(repo, 10)
+		if err != nil {
+			t.Fatalf("iteration %d: Detect: %v", i, err)
+		}
+		if result.Convention.Name != "bracket-scope" {
+			t.Errorf("iteration %d: Detect() = %q, want %q",
+				i, result.Convention.Name, "bracket-scope")
+		}
+	}
+}
+
+func TestDetect_BracketScopeRepo(t *testing.T) {
+	repo := setupTempGitRepo(t, []string{
+		"feat: [Web] add restore button",
+		"fix: [Auth] resolve token issue",
+		"refactor: [Core/DB] optimize query",
+		"feat!: [API] change endpoint",
+		"docs: [Build] update CI guide",
+		"test: [Web] add unit tests",
+		"chore: [Build] update deps",
+		"feat: [Web/Startup] init sequence",
+		"fix: [Auth] session handling",
+		"perf: [Core] cache optimization",
+	})
+
+	result, err := Detect(repo, 20)
+	if err != nil {
+		t.Fatalf("Detect: %v", err)
+	}
+	if result.Convention.Name != "bracket-scope" {
+		t.Errorf("Detect() = %q, want bracket-scope", result.Convention.Name)
+	}
+	if result.Confidence < 0.8 {
+		t.Errorf("Confidence = %.2f, want >= 0.8", result.Confidence)
 	}
 }
 

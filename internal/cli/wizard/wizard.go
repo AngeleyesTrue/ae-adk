@@ -198,6 +198,19 @@ func saveAnswer(id, value string, result *WizardResult, locale *string) {
 		result.GitLabUsername = value
 	case "gitlab_token":
 		result.GitLabToken = value
+	case "commit_scopes":
+		// 쉼표로 구분된 scope 목록 파싱
+		if value != "" {
+			parts := strings.Split(value, ",")
+			scopes := make([]string, 0, len(parts))
+			for _, p := range parts {
+				s := strings.TrimSpace(p)
+				if s != "" {
+					scopes = append(scopes, s)
+				}
+			}
+			result.CommitScopes = scopes
+		}
 	}
 	_ = locale // locale is kept for GetLocalizedQuestion compatibility
 }

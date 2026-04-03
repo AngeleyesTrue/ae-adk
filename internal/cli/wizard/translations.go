@@ -44,6 +44,10 @@ var translations = map[string]map[string]QuestionTranslation{
 				{Label: "Team", Desc: "AI가 브랜치 생성, 커밋, PR 생성 가능"},
 			},
 		},
+		"commit_scopes": {
+			Title:       "프로젝트별 커밋 scope 입력 (선택)",
+			Description: "쉼표로 구분된 PascalCase 이름. 기본 scope: Tests, Docs, Build, DB, Auth, Solution",
+		},
 		"git_provider": {
 			Title:       "Git 프로바이더 선택",
 			Description: "프로젝트의 Git 호스팅 플랫폼을 선택합니다.",
@@ -95,6 +99,10 @@ var translations = map[string]map[string]QuestionTranslation{
 				{Label: "Team", Desc: "AIがブランチ作成、コミット、PR作成が可能"},
 			},
 		},
+		"commit_scopes": {
+			Title:       "プロジェクト固有のコミットスコープを入力（任意）",
+			Description: "カンマ区切りのPascalCase名。デフォルトスコープ: Tests, Docs, Build, DB, Auth, Solution",
+		},
 		"git_provider": {
 			Title:       "Gitプロバイダーを選択",
 			Description: "プロジェクトのGitホスティングプラットフォームを選択します。",
@@ -145,6 +153,10 @@ var translations = map[string]map[string]QuestionTranslation{
 				{Label: "Personal", Desc: "AI可以创建分支和提交"},
 				{Label: "Team", Desc: "AI可以创建分支、提交和创建PR"},
 			},
+		},
+		"commit_scopes": {
+			Title:       "输入项目特定的提交范围（可选）",
+			Description: "逗号分隔的PascalCase名称。默认范围: Tests, Docs, Build, DB, Auth, Solution",
 		},
 		"git_provider": {
 			Title:       "选择Git提供商",

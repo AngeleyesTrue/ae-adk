@@ -6,6 +6,9 @@ import (
 	"strings"
 )
 
+// defaultFallback은 동일 신뢰도 tie-breaking 시 우선 선택되는 컨벤션 이름이다.
+const defaultFallback = "bracket-scope"
+
 // Detect analyzes recent commits in the repository and returns the best
 // matching built-in convention. sampleSize controls how many recent commits
 // to analyze. repoPath is the git repository root.
@@ -41,7 +44,9 @@ func Detect(repoPath string, sampleSize int) (*DetectionResult, error) {
 
 		confidence := float64(matchCount) / float64(len(messages))
 
-		if bestResult == nil || confidence > bestResult.Confidence {
+		// 동일 신뢰도일 때 fallback 컨벤션을 우선 선택 (결정적 tie-breaking)
+		if bestResult == nil || confidence > bestResult.Confidence ||
+			(confidence == bestResult.Confidence && name == defaultFallback) {
 			bestResult = &DetectionResult{
 				Convention: conv,
 				Confidence: confidence,

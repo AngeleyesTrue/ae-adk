@@ -290,9 +290,134 @@ func TestExtractScope(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.header, func(t *testing.T) {
-			got := extractScope(tt.header)
+			got := extractScope(tt.header, "()")
 			if got != tt.want {
-				t.Errorf("extractScope(%q) = %q, want %q", tt.header, got, tt.want)
+				t.Errorf("extractScope(%q, \"()\") = %q, want %q", tt.header, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestExtractScope_BracketDelimiter(t *testing.T) {
+	tests := []struct {
+		name   string
+		header string
+		delim  string
+		want   string
+	}{
+		{"bracket single scope", "feat: [Web] msg", "[]", "Web"},
+		{"bracket multi scope", "feat: [Web/Startup] msg", "[]", "Web/Startup"},
+		{"bracket with breaking", "feat!: [Auth] desc", "[]", "Auth"},
+		{"bracket no scope", "feat: msg", "[]", ""},
+		{"bracket 3-level", "feat: [Web/Startup/Auth] msg", "[]", "Web/Startup/Auth"},
+		{"paren scope", "feat(auth): msg", "()", "auth"},
+		{"empty delim defaults to paren", "feat(auth): msg", "", "auth"},
+		{"empty delim ignores brackets", "feat: [Web] msg", "", ""},
+		// M-2: description 내 bracket은 scope로 추출하지 않아야 함
+		{"bracket in description only", "feat: description [note]", "[]", ""},
+		{"bracket late in text", "fix: resolve issue [see #123]", "[]", ""},
+		{"bracket after normal text", "docs: update guide [draft]", "[]", ""},
+		// M-2: ": " 없는 경우
+		{"bracket no colon space", "feat:[Web] no space", "[]", ""},
+		{"bracket no colon at all", "feat[Web] desc", "[]", ""},
+		// M-2: ": " 중복 케이스
+		{"bracket colon in desc", "feat: [Web] desc: more info", "[]", "Web"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := extractScope(tt.header, tt.delim)
+			if got != tt.want {
+				t.Errorf("extractScope(%q, %q) = %q, want %q", tt.header, tt.delim, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestValidate_BracketScope(t *testing.T) {
+	// bracket-scope 컨벤션 직접 생성 (templates.go 의존 제거)
+	conv, err := Parse(ConventionConfig{
+		Name:           "bracket-scope",
+		Pattern:        `^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)!?: (\[[A-Za-z][\w]*(/[A-Za-z][\w]*)*\] )?[^\[\]].+`,
+		Types:          []string{"build", "chore", "ci", "docs", "feat", "fix", "perf", "refactor", "revert", "style", "test"},
+		MaxLength:      100,
+		ScopeDelimiter: "[]",
+	})
+	if err != nil {
+		t.Fatalf("Parse bracket-scope: %v", err)
+	}
+
+	matches := []struct {
+		name string
+		msg  string
+	}{
+		{"single scope", "feat: [Web] description"},
+		{"multi scope", "feat: [Web/Startup] description"},
+		{"3-level scope", "feat: [Web/Startup/Auth] description"},
+		{"breaking change", "feat!: [Web] breaking change"},
+		{"no scope", "feat: description"},
+	}
+
+	for _, tt := range matches {
+		t.Run("match_"+tt.name, func(t *testing.T) {
+			result := Validate(tt.msg, conv)
+			if !result.Valid {
+				t.Errorf("Validate(%q) should be valid, violations: %v", tt.msg, result.Violations)
+			}
+		})
+	}
+
+	rejects := []struct {
+		name string
+		msg  string
+	}{
+		{"old format parens", "feat(scope): description"},
+		{"hyphen in scope", "feat: [Web-Auth] description"},
+		{"no space after bracket", "feat: [Web]description"},
+		{"empty bracket", "feat: [] description"},
+		{"numeric start", "feat: [123] description"},
+		{"trailing slash", "feat: [Web/] description"},
+		{"leading slash", "feat: [/Web] description"},
+	}
+
+	for _, tt := range rejects {
+		t.Run("reject_"+tt.name, func(t *testing.T) {
+			result := Validate(tt.msg, conv)
+			if result.Valid {
+				t.Errorf("Validate(%q) should be invalid", tt.msg)
+			}
+		})
+	}
+}
+
+func TestSuggestFix_BracketScope(t *testing.T) {
+	bracketConv := &Convention{
+		Name:           "bracket-scope",
+		ScopeDelimiter: "[]",
+	}
+	conventionalConv := &Convention{
+		Name:           "conventional-commits",
+		ScopeDelimiter: "()",
+	}
+
+	tests := []struct {
+		name       string
+		header     string
+		conv       *Convention
+		wantPrefix string
+	}{
+		{"bracket fix", "Fix the login bug", bracketConv, "fix: [Scope] "},
+		{"bracket feat", "Add new feature", bracketConv, "feat: [Scope] "},
+		{"conventional fix", "Fix the login bug", conventionalConv, "fix: "},
+		{"conventional feat", "Add new feature", conventionalConv, "feat: "},
+		{"nil conv", "Fix bug", nil, "fix: "},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := suggestFix(tt.header, tt.conv)
+			if !strings.HasPrefix(got, tt.wantPrefix) {
+				t.Errorf("suggestFix(%q, %v) = %q, want prefix %q", tt.header, tt.conv, got, tt.wantPrefix)
 			}
 		})
 	}

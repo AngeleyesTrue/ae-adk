@@ -12,6 +12,14 @@ func Parse(cfg ConventionConfig) (*Convention, error) {
 		return nil, fmt.Errorf("convention %q: pattern is required", cfg.Name)
 	}
 
+	// ScopeDelimiter 허용값 검증
+	switch cfg.ScopeDelimiter {
+	case "", "()", "[]":
+		// 허용
+	default:
+		return nil, fmt.Errorf("convention %q: invalid scope_delimiter %q: must be \"\", \"()\", or \"[]\"", cfg.Name, cfg.ScopeDelimiter)
+	}
+
 	compiled, err := regexp.Compile(cfg.Pattern)
 	if err != nil {
 		return nil, fmt.Errorf("convention %q: invalid pattern: %w", cfg.Name, err)
@@ -23,13 +31,14 @@ func Parse(cfg ConventionConfig) (*Convention, error) {
 	}
 
 	return &Convention{
-		Name:      cfg.Name,
-		Pattern:   compiled,
-		Types:     cfg.Types,
-		Scopes:    cfg.Scopes,
-		MaxLength: maxLen,
-		Required:  cfg.Required,
-		Examples:  cfg.Examples,
+		Name:           cfg.Name,
+		Pattern:        compiled,
+		Types:          cfg.Types,
+		Scopes:         cfg.Scopes,
+		MaxLength:      maxLen,
+		Required:       cfg.Required,
+		Examples:       cfg.Examples,
+		ScopeDelimiter: cfg.ScopeDelimiter,
 	}, nil
 }
 
