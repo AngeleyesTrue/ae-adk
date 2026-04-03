@@ -83,10 +83,11 @@ func TestParse(t *testing.T) {
 		{
 			name: "preserves scopes and required",
 			cfg: ConventionConfig{
-				Name:     "full",
-				Pattern:  `^.+`,
-				Scopes:   []string{"api", "cli"},
-				Required: []string{"type", "description"},
+				Name:           "full",
+				Pattern:        `^.+`,
+				Scopes:         []string{"api", "cli"},
+				Required:       []string{"type", "description"},
+				ScopeDelimiter: "[]",
 			},
 			wantErr: false,
 			check: func(t *testing.T, conv *Convention) {
@@ -95,6 +96,9 @@ func TestParse(t *testing.T) {
 				}
 				if len(conv.Required) != 2 {
 					t.Errorf("Required length = %d, want %d", len(conv.Required), 2)
+				}
+				if conv.ScopeDelimiter != "[]" {
+					t.Errorf("ScopeDelimiter = %q, want %q", conv.ScopeDelimiter, "[]")
 				}
 			},
 		},
@@ -133,6 +137,39 @@ func TestParseBuiltin(t *testing.T) {
 			}
 			if conv.MaxLength <= 0 {
 				t.Errorf("MaxLength = %d, want > 0", conv.MaxLength)
+			}
+		})
+	}
+}
+
+func TestParse_ScopeDelimiterPropagation(t *testing.T) {
+	tests := []struct {
+		name      string
+		delim     string
+		wantDelim string
+		wantErr   bool
+	}{
+		{"bracket delimiter", "[]", "[]", false},
+		{"paren delimiter", "()", "()", false},
+		{"empty delimiter (기본값)", "", "", false},
+		{"invalid braces", "{}", "", true},
+		{"invalid string", "abc", "", true},
+		{"invalid single char", "[", "", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			conv, err := Parse(ConventionConfig{
+				Name:           "test",
+				Pattern:        `^.+`,
+				ScopeDelimiter: tt.delim,
+			})
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Parse() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !tt.wantErr && conv.ScopeDelimiter != tt.wantDelim {
+				t.Errorf("ScopeDelimiter = %q, want %q", conv.ScopeDelimiter, tt.wantDelim)
 			}
 		})
 	}

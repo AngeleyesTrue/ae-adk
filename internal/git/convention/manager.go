@@ -20,8 +20,8 @@ func (m *Manager) LoadConvention(name string) error {
 	if name == "auto" {
 		result, err := Detect(m.repoPath, 100)
 		if err != nil {
-			// Fallback to conventional-commits.
-			conv, parseErr := ParseBuiltin("conventional-commits")
+			// Fallback to bracket-scope. (기존: conventional-commits)
+			conv, parseErr := ParseBuiltin("bracket-scope")
 			if parseErr != nil {
 				return fmt.Errorf("load convention: auto-detect failed and fallback failed: %w", parseErr)
 			}

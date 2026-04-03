@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"slices"
+	"strings"
 
 	"github.com/charmbracelet/huh"
 	"github.com/mattn/go-isatty"
@@ -54,6 +55,7 @@ func init() {
 	initCmd.Flags().String("git-provider", "", "Git provider (github, gitlab)")
 	initCmd.Flags().String("github-username", "", "GitHub username (required for personal/team modes)")
 	initCmd.Flags().String("gitlab-instance-url", "", "GitLab instance URL for self-hosted")
+	initCmd.Flags().String("commit-scopes", "", "Comma-separated commit scopes for bracket-scope convention (e.g., Web,Auth,DB)")
 	initCmd.Flags().Bool("non-interactive", false, "Skip interactive wizard; use flags and defaults")
 	initCmd.Flags().Bool("force", false, "Reinitialize an existing project (backs up current .ae/)")
 }
@@ -196,6 +198,12 @@ func runInit(cmd *cobra.Command, args []string) error {
 		Force:             getBoolFlag(cmd, "force"),
 	}
 
+	// 커밋 scope 설정 (non-interactive 모드용)
+	commitScopes := getStringFlag(cmd, "commit-scopes")
+	if commitScopes != "" {
+		opts.CommitScopes = commitScopes
+	}
+
 	// Apply user-level defaults from profile preferences.
 	// Profile preferences (identity, languages, model policy) are set via
 	// "ae profile setup" and stored in ~/.ae/claude-profiles/<name>/preferences.yaml.
@@ -273,6 +281,11 @@ func runInit(cmd *cobra.Command, args []string) error {
 		if opts.GitLabInstanceURL == "" {
 			opts.GitLabInstanceURL = result.GitLabInstanceURL
 		}
+		// wizard commit scopes도 적용
+		if len(result.CommitScopes) > 0 && opts.CommitScopes == "" {
+			// 쉼표 구분 문자열로 변환하여 opts에 저장
+			opts.CommitScopes = strings.Join(result.CommitScopes, ",")
+		}
 	}
 
 	// Default git provider to "github" for backward compatibility
@@ -314,6 +327,23 @@ func runInit(cmd *cobra.Command, args []string) error {
 	result, err := executor.Execute(ctx, opts)
 	if err != nil {
 		return fmt.Errorf("initialization failed: %w", err)
+	}
+
+	// 커밋 scope 저장
+	if opts.CommitScopes != "" {
+		scopeList := strings.Split(opts.CommitScopes, ",")
+		trimmed := make([]string, 0, len(scopeList))
+		for _, s := range scopeList {
+			s = strings.TrimSpace(s)
+			if s != "" {
+				trimmed = append(trimmed, s)
+			}
+		}
+		if len(trimmed) > 0 {
+			if err := wizard.SaveScopesToConfig(opts.ProjectRoot, trimmed); err != nil {
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), "Warning: failed to save commit scopes: %v\n", err)
+			}
+		}
 	}
 
 	// Display success message

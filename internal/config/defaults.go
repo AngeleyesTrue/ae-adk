@@ -47,7 +47,7 @@ const (
 	DefaultGitConvention                    = "auto"
 	DefaultGitConventionSampleSize          = 100
 	DefaultGitConventionConfidenceThreshold = 0.5
-	DefaultGitConventionFallback            = "conventional-commits"
+	DefaultGitConventionFallback            = "bracket-scope"
 	DefaultGitConventionMaxLength           = 100
 
 	DefaultStateDir = ".ae/state"

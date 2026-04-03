@@ -7,12 +7,13 @@ import "path/filepath"
 // 1. Project name (required)
 // 2. Development mode
 // 3. Git mode
-// 4. Git provider (conditional)
-// 5. GitLab instance URL (conditional)
-// 6. GitHub username (conditional)
-// 7. GitHub token (conditional)
-// 8. GitLab username (conditional)
-// 9. GitLab token (conditional)
+// 4. Commit scopes (optional)
+// 5. Git provider (conditional)
+// 6. GitLab instance URL (conditional)
+// 7. GitHub username (conditional)
+// 8. GitHub token (conditional)
+// 9. GitLab username (conditional)
+// 10. GitLab token (conditional)
 func DefaultQuestions(projectRoot string) []Question {
 	// Use current directory name as default project name
 	defaultProjectName := filepath.Base(projectRoot)
@@ -57,7 +58,16 @@ func DefaultQuestions(projectRoot string) []Question {
 			Default:  "manual",
 			Required: true,
 		},
-		// 4. Git Provider (conditional - only for personal/team modes)
+		// 4. Commit Scopes (bracket-scope 컨벤션용)
+		{
+			ID:          "commit_scopes",
+			Type:        QuestionTypeInput,
+			Title:       "Enter project-specific commit scopes (optional)",
+			Description: "Comma-separated PascalCase names. Default scopes: Tests, Docs, Build, DB, Auth, Solution",
+			Default:     "",
+			Required:    false,
+		},
+		// 5. Git Provider (conditional - only for personal/team modes)
 		{
 			ID:          "git_provider",
 			Type:        QuestionTypeSelect,
@@ -73,7 +83,7 @@ func DefaultQuestions(projectRoot string) []Question {
 				return r.GitMode == "personal" || r.GitMode == "team"
 			},
 		},
-		// 5. GitLab Instance URL (conditional - only for gitlab provider)
+		// 6. GitLab Instance URL (conditional - only for gitlab provider)
 		{
 			ID:          "gitlab_instance_url",
 			Type:        QuestionTypeInput,
@@ -85,7 +95,7 @@ func DefaultQuestions(projectRoot string) []Question {
 				return (r.GitMode == "personal" || r.GitMode == "team") && r.GitProvider == "gitlab"
 			},
 		},
-		// 6. GitHub Username (conditional - only for github provider)
+		// 7. GitHub Username (conditional - only for github provider)
 		{
 			ID:          "github_username",
 			Type:        QuestionTypeInput,
@@ -97,7 +107,7 @@ func DefaultQuestions(projectRoot string) []Question {
 				return (r.GitMode == "personal" || r.GitMode == "team") && r.GitProvider == "github"
 			},
 		},
-		// 7. GitHub Token (conditional - only for github provider)
+		// 8. GitHub Token (conditional - only for github provider)
 		{
 			ID:          "github_token",
 			Type:        QuestionTypeInput,
@@ -109,7 +119,7 @@ func DefaultQuestions(projectRoot string) []Question {
 				return (r.GitMode == "personal" || r.GitMode == "team") && r.GitProvider == "github"
 			},
 		},
-		// 8. GitLab Username (conditional - only for gitlab provider)
+		// 9. GitLab Username (conditional - only for gitlab provider)
 		{
 			ID:          "gitlab_username",
 			Type:        QuestionTypeInput,
@@ -121,7 +131,7 @@ func DefaultQuestions(projectRoot string) []Question {
 				return (r.GitMode == "personal" || r.GitMode == "team") && r.GitProvider == "gitlab"
 			},
 		},
-		// 9. GitLab Token (conditional - only for gitlab provider)
+		// 10. GitLab Token (conditional - only for gitlab provider)
 		{
 			ID:          "gitlab_token",
 			Type:        QuestionTypeInput,

@@ -1,6 +1,7 @@
 package wizard
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -68,6 +69,41 @@ func readUserField(projectRoot, field string) string {
 
 	value, _ := userSection[field].(string)
 	return value
+}
+
+// SaveScopesToConfig는 commit scope 목록을 git-strategy.yaml에 저장한다.
+// 기존 파일 내용은 보존하고 commit_style.scopes 필드만 추가/업데이트한다.
+func SaveScopesToConfig(projectRoot string, scopes []string) error {
+	if len(scopes) == 0 {
+		return nil
+	}
+
+	gitStrategyPath := filepath.Join(aeSectionsDir(projectRoot), "git-strategy.yaml")
+	data, err := os.ReadFile(gitStrategyPath)
+	if err != nil {
+		return fmt.Errorf("read git-strategy.yaml: %w", err)
+	}
+
+	var parsed map[string]any
+	if err := yaml.Unmarshal(data, &parsed); err != nil {
+		return fmt.Errorf("parse git-strategy.yaml: %w", err)
+	}
+
+	gsSection, ok := parsed["git_strategy"].(map[string]any)
+	if !ok {
+		return fmt.Errorf("git_strategy section not found")
+	}
+
+	// commit_scopes를 git_strategy 최상위에 저장
+	gsSection["commit_scopes"] = scopes
+	parsed["git_strategy"] = gsSection
+
+	out, err := yaml.Marshal(parsed)
+	if err != nil {
+		return fmt.Errorf("marshal git-strategy.yaml: %w", err)
+	}
+
+	return os.WriteFile(gitStrategyPath, out, 0644)
 }
 
 // IsGhAuthenticated checks whether the gh CLI is authenticated.

@@ -42,24 +42,26 @@ type ValidationResult struct {
 
 // ConventionConfig represents a convention definition loadable from YAML.
 type ConventionConfig struct {
-	Name      string   `yaml:"name"`
-	Pattern   string   `yaml:"pattern"`
-	Types     []string `yaml:"types"`
-	Scopes    []string `yaml:"scopes"`
-	MaxLength int      `yaml:"max_length"`
-	Required  []string `yaml:"required"`
-	Examples  []string `yaml:"examples"`
+	Name           string   `yaml:"name"`
+	Pattern        string   `yaml:"pattern"`
+	Types          []string `yaml:"types"`
+	Scopes         []string `yaml:"scopes"`
+	MaxLength      int      `yaml:"max_length"`
+	Required       []string `yaml:"required"`
+	Examples       []string `yaml:"examples"`
+	ScopeDelimiter string   `yaml:"scope_delimiter"` // "()" 또는 "[]", 빈 문자열이면 기본값 "()"
 }
 
 // Convention represents a compiled commit message convention ready for use.
 type Convention struct {
-	Name      string
-	Pattern   *regexp.Regexp
-	Types     []string
-	Scopes    []string
-	MaxLength int
-	Required  []string
-	Examples  []string
+	Name           string
+	Pattern        *regexp.Regexp
+	Types          []string
+	Scopes         []string
+	MaxLength      int
+	Required       []string
+	Examples       []string
+	ScopeDelimiter string // "()" 또는 "[]", 빈 문자열이면 기본값 "()"
 }
 
 // DetectionResult contains the outcome of auto-detecting a convention

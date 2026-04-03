@@ -36,8 +36,9 @@ git_strategy:
 
     # Commit message style
     commit_style:
-      format: conventional      # conventional, simple
+      format: bracket-scope     # bracket-scope, conventional, angular, karma
       scope_required: false
+      scopes: []                # PascalCase scope names (e.g., Web, Auth, DB)
 
   # Personal Mode Settings (GitHub Individual)
   personal:
@@ -68,8 +69,9 @@ git_strategy:
 
     # Commit message style
     commit_style:
-      format: conventional
+      format: bracket-scope
       scope_required: false
+      scopes: []
 
   # Team Mode Settings (GitHub Team)
   team:
@@ -103,5 +105,6 @@ git_strategy:
 
     # Commit message style
     commit_style:
-      format: conventional
+      format: bracket-scope
       scope_required: true      # Required for team projects
+      scopes: []

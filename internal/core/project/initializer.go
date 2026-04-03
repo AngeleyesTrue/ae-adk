@@ -42,6 +42,7 @@ type InitOptions struct {
 	Force             bool     // If true, allow reinitializing an existing project.
 	SkipShellConfig   bool     // If true, skip shell environment configuration.
 	ModelPolicy       string   // Token consumption tier: "high", "medium", "low".
+	CommitScopes      string   // 커밋 scope 목록 (쉼표 구분)
 }
 
 // InitResult summarizes the outcome of project initialization.

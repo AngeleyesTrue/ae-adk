@@ -23,6 +23,7 @@ func TestManager_LoadConvention_Builtin(t *testing.T) {
 		{"conventional-commits", "conventional-commits", false},
 		{"angular", "angular", false},
 		{"karma", "karma", false},
+		{"bracket-scope", "bracket-scope", false},
 		{"unknown", "nonexistent", true},
 	}
 
@@ -70,8 +71,22 @@ func TestManager_LoadConvention_AutoFallback(t *testing.T) {
 	if m.Convention() == nil {
 		t.Fatal("Convention() should not be nil after auto-fallback")
 	}
-	if m.Convention().Name != "conventional-commits" {
-		t.Errorf("Convention().Name = %q, want %q", m.Convention().Name, "conventional-commits")
+	if m.Convention().Name != "bracket-scope" {
+		t.Errorf("Convention().Name = %q, want %q", m.Convention().Name, "bracket-scope")
+	}
+}
+
+func TestManager_LoadConvention_BracketScope(t *testing.T) {
+	m := NewManager("/unused")
+	err := m.LoadConvention("bracket-scope")
+	if err != nil {
+		t.Fatalf("LoadConvention(bracket-scope) error = %v", err)
+	}
+	if m.Convention() == nil {
+		t.Fatal("Convention() should not be nil")
+	}
+	if m.Convention().Name != "bracket-scope" {
+		t.Errorf("Convention().Name = %q, want %q", m.Convention().Name, "bracket-scope")
 	}
 }
 

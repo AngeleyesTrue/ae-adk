@@ -41,7 +41,9 @@ func Detect(repoPath string, sampleSize int) (*DetectionResult, error) {
 
 		confidence := float64(matchCount) / float64(len(messages))
 
-		if bestResult == nil || confidence > bestResult.Confidence {
+		// 동일 신뢰도일 때 bracket-scope를 우선 선택 (결정적 tie-breaking)
+		if bestResult == nil || confidence > bestResult.Confidence ||
+			(confidence == bestResult.Confidence && name == "bracket-scope") {
 			bestResult = &DetectionResult{
 				Convention: conv,
 				Confidence: confidence,

@@ -24,6 +24,9 @@ type WizardResult struct {
 	GitLabInstanceURL string // GitLab instance URL (for self-hosted, e.g. "https://gitlab.company.com")
 	GitLabUsername    string // GitLab username (for personal/team modes with gitlab provider)
 	GitLabToken       string // GitLab personal access token (optional)
+
+	// Commit scope settings
+	CommitScopes []string // 프로젝트별 커밋 scope 목록 (bracket-scope 컨벤션용)
 }
 
 // QuestionType represents the type of wizard question.

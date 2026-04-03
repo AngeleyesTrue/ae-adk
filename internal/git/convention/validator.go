@@ -76,7 +76,7 @@ func validateSemantics(header string, conv *Convention, result *ValidationResult
 	}
 
 	// Check scope validity (only when scopes are defined).
-	scope := extractScope(header)
+	scope := extractScope(header, conv.ScopeDelimiter)
 	if len(conv.Scopes) > 0 && scope != "" {
 		found := slices.Contains(conv.Scopes, scope)
 		if !found {
@@ -101,21 +101,28 @@ func extractType(header string) string {
 	return ""
 }
 
-// extractScope extracts the scope from the header.
-// e.g., "feat(auth): add JWT" -> "auth"
-func extractScope(header string) string {
-	start := strings.IndexByte(header, '(')
+// extractScope는 헤더에서 scope를 추출한다.
+// delim이 "[]"이면 대괄호, "()"이면 소괄호에서 추출.
+// 빈 문자열이면 기본값 "()" 사용 (하위호환).
+func extractScope(header string, delim string) string {
+	if delim == "" {
+		delim = "()"
+	}
+	open := delim[0]
+	close := delim[1]
+
+	start := strings.IndexByte(header, open)
 	if start < 0 {
 		return ""
 	}
-	end := strings.IndexByte(header[start:], ')')
+	end := strings.IndexByte(header[start:], close)
 	if end < 0 {
 		return ""
 	}
 	return header[start+1 : start+end]
 }
 
-// suggestFix attempts to create a valid message suggestion.
+// suggestFix는 유효한 커밋 메시지 형식을 제안한다.
 func suggestFix(header string, conv *Convention) string {
 	lower := strings.ToLower(header)
 
@@ -135,8 +142,13 @@ func suggestFix(header string, conv *Convention) string {
 
 	desc := strings.TrimSpace(header)
 	if len(desc) > 0 {
-		// Lowercase first character.
+		// 첫 글자 소문자 변환
 		desc = strings.ToLower(desc[:1]) + desc[1:]
+	}
+
+	// bracket-scope 컨벤션이면 [Scope] 형식으로 제안
+	if conv != nil && conv.ScopeDelimiter == "[]" {
+		return suggestedType + ": [Scope] " + desc
 	}
 
 	return suggestedType + ": " + desc

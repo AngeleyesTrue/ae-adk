@@ -9,22 +9,20 @@ import (
 func TestBuiltinNames(t *testing.T) {
 	names := BuiltinNames()
 
-	if len(names) == 0 {
-		t.Fatal("BuiltinNames() returned empty list")
+	if len(names) != 4 {
+		t.Fatalf("BuiltinNames() length = %d, want 4", len(names))
 	}
 
-	expected := []string{"conventional-commits", "angular", "karma"}
-	sort.Strings(expected)
-	sort.Strings(names)
-
-	if len(names) != len(expected) {
-		t.Fatalf("BuiltinNames() length = %d, want %d", len(names), len(expected))
-	}
-
+	expected := []string{"angular", "bracket-scope", "conventional-commits", "karma"}
 	for i, name := range names {
 		if name != expected[i] {
 			t.Errorf("BuiltinNames()[%d] = %q, want %q", i, name, expected[i])
 		}
+	}
+
+	// T-5b: 정렬 순서 검증
+	if !sort.StringsAreSorted(names) {
+		t.Error("BuiltinNames() should return sorted slice")
 	}
 }
 
@@ -37,6 +35,7 @@ func TestGetBuiltin(t *testing.T) {
 		{name: "conventional-commits", wantName: "conventional-commits"},
 		{name: "angular", wantName: "angular"},
 		{name: "karma", wantName: "karma"},
+		{name: "bracket-scope", wantName: "bracket-scope"},
 		{name: "nonexistent", wantNil: true},
 		{name: "", wantNil: true},
 	}
