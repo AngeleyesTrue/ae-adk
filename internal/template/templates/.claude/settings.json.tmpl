@@ -242,7 +242,29 @@
           }
         ]
       }
-    ]
+    ],
+    "PermissionDenied": [
+      {
+        "hooks": [
+          {
+{{- if eq .Platform "windows"}}
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-permission-denied.sh\"",
+{{- else}}
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-permission-denied.sh\"",
+{{- end}}
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "StopFailure": [],
+    "PostCompact": [],
+    "InstructionsLoaded": [],
+    "CwdChanged": [],
+    "FileChanged": [],
+    "Elicitation": [],
+    "ElicitationResult": []
   },
   "statusLine": {
     "type": "command",

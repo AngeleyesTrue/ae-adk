@@ -1,0 +1,29 @@
+# Lenient Evaluator Profile
+# Relaxed thresholds for prototyping and experimentation
+
+profile:
+  name: lenient
+  description: "Relaxed thresholds for prototyping and experimentation"
+
+  dimensions:
+    functionality:
+      weight: 0.50
+      pass_threshold: 0.60
+      must_pass: true
+    security:
+      weight: 0.20
+      pass_threshold: 0.70
+      must_pass: true
+    craft:
+      weight: 0.15
+      pass_threshold: 0.50
+      must_pass: false
+    consistency:
+      weight: 0.15
+      pass_threshold: 0.50
+      must_pass: false
+
+  overall_pass_threshold: 0.60
+  max_iterations: 3
+  escalation_after: 2
+  improvement_threshold: 0.03

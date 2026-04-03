@@ -997,7 +997,7 @@ func TestCleanupOldBackups(t *testing.T) {
 	}
 
 	// Test cleanup with keep_count=5
-	deletedCount := cleanup_old_backups(tmpDir, 5)
+	deletedCount := cleanupOldBackups(tmpDir, 5)
 	if deletedCount != 5 {
 		t.Errorf("should delete 5 old backups, got: %d", deletedCount)
 	}
@@ -1024,13 +1024,13 @@ func TestCleanupOldBackups(t *testing.T) {
 	}
 
 	// Test cleanup with keep_count=10 (no deletion)
-	deletedCount = cleanup_old_backups(tmpDir, 10)
+	deletedCount = cleanupOldBackups(tmpDir, 10)
 	if deletedCount != 0 {
 		t.Errorf("should not delete any backups with keep_count=10, got: %d", deletedCount)
 	}
 
 	// Test cleanup with keep_count=0 (delete all)
-	deletedCount = cleanup_old_backups(tmpDir, 0)
+	deletedCount = cleanupOldBackups(tmpDir, 0)
 	if deletedCount != 5 {
 		t.Errorf("should delete all 5 backups with keep_count=0, got: %d", deletedCount)
 	}
@@ -1077,7 +1077,7 @@ func TestCleanupOldBackups_InvalidBackupPattern(t *testing.T) {
 	}
 
 	// Should return 0 for invalid backup names
-	deletedCount := cleanup_old_backups(tmpDir, 5)
+	deletedCount := cleanupOldBackups(tmpDir, 5)
 	if deletedCount != 0 {
 		t.Errorf("should not delete any invalid backups, got: %d", deletedCount)
 	}
@@ -1088,7 +1088,7 @@ func TestCleanupOldBackups_NoBackupsDir(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Should return 0 without error
-	deletedCount := cleanup_old_backups(tmpDir, 5)
+	deletedCount := cleanupOldBackups(tmpDir, 5)
 	if deletedCount != 0 {
 		t.Errorf("should return 0 when no backups exist, got: %d", deletedCount)
 	}
@@ -1336,9 +1336,10 @@ func TestEnsureGlobalSettingsEnv(t *testing.T) {
 			t.Errorf("CUSTOM_VAR not preserved: got %v", envMap["CUSTOM_VAR"])
 		}
 
-		// ae-managed keys should be REMOVED
-		if _, exists := envMap["PATH"]; exists {
-			t.Error("PATH should be removed from global settings (managed at project level)")
+		// ae-managed keys should be cleaned up, except PATH which is preserved
+		// as a global fallback for non-ae projects (issue #598).
+		if _, exists := envMap["PATH"]; !exists {
+			t.Error("PATH should be preserved in global settings as fallback for non-ae projects")
 		}
 		if _, exists := envMap["ENABLE_TOOL_SEARCH"]; exists {
 			t.Error("ENABLE_TOOL_SEARCH should be removed from global settings")
@@ -1447,12 +1448,15 @@ func TestEnsureGlobalSettingsEnv(t *testing.T) {
 			t.Fatal("env should exist (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS should be added)")
 		}
 		envMap := env.(map[string]any)
-		// Only CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS should be present
+		// CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS and PATH should be present
 		if envMap["CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"] != "1" {
 			t.Errorf("CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS should be '1', got: %v", envMap["CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"])
 		}
-		if len(envMap) != 1 {
-			t.Errorf("env should only contain CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS, got: %v", envMap)
+		if _, hasPATH := envMap["PATH"]; !hasPATH {
+			t.Error("PATH should be preserved in env after cleanup")
+		}
+		if len(envMap) != 2 {
+			t.Errorf("env should contain CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS and PATH, got: %v", envMap)
 		}
 
 		// SessionEnd hook should NOT be present (no longer managed globally)
@@ -1550,8 +1554,8 @@ func TestEnsureGlobalSettingsEnv_CleanupMigratedSettings(t *testing.T) {
 
 	settingsPath := filepath.Join(claudeDir, "settings.json")
 
-	// Create existing settings with ALL ae-managed settings that should be cleaned up:
-	// env keys (PATH, ENABLE_TOOL_SEARCH, CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS),
+	// Create existing settings with ae-managed settings that should be cleaned up:
+	// env keys (ENABLE_TOOL_SEARCH is removed; PATH is preserved as fallback),
 	// permissions with only Task:*, teammateMode "auto", orphaned SessionEnd hook, plus a custom env key
 	existing := map[string]any{
 		"env": map[string]any{
@@ -1599,15 +1603,16 @@ func TestEnsureGlobalSettingsEnv_CleanupMigratedSettings(t *testing.T) {
 		t.Fatalf("failed to parse settings.json: %v", err)
 	}
 
-	// ae-managed env keys should be REMOVED from global settings
+	// ae-managed env keys should be cleaned up from global settings,
+	// except PATH which is preserved as a fallback for non-ae projects (issue #598).
 	env, hasEnv := settings["env"]
 	if !hasEnv {
-		t.Fatal("env should still exist (CUSTOM_VAR is present)")
+		t.Fatal("env should still exist (CUSTOM_VAR and PATH are present)")
 	}
 	envMap := env.(map[string]any)
 
-	if _, exists := envMap["PATH"]; exists {
-		t.Error("PATH should be removed from global settings (managed at project level)")
+	if _, exists := envMap["PATH"]; !exists {
+		t.Error("PATH should be preserved in global settings as fallback for non-ae projects")
 	}
 	if _, exists := envMap["ENABLE_TOOL_SEARCH"]; exists {
 		t.Error("ENABLE_TOOL_SEARCH should be removed from global settings")
@@ -1639,6 +1644,69 @@ func TestEnsureGlobalSettingsEnv_CleanupMigratedSettings(t *testing.T) {
 				t.Error("orphaned SessionEnd hook should be removed from global settings")
 			}
 		}
+	}
+}
+
+// TestEnsureGlobalSettingsEnv_PATHFallback verifies that when global settings
+// exist but have no PATH in env, a SmartPATH fallback is added. This prevents
+// PATH loss when Claude Code runs in non-ae project directories (issue #598).
+func TestEnsureGlobalSettingsEnv_PATHFallback(t *testing.T) {
+	tempDir := t.TempDir()
+	origHome := os.Getenv("HOME")
+	origUserProfile := os.Getenv("USERPROFILE")
+	defer func() {
+		_ = os.Setenv("HOME", origHome)
+		_ = os.Setenv("USERPROFILE", origUserProfile)
+	}()
+	_ = os.Setenv("HOME", tempDir)
+	_ = os.Setenv("USERPROFILE", tempDir)
+
+	claudeDir := filepath.Join(tempDir, ".claude")
+	if err := os.MkdirAll(claudeDir, 0755); err != nil {
+		t.Fatalf("failed to create .claude dir: %v", err)
+	}
+
+	// Create settings with env but no PATH
+	settingsPath := filepath.Join(claudeDir, "settings.json")
+	existing := map[string]any{
+		"env": map[string]any{
+			"CUSTOM_VAR": "value",
+		},
+	}
+	data, _ := json.MarshalIndent(existing, "", "  ")
+	if err := os.WriteFile(settingsPath, data, 0644); err != nil {
+		t.Fatalf("failed to write settings: %v", err)
+	}
+
+	err := ensureGlobalSettingsEnv()
+	if err != nil {
+		t.Fatalf("ensureGlobalSettingsEnv failed: %v", err)
+	}
+
+	// Read back and verify PATH was added as fallback
+	data, err = os.ReadFile(settingsPath)
+	if err != nil {
+		t.Fatalf("failed to read settings.json: %v", err)
+	}
+
+	var settings map[string]any
+	if err := json.Unmarshal(data, &settings); err != nil {
+		t.Fatalf("failed to parse settings.json: %v", err)
+	}
+
+	envMap, ok := settings["env"].(map[string]any)
+	if !ok {
+		t.Fatal("env should exist")
+	}
+
+	pathVal, hasPath := envMap["PATH"]
+	if !hasPath {
+		t.Fatal("PATH should be added as a global fallback when missing")
+	}
+
+	pathStr, ok := pathVal.(string)
+	if !ok || pathStr == "" {
+		t.Error("PATH fallback should be a non-empty string (SmartPATH)")
 	}
 }
 

@@ -205,12 +205,9 @@ dist-ssr/
 .netlify/
 .firebase/
 
-# ===========================================
-# MoAI Framework (Private - excluded from public repo)
-# ===========================================
+# User Custom Patterns (preserved by moai update)
 /CLAUDE.md
-
-# .claude/ - exclude agent definitions, skills, rules, hooks (MoAI orchestration layer)
+.agency/
 .claude/agents/
 .claude/skills/*
 !.claude/skills/ae-lang-csharp/
@@ -219,12 +216,7 @@ dist-ssr/
 .claude/output-styles/
 .claude/commands/
 .claude/settings.json
-.claude/settings.local.json
-
-# .moai/ - exclude all MoAI configuration and state
 .moai/
-
-# User Custom Patterns (preserved by moai update)
 .ae-backups/
 .ae/memory/
 .ae/worktrees/

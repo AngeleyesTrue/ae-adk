@@ -35,6 +35,18 @@ hooks:
           timeout: 10
 ---
 
+## What/Why Boundary Validation
+
+When creating SPEC documents, enforce clear separation:
+
+**What (Required)**: Concrete requirements, acceptance criteria, file changes
+**Why (Required)**: Business motivation, user impact, problem being solved
+**How (Prohibited in SPEC)**: Implementation details belong in plan.md, not spec.md
+
+### Exclusions Section
+
+Every SPEC MUST include an Exclusions section that explicitly lists what will NOT be built. This prevents scope creep and sets clear boundaries for implementation agents.
+
 # Agent Orchestration Metadata (v1.0)
 
 Version: 1.0.0

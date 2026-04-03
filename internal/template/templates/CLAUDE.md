@@ -79,6 +79,17 @@ Default (natural language): Routes to autonomous workflow (plan -> run -> sync p
 
 Allowed Tools: Full access (Agent, AskUserQuestion, TaskCreate, TaskUpdate, TaskList, TaskGet, Bash, Read, Write, Edit, Glob, Grep)
 
+### Unified Skill: /agency
+
+Definition: Self-evolving creative production system for websites, landing pages, and web applications.
+
+Subcommands: brief, build, review, learn, evolve, resume, profile, phase, sync-upstream, rollback, config
+Default (natural language): Routes to agency pipeline (Planner -> Copywriter/Designer -> Builder -> Evaluator -> Learner)
+
+Pipeline: GAN Loop (Builder-Evaluator iterates up to 5 times until quality threshold 0.75 is met)
+
+For detailed Agency rules, see .claude/rules/ae/agency/constitution.md
+
 ---
 
 ## 4. Agent Catalog
@@ -102,6 +113,14 @@ backend, frontend, security, devops, performance, debug, testing, refactoring
 ### Builder Agents (3)
 
 agent, skill, plugin
+
+### Evaluator Agents (1)
+
+evaluator-active (independent skeptical quality assessment, 4-dimension scoring)
+
+### Agency Agents (6)
+
+planner, copywriter, designer, builder, evaluator, learner (self-evolving creative production pipeline)
 
 ### Dynamic Team Generation (Experimental)
 
@@ -159,6 +178,18 @@ For team-based parallel execution of these phases, see .claude/skills/ae/team/pl
 ## 6. Quality Gates
 
 For TRUST 5 framework details, see .claude/rules/ae/core/ae-constitution.md
+
+### Harness-Based Quality Routing
+
+AE-ADK uses a 3-level harness system for adaptive quality depth:
+
+- **minimal**: Fast validation for simple changes
+- **standard**: Default quality checks for most work
+- **thorough**: Full evaluator-active + TRUST 5 validation for complex SPECs
+
+Harness level is auto-determined by the Complexity Estimator based on SPEC scope. evaluator-active provides independent skeptical assessment with 4-dimension scoring (Functionality/Security/Craft/Consistency).
+
+**Configuration:** .ae/config/sections/harness.yaml, .ae/config/evaluator-profiles/
 
 ### LSP Quality Gates
 
@@ -275,6 +306,15 @@ AE-ADK uses Claude Code's official rules system at `.claude/rules/ae/`:
 - Code Comments: Per code_comments setting (default: English)
 - Commands, Agents, Skills Instructions: Always English
 
+### Agency Configuration
+
+- `.agency/config.yaml`: Agency pipeline settings, adaptation weights, iteration limits
+- `.agency/context/`: Brand voice, visual identity, target audience, tech preferences
+- `.agency/fork-manifest.yaml`: Fork tracking for agency agents/skills evolved from upstream
+- `.ae/config/sections/constitution.yaml`: Project technical constraints (machine-readable)
+- `.ae/config/sections/harness.yaml`: Quality depth routing (minimal/standard/thorough)
+- `.ae/config/evaluator-profiles/`: Evaluator scoring profiles (default, strict, lenient, frontend)
+
 ---
 
 ## 10. Web Search Protocol
@@ -317,8 +357,8 @@ Resume interrupted agent work using agentId:
 
 AE-ADK integrates multiple MCP servers for specialized capabilities:
 
-- **Sequential Thinking** (`--deepthink` flag): MCP tool for structured step-by-step analysis. Generates `server_tool_use` content — NOT compatible with GLM API. See Skill("ae-workflow-thinking").
-- **UltraThink** (`ultrathink` keyword): Claude native extended reasoning mode (high effort). No MCP dependency — compatible with all APIs including GLM. Do NOT confuse with `--deepthink`.
+- **Sequential Thinking** (`--deepthink` flag): MCP tool for structured step-by-step analysis. See Skill("ae-workflow-thinking").
+- **UltraThink** (`ultrathink` keyword): Claude native extended reasoning mode (high effort). No MCP dependency. Do NOT confuse with `--deepthink`.
 - **Context7**: Up-to-date library documentation lookup via resolve-library-id and get-library-docs.
 - **Pencil**: UI/UX design editing for .pen files (used by expert-frontend and designer teammates).
 - **claude-in-chrome**: Browser automation for web-based tasks.
@@ -395,40 +435,6 @@ TeammateIdle (exit 2 = keep working), TaskCompleted (exit 2 = reject completion)
 Teammates are spawned dynamically using `Agent(subagent_type: "general-purpose")` with runtime parameter overrides. Role profiles in `workflow.yaml` define mode, model, isolation, tools, and skills per role type. No static team agent definition files are used.
 
 For complete Agent Teams documentation including team API reference, role profiles, file ownership strategy, team workflows, and configuration, see .claude/rules/ae/workflow/spec-workflow.md and .ae/config/sections/workflow.yaml.
-
-### CG Mode (Claude + GLM Cost Optimization)
-
-AE-ADK supports CG Mode for 60-70% cost reduction on implementation-heavy tasks via tmux Agent Teams:
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│  LEADER (Claude, current tmux pane)                         │
-│  - Orchestrates workflow (no GLM env)                        │
-│  - Delegates tasks via Agent Teams                           │
-│  - Reviews results                                           │
-└──────────────────────┬──────────────────────────────────────┘
-                       │ Agent Teams (tmux panes)
-                       ▼
-┌─────────────────────────────────────────────────────────────┐
-│  TEAMMATES (GLM, new tmux panes)                            │
-│  - Inherit GLM env from tmux session                        │
-│  - Execute implementation tasks                              │
-│  - Full access to codebase                                   │
-└─────────────────────────────────────────────────────────────┘
-```
-
-**Activation**: `ae cg` (requires tmux). Uses tmux session-level env isolation.
-
-**When to use**:
-- Implementation-heavy SPECs (run phase)
-- Code generation tasks
-- Test writing
-- Documentation generation
-
-**When NOT to use**:
-- Planning/architecture decisions (needs Opus reasoning)
-- Security reviews (needs Claude's security training)
-- Complex debugging (needs advanced reasoning)
 
 ---
 
@@ -520,8 +526,8 @@ Large PDFs (>10 pages) return a lightweight reference when @-mentioned. Always s
 
 ---
 
-Version: 13.1.0 (Agent Teams Integration)
-Last Updated: 2026-03-29
+Version: 14.0.0 (Agency v3.2 + Harness Design Integration)
+Last Updated: 2026-04-04
 Language: English
 Core Rule: AE is an orchestrator; direct implementation is prohibited
 

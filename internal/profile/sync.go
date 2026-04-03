@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 
 	"github.com/AngeleyesTrue/ae-adk/internal/config"
+	"github.com/AngeleyesTrue/ae-adk/internal/manifest"
+	"github.com/AngeleyesTrue/ae-adk/internal/template"
 	"github.com/AngeleyesTrue/ae-adk/pkg/models"
 	"gopkg.in/yaml.v3"
 )
@@ -70,6 +72,28 @@ func SyncToProjectConfig(projectRoot string, prefs ProfilePreferences) error {
 	if prefs.StatuslinePreset != "" || prefs.StatuslineTheme != "" || prefs.StatuslineSegments != nil || prefs.StatuslineMode != "" {
 		if err := syncStatusline(projectRoot, prefs); err != nil {
 			return fmt.Errorf("sync statusline: %w", err)
+		}
+	}
+
+	// Sync model policy to agent definition files.
+	// When the user changes their model policy via "ae profile setup",
+	// subsequent "ae update" calls must propagate the new policy to the
+	// agent model: frontmatter fields. Without this, model policy changes
+	// made after initial project setup would have no effect (issue #597).
+	if prefs.ModelPolicy != "" {
+		policy := template.ModelPolicy(prefs.ModelPolicy)
+		if template.IsValidModelPolicy(prefs.ModelPolicy) {
+			manifestMgr := manifest.NewManager()
+			if _, loadErr := manifestMgr.Load(projectRoot); loadErr != nil {
+				fmt.Fprintf(os.Stderr, "Warning: could not load manifest for model policy: %v\n", loadErr)
+			} else {
+				if err := template.ApplyModelPolicy(projectRoot, policy, manifestMgr); err != nil {
+					return fmt.Errorf("apply model policy: %w", err)
+				}
+				if err := manifestMgr.Save(); err != nil {
+					return fmt.Errorf("save manifest after model policy: %w", err)
+				}
+			}
 		}
 	}
 

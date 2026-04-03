@@ -1,0 +1,30 @@
+# Strict Evaluator Profile
+# High-quality bar for critical features
+
+profile:
+  name: strict
+  description: "High-quality bar for critical features"
+
+  dimensions:
+    functionality:
+      weight: 0.40
+      pass_threshold: 0.85
+      must_pass: true
+    security:
+      weight: 0.25
+      pass_threshold: 0.90
+      must_pass: true
+    craft:
+      weight: 0.20
+      pass_threshold: 0.80
+      must_pass: true
+    consistency:
+      weight: 0.15
+      pass_threshold: 0.75
+      must_pass: false
+
+  overall_pass_threshold: 0.85
+  max_iterations: 5
+  escalation_after: 2
+  improvement_threshold: 0.05
+  strict_mode: true

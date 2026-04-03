@@ -302,11 +302,16 @@ func TestSettingsTemplateAllHookEvents(t *testing.T) {
 	}
 
 	allEvents := []string{
-		"SessionStart", "PreCompact", "SessionEnd",
-		"PreToolUse", "PostToolUse", "Stop",
-		"SubagentStop", "PostToolUseFailure", "Notification",
-		"SubagentStart", "UserPromptSubmit", "PermissionRequest",
+		"SessionStart", "PreCompact", "PostCompact", "SessionEnd",
+		"PreToolUse", "PostToolUse", "PostToolUseFailure",
+		"Stop", "StopFailure",
+		"SubagentStart", "SubagentStop",
+		"UserPromptSubmit", "PermissionRequest", "PermissionDenied",
+		"Notification",
 		"TeammateIdle", "TaskCompleted",
+		"WorktreeCreate", "WorktreeRemove",
+		"InstructionsLoaded", "CwdChanged", "FileChanged",
+		"Elicitation", "ElicitationResult",
 	}
 	for _, event := range allEvents {
 		if _, ok := hooks[event]; !ok {
@@ -502,7 +507,7 @@ func TestSettingsTemplateHookEventCount(t *testing.T) {
 		t.Fatal("missing hooks section")
 	}
 
-	const expectedCount = 16 // WorktreeCreate, WorktreeRemove 훅 추가로 14 → 16
+	const expectedCount = 24 // SPEC-UPDATE-002: PermissionDenied + 7 events 추가로 16 → 24
 	if len(hooks) != expectedCount {
 		t.Errorf("hook event count = %d, want %d; events: %v", len(hooks), expectedCount, hookKeys(hooks))
 	}

@@ -102,6 +102,7 @@ graph LR
 | `/ae coverage` | Test coverage analysis + gap filling |
 | `/ae mx` | Add @MX code annotations for AI context |
 | `/ae clean` | Dead code identification and removal |
+| `/ae agency` | AI Agency creative production pipeline |
 
 ## Development Methodology
 

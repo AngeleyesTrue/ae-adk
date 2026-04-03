@@ -611,7 +611,7 @@ func runTemplateSyncWithReporter(cmd *cobra.Command, reporter project.ProgressRe
 					return restoreErr
 				}
 				_, _ = fmt.Fprintf(out, "\r  %s User settings restored\n", symSuccess())
-				deletedCount := cleanup_old_backups(projectRoot, 5)
+				deletedCount := cleanupOldBackups(projectRoot, 5)
 				if deletedCount > 0 {
 					_, _ = fmt.Fprintf(out, "  %s Cleaned up %d old backup(s)\n", symSuccess(), deletedCount)
 				}
@@ -1484,9 +1484,9 @@ func migrateLegacyMemoryDir(projectRoot string, out io.Writer) error {
 	return nil
 }
 
-// cleanup_old_backups maintains a maximum of 'keepCount' backups, deleting the oldest ones.
+// cleanupOldBackups maintains a maximum of 'keepCount' backups, deleting the oldest ones.
 // Returns the number of backups deleted.
-func cleanup_old_backups(projectRoot string, keepCount int) int {
+func cleanupOldBackups(projectRoot string, keepCount int) int {
 	backupDir := filepath.Join(projectRoot, defs.BackupsDir)
 
 	// Check if backup directory exists
@@ -2176,14 +2176,26 @@ func ensureGlobalSettingsEnv() error {
 	// Clean up ae-managed settings that have been migrated to project level.
 	// Preserve any user-added custom env keys but remove ae-specific ones.
 	// Note: CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS is kept as a default value (see below).
+	// Note: PATH is preserved (not removed) as a fallback for non-ae projects.
+	// Removing PATH from global settings caused PATH loss when Claude Code was
+	// launched in directories without a project-level settings.json (issue #598).
 	if envVal, exists := existingSettings["env"]; exists {
 		if envMap, ok := envVal.(map[string]any); ok {
-			aeKeys := []string{"PATH", "ENABLE_TOOL_SEARCH"}
+			aeKeys := []string{"ENABLE_TOOL_SEARCH"}
 			for _, key := range aeKeys {
 				if _, exists := envMap[key]; exists {
 					delete(envMap, key)
 					needsUpdate = true
 				}
+			}
+			// Ensure PATH is present as a global fallback.
+			// When Claude Code runs in a non-ae project directory, the
+			// project-level settings.json won't exist, so the global PATH
+			// is the only source. Without it, tools (npx, go, git, etc.)
+			// become unreachable.
+			if _, hasPath := envMap["PATH"]; !hasPath {
+				envMap["PATH"] = template.BuildSmartPATH()
+				needsUpdate = true
 			}
 			// If env is now empty, remove it entirely
 			if len(envMap) == 0 {

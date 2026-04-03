@@ -56,6 +56,14 @@ Success Criteria:
 - TRUST 5 quality gates passed
 - MX tags added for new code (NOTE, ANCHOR, WARN as appropriate)
 
+### Sprint Contract (Thorough Harness)
+
+When harness level is thorough, a sprint contract is negotiated before implementation:
+- evaluator-active reviews the implementation plan
+- Identifies missing edge cases and security concerns
+- Produces done criteria with hard thresholds
+- Recorded in `.ae/specs/SPEC-{ID}/contract.md`
+
 ### Re-planning Gate
 
 Detect when implementation is stuck or diverging from SPEC and trigger re-assessment.

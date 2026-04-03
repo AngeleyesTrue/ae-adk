@@ -1,0 +1,30 @@
+# Project Technical Constraints (Machine-Readable)
+# Defines project-specific constraints for AI agents.
+
+constitution:
+  project:
+    name: ""
+    description: ""
+    primary_language: ""
+
+  constraints:
+    max_file_size_lines: 500
+    max_function_size_lines: 50
+    max_cyclomatic_complexity: 10
+    max_nesting_depth: 4
+    min_test_coverage: 85
+
+  forbidden_patterns:
+    - "eval("
+    - "exec("
+    - "dangerouslySetInnerHTML"
+
+  required_patterns:
+    error_handling: true
+    input_validation: true
+    logging: true
+
+  dependencies:
+    auto_update: false
+    security_audit: true
+    license_check: true

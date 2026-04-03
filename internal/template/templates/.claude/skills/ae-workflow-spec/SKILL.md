@@ -332,6 +332,10 @@ Lifecycle Transition Rules:
 - spec-anchored to spec-as-source: When compliance or regeneration workflow required
 - Downgrade allowed but requires explicit justification in SPEC history
 
+### Harness-Based Quality Routing
+
+AE-ADK uses a 3-level harness system (minimal, standard, thorough) for adaptive quality depth during SPEC execution. When harness level is thorough, a sprint contract is negotiated before implementation via evaluator-active, recorded in `.ae/specs/SPEC-{ID}/contract.md`. See spec-workflow.md Run Phase for details.
+
 ### Quality Metrics
 
 SPEC Quality Indicators:

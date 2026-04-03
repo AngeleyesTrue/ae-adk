@@ -1,0 +1,11 @@
+# Agency Fork Manifest
+# Tracks forked skills/agents from upstream AE-ADK
+
+forks: []
+# Example entry:
+# - name: agency-copywriting
+#   upstream: ae-agency-copywriting
+#   version_at_fork: "1.0.0"
+#   generation: 0
+#   divergence_score: 0.0
+#   sync_policy: auto-propose

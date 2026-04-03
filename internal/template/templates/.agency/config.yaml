@@ -1,0 +1,45 @@
+# AI Agency Configuration
+# Pipeline settings and adaptation parameters
+
+agency:
+  version: "3.2.0"
+
+  pipeline:
+    pass_threshold: 0.75
+    max_iterations: 5
+    escalation_after: 3
+    improvement_threshold: 0.05
+    strict_mode: false
+    parallel_phases:
+      - copywriter
+      - designer
+
+  adaptation:
+    enabled: true
+    confidence_threshold: 0.70
+    min_projects_for_adaptation: 5
+    phase_weights:
+      planner: 1.0
+      copywriter: 0.8
+      designer: 0.8
+      builder: 1.0
+      evaluator: 1.0
+      learner: 0.5
+    iteration_limits:
+      builder: 5
+      evaluator: 5
+
+  evolution:
+    require_approval: true
+    max_evolution_rate_per_week: 3
+    cooldown_hours: 24
+    max_active_learnings: 50
+    staleness_window_days: 30
+
+  models:
+    planner: sonnet
+    copywriter: sonnet
+    designer: sonnet
+    builder: sonnet
+    evaluator: sonnet
+    learner: sonnet
