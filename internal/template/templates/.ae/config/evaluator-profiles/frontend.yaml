@@ -1,0 +1,36 @@
+# Frontend Evaluator Profile
+# UI/UX focused evaluation with accessibility emphasis
+
+profile:
+  name: frontend
+  description: "UI/UX focused evaluation with accessibility emphasis"
+
+  dimensions:
+    functionality:
+      weight: 0.35
+      pass_threshold: 0.70
+      must_pass: true
+    security:
+      weight: 0.15
+      pass_threshold: 0.75
+      must_pass: true
+    craft:
+      weight: 0.30
+      pass_threshold: 0.70
+      must_pass: false
+      sub_criteria:
+        - accessibility_wcag_aa
+        - responsive_design
+        - performance_metrics
+    consistency:
+      weight: 0.20
+      pass_threshold: 0.65
+      must_pass: false
+      sub_criteria:
+        - design_system_adherence
+        - component_patterns
+
+  overall_pass_threshold: 0.75
+  max_iterations: 5
+  escalation_after: 3
+  improvement_threshold: 0.05

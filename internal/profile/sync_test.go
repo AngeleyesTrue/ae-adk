@@ -1,8 +1,10 @@
 package profile
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"gopkg.in/yaml.v3"
@@ -490,5 +492,132 @@ func TestSyncToProjectConfig_AllFields(t *testing.T) {
 	}
 	if lw.Language.Documentation != "zh" {
 		t.Errorf("documentation = %q, want %q", lw.Language.Documentation, "zh")
+	}
+}
+
+// setupAgentFiles creates minimal agent definition files with model: frontmatter
+// and a manifest.json so that ApplyModelPolicy can patch them.
+func setupAgentFiles(t *testing.T, projectRoot string) {
+	t.Helper()
+	agentsDir := filepath.Join(projectRoot, ".claude", "agents", "ae")
+	if err := os.MkdirAll(agentsDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	// Create agent files with high-policy models (default)
+	agents := map[string]string{
+		"manager-spec.md":     "---\nname: manager-spec\nmodel: opus\n---\nSpec agent.",
+		"expert-backend.md":   "---\nname: expert-backend\nmodel: opus\n---\nBackend agent.",
+		"manager-docs.md":     "---\nname: manager-docs\nmodel: sonnet\n---\nDocs agent.",
+		"manager-quality.md":  "---\nname: manager-quality\nmodel: haiku\n---\nQuality agent.",
+	}
+	for name, content := range agents {
+		path := filepath.Join(agentsDir, name)
+		if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+			t.Fatalf("write %s: %v", name, err)
+		}
+	}
+
+	// Create a minimal manifest.json
+	aeDir := filepath.Join(projectRoot, ".ae")
+	if err := os.MkdirAll(aeDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	manifestData := map[string]any{
+		"version": "1.0.0",
+		"files":   map[string]any{},
+	}
+	data, _ := json.Marshal(manifestData)
+	if err := os.WriteFile(filepath.Join(aeDir, "manifest.json"), data, 0o644); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSyncToProjectConfig_ModelPolicy(t *testing.T) {
+	projectRoot := t.TempDir()
+	setupProjectConfig(t, projectRoot)
+	setupAgentFiles(t, projectRoot)
+
+	prefs := ProfilePreferences{
+		ModelPolicy: "low",
+	}
+
+	if err := SyncToProjectConfig(projectRoot, prefs); err != nil {
+		t.Fatalf("SyncToProjectConfig: %v", err)
+	}
+
+	// Verify agent files were patched with low-policy models.
+	// Under "low" policy:
+	//   manager-spec: sonnet (was opus)
+	//   expert-backend: sonnet (was opus)
+	//   manager-docs: haiku (was sonnet)
+	//   manager-quality: haiku (unchanged)
+	expectations := map[string]string{
+		"manager-spec.md":    "model: sonnet",
+		"expert-backend.md":  "model: sonnet",
+		"manager-docs.md":    "model: haiku",
+		"manager-quality.md": "model: haiku",
+	}
+
+	agentsDir := filepath.Join(projectRoot, ".claude", "agents", "ae")
+	for filename, expectedModel := range expectations {
+		data, err := os.ReadFile(filepath.Join(agentsDir, filename))
+		if err != nil {
+			t.Fatalf("read %s: %v", filename, err)
+		}
+		if !strings.Contains(string(data), expectedModel) {
+			t.Errorf("%s: expected %q, got:\n%s", filename, expectedModel, string(data))
+		}
+	}
+}
+
+func TestSyncToProjectConfig_ModelPolicyEmpty_NoChange(t *testing.T) {
+	projectRoot := t.TempDir()
+	setupProjectConfig(t, projectRoot)
+	setupAgentFiles(t, projectRoot)
+
+	// Empty model policy should not modify agent files
+	prefs := ProfilePreferences{
+		UserName: "testuser",
+		// ModelPolicy intentionally empty
+	}
+
+	if err := SyncToProjectConfig(projectRoot, prefs); err != nil {
+		t.Fatalf("SyncToProjectConfig: %v", err)
+	}
+
+	// Verify agent files were NOT changed (still have original models)
+	agentsDir := filepath.Join(projectRoot, ".claude", "agents", "ae")
+	data, err := os.ReadFile(filepath.Join(agentsDir, "manager-spec.md"))
+	if err != nil {
+		t.Fatalf("read manager-spec.md: %v", err)
+	}
+	if !strings.Contains(string(data), "model: opus") {
+		t.Errorf("manager-spec.md should still have 'model: opus' when ModelPolicy is empty, got:\n%s", string(data))
+	}
+}
+
+func TestSyncToProjectConfig_ModelPolicyInvalid_NoChange(t *testing.T) {
+	projectRoot := t.TempDir()
+	setupProjectConfig(t, projectRoot)
+	setupAgentFiles(t, projectRoot)
+
+	// Invalid model policy should not modify agent files
+	prefs := ProfilePreferences{
+		ModelPolicy: "ultra", // invalid
+	}
+
+	if err := SyncToProjectConfig(projectRoot, prefs); err != nil {
+		t.Fatalf("SyncToProjectConfig: %v", err)
+	}
+
+	// Verify agent files were NOT changed
+	agentsDir := filepath.Join(projectRoot, ".claude", "agents", "ae")
+	data, err := os.ReadFile(filepath.Join(agentsDir, "manager-spec.md"))
+	if err != nil {
+		t.Fatalf("read manager-spec.md: %v", err)
+	}
+	if !strings.Contains(string(data), "model: opus") {
+		t.Errorf("manager-spec.md should still have 'model: opus' with invalid policy, got:\n%s", string(data))
 	}
 }
