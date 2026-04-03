@@ -351,8 +351,8 @@ func TestUpdate002_ManagerSpecWhatWhy(t *testing.T) {
 	}
 	content := string(data)
 
-	// What/Why boundary validation
-	if !strings.Contains(content, "What") || !strings.Contains(content, "Why") {
+	// What/Why boundary validation - check for the specific boundary feature
+	if !strings.Contains(content, "What/Why") && !strings.Contains(content, "what/why") && !(strings.Contains(content, "What") && strings.Contains(content, "Why") && strings.Contains(content, "boundary")) {
 		t.Error("manager-spec.md should contain What/Why boundary validation")
 	}
 }

@@ -997,7 +997,7 @@ func TestCleanupOldBackups(t *testing.T) {
 	}
 
 	// Test cleanup with keep_count=5
-	deletedCount := cleanup_old_backups(tmpDir, 5)
+	deletedCount := cleanupOldBackups(tmpDir, 5)
 	if deletedCount != 5 {
 		t.Errorf("should delete 5 old backups, got: %d", deletedCount)
 	}
@@ -1024,13 +1024,13 @@ func TestCleanupOldBackups(t *testing.T) {
 	}
 
 	// Test cleanup with keep_count=10 (no deletion)
-	deletedCount = cleanup_old_backups(tmpDir, 10)
+	deletedCount = cleanupOldBackups(tmpDir, 10)
 	if deletedCount != 0 {
 		t.Errorf("should not delete any backups with keep_count=10, got: %d", deletedCount)
 	}
 
 	// Test cleanup with keep_count=0 (delete all)
-	deletedCount = cleanup_old_backups(tmpDir, 0)
+	deletedCount = cleanupOldBackups(tmpDir, 0)
 	if deletedCount != 5 {
 		t.Errorf("should delete all 5 backups with keep_count=0, got: %d", deletedCount)
 	}
@@ -1077,7 +1077,7 @@ func TestCleanupOldBackups_InvalidBackupPattern(t *testing.T) {
 	}
 
 	// Should return 0 for invalid backup names
-	deletedCount := cleanup_old_backups(tmpDir, 5)
+	deletedCount := cleanupOldBackups(tmpDir, 5)
 	if deletedCount != 0 {
 		t.Errorf("should not delete any invalid backups, got: %d", deletedCount)
 	}
@@ -1088,7 +1088,7 @@ func TestCleanupOldBackups_NoBackupsDir(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Should return 0 without error
-	deletedCount := cleanup_old_backups(tmpDir, 5)
+	deletedCount := cleanupOldBackups(tmpDir, 5)
 	if deletedCount != 0 {
 		t.Errorf("should return 0 when no backups exist, got: %d", deletedCount)
 	}

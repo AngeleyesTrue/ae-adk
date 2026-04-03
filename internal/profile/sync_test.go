@@ -621,3 +621,79 @@ func TestSyncToProjectConfig_ModelPolicyInvalid_NoChange(t *testing.T) {
 		t.Errorf("manager-spec.md should still have 'model: opus' with invalid policy, got:\n%s", string(data))
 	}
 }
+
+func TestSyncToProjectConfig_ModelPolicyHigh_PreservesOpus(t *testing.T) {
+	projectRoot := t.TempDir()
+	setupProjectConfig(t, projectRoot)
+	setupAgentFiles(t, projectRoot)
+
+	prefs := ProfilePreferences{
+		ModelPolicy: "high",
+	}
+
+	if err := SyncToProjectConfig(projectRoot, prefs); err != nil {
+		t.Fatalf("SyncToProjectConfig: %v", err)
+	}
+
+	// Under "high" policy, opus agents should remain opus
+	agentsDir := filepath.Join(projectRoot, ".claude", "agents", "ae")
+	data, err := os.ReadFile(filepath.Join(agentsDir, "manager-spec.md"))
+	if err != nil {
+		t.Fatalf("read manager-spec.md: %v", err)
+	}
+	if !strings.Contains(string(data), "model: opus") {
+		t.Errorf("manager-spec.md should have 'model: opus' with high policy, got:\n%s", string(data))
+	}
+}
+
+func TestSyncToProjectConfig_ModelPolicyMedium(t *testing.T) {
+	projectRoot := t.TempDir()
+	setupProjectConfig(t, projectRoot)
+	setupAgentFiles(t, projectRoot)
+
+	prefs := ProfilePreferences{
+		ModelPolicy: "medium",
+	}
+
+	if err := SyncToProjectConfig(projectRoot, prefs); err != nil {
+		t.Fatalf("SyncToProjectConfig: %v", err)
+	}
+
+	// Medium policy per agentModelMap:
+	//   manager-spec: [opus, opus, sonnet] → medium keeps opus
+	//   expert-backend: [opus, sonnet, sonnet] → medium uses sonnet
+	//   manager-docs: [sonnet, haiku, haiku] → medium uses haiku
+	//   manager-quality: [haiku, haiku, haiku] → unchanged
+	expectations := map[string]string{
+		"manager-spec.md":    "model: opus",
+		"expert-backend.md":  "model: sonnet",
+		"manager-docs.md":    "model: haiku",
+		"manager-quality.md": "model: haiku",
+	}
+
+	agentsDir := filepath.Join(projectRoot, ".claude", "agents", "ae")
+	for filename, expectedModel := range expectations {
+		data, err := os.ReadFile(filepath.Join(agentsDir, filename))
+		if err != nil {
+			t.Fatalf("read %s: %v", filename, err)
+		}
+		if !strings.Contains(string(data), expectedModel) {
+			t.Errorf("%s: expected %q with medium policy, got:\n%s", filename, expectedModel, string(data))
+		}
+	}
+}
+
+func TestSyncToProjectConfig_ModelPolicyNoManifest_Warns(t *testing.T) {
+	projectRoot := t.TempDir()
+	setupProjectConfig(t, projectRoot)
+	// Intentionally NOT calling setupAgentFiles - no manifest.json
+
+	prefs := ProfilePreferences{
+		ModelPolicy: "low",
+	}
+
+	// Should not return error - manifest missing is a warning, not a failure
+	if err := SyncToProjectConfig(projectRoot, prefs); err != nil {
+		t.Fatalf("SyncToProjectConfig should not fail when manifest is missing: %v", err)
+	}
+}

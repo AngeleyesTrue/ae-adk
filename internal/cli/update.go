@@ -611,7 +611,7 @@ func runTemplateSyncWithReporter(cmd *cobra.Command, reporter project.ProgressRe
 					return restoreErr
 				}
 				_, _ = fmt.Fprintf(out, "\r  %s User settings restored\n", symSuccess())
-				deletedCount := cleanup_old_backups(projectRoot, 5)
+				deletedCount := cleanupOldBackups(projectRoot, 5)
 				if deletedCount > 0 {
 					_, _ = fmt.Fprintf(out, "  %s Cleaned up %d old backup(s)\n", symSuccess(), deletedCount)
 				}
@@ -1484,9 +1484,9 @@ func migrateLegacyMemoryDir(projectRoot string, out io.Writer) error {
 	return nil
 }
 
-// cleanup_old_backups maintains a maximum of 'keepCount' backups, deleting the oldest ones.
+// cleanupOldBackups maintains a maximum of 'keepCount' backups, deleting the oldest ones.
 // Returns the number of backups deleted.
-func cleanup_old_backups(projectRoot string, keepCount int) int {
+func cleanupOldBackups(projectRoot string, keepCount int) int {
 	backupDir := filepath.Join(projectRoot, defs.BackupsDir)
 
 	// Check if backup directory exists

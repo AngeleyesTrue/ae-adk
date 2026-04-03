@@ -357,8 +357,8 @@ Resume interrupted agent work using agentId:
 
 AE-ADK integrates multiple MCP servers for specialized capabilities:
 
-- **Sequential Thinking** (`--deepthink` flag): MCP tool for structured step-by-step analysis. Generates `server_tool_use` content — NOT compatible with GLM API. See Skill("ae-workflow-thinking").
-- **UltraThink** (`ultrathink` keyword): Claude native extended reasoning mode (high effort). No MCP dependency — compatible with all APIs including GLM. Do NOT confuse with `--deepthink`.
+- **Sequential Thinking** (`--deepthink` flag): MCP tool for structured step-by-step analysis. See Skill("ae-workflow-thinking").
+- **UltraThink** (`ultrathink` keyword): Claude native extended reasoning mode (high effort). No MCP dependency. Do NOT confuse with `--deepthink`.
 - **Context7**: Up-to-date library documentation lookup via resolve-library-id and get-library-docs.
 - **Pencil**: UI/UX design editing for .pen files (used by expert-frontend and designer teammates).
 - **claude-in-chrome**: Browser automation for web-based tasks.

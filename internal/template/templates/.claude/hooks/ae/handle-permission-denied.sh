@@ -9,8 +9,8 @@ set -euo pipefail
 EVENT_DATA=$(cat)
 
 # Extract relevant fields
-TOOL_NAME=$(echo "$EVENT_DATA" | grep -o '"toolName":"[^"]*"' | cut -d'"' -f4 2>/dev/null || echo "unknown")
-SESSION_ID=$(echo "$EVENT_DATA" | grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4 2>/dev/null || echo "unknown")
+TOOL_NAME=$(printf '%s\n' "$EVENT_DATA" | grep -o '"toolName":"[^"]*"' | cut -d'"' -f4 2>/dev/null || echo "unknown")
+SESSION_ID=$(printf '%s\n' "$EVENT_DATA" | grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4 2>/dev/null || echo "unknown")
 
 # Log to stderr (captured by Claude Code)
 echo "[AE] Permission denied: tool=$TOOL_NAME session=$SESSION_ID" >&2

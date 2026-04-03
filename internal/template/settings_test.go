@@ -302,11 +302,16 @@ func TestSettingsTemplateAllHookEvents(t *testing.T) {
 	}
 
 	allEvents := []string{
-		"SessionStart", "PreCompact", "SessionEnd",
-		"PreToolUse", "PostToolUse", "Stop",
-		"SubagentStop", "PostToolUseFailure", "Notification",
-		"SubagentStart", "UserPromptSubmit", "PermissionRequest",
+		"SessionStart", "PreCompact", "PostCompact", "SessionEnd",
+		"PreToolUse", "PostToolUse", "PostToolUseFailure",
+		"Stop", "StopFailure",
+		"SubagentStart", "SubagentStop",
+		"UserPromptSubmit", "PermissionRequest", "PermissionDenied",
+		"Notification",
 		"TeammateIdle", "TaskCompleted",
+		"WorktreeCreate", "WorktreeRemove",
+		"InstructionsLoaded", "CwdChanged", "FileChanged",
+		"Elicitation", "ElicitationResult",
 	}
 	for _, event := range allEvents {
 		if _, ok := hooks[event]; !ok {
