@@ -21,7 +21,7 @@ func TestRender_MinimalMode(t *testing.T) {
 
 	got := r.Render(data, ModeMinimal)
 
-	if !strings.Contains(got, "🤖 Opus 4.5") {
+	if !strings.Contains(got, "⚡ Opus 4.5") {
 		t.Errorf("minimal mode should contain model name with emoji, got %q", got)
 	}
 	if !strings.Contains(got, "🔋") {
@@ -46,19 +46,19 @@ func TestRender_DefaultMode(t *testing.T) {
 	got := r.Render(data, ModeDefault)
 
 	// Check all sections are present with emojis
-	if !strings.Contains(got, "🤖 Opus 4.5") {
+	if !strings.Contains(got, "⚡ Opus 4.5") {
 		t.Errorf("default mode should contain model with emoji, got %q", got)
 	}
 	if !strings.Contains(got, "🔋") {
 		t.Errorf("default mode should contain battery emoji, got %q", got)
 	}
-	if !strings.Contains(got, "💬 Mr.Alfred") {
+	if !strings.Contains(got, "👁️ Mr.Alfred") {
 		t.Errorf("default mode should contain output style with emoji, got %q", got)
 	}
-	if !strings.Contains(got, "📁 ae-adk-go") {
+	if !strings.Contains(got, "⚙️ ae-adk-go") {
 		t.Errorf("default mode should contain directory with emoji, got %q", got)
 	}
-	if !strings.Contains(got, "📊") {
+	if !strings.Contains(got, "📝") {
 		t.Errorf("default mode should contain git status with emoji, got %q", got)
 	}
 	if !strings.Contains(got, "+3") {
@@ -70,10 +70,10 @@ func TestRender_DefaultMode(t *testing.T) {
 	if !strings.Contains(got, "?1") {
 		t.Errorf("default mode should contain untracked count, got %q", got)
 	}
-	if !strings.Contains(got, "🗿 v1.14.5") {
-		t.Errorf("default mode should contain AE version with 🗿 emoji, got %q", got)
+	if !strings.Contains(got, "🏷️ v1.14.5") {
+		t.Errorf("default mode should contain AE version with 🏷️ emoji, got %q", got)
 	}
-	if !strings.Contains(got, "🔀 main") {
+	if !strings.Contains(got, "🌿 main") {
 		t.Errorf("default mode should contain branch with emoji, got %q", got)
 	}
 }
@@ -101,13 +101,13 @@ func TestRender_VerboseMode_MultiLine(t *testing.T) {
 	lines := strings.Split(got, "\n")
 
 	// v3 full L1: Model, Claude version, AE version (no prefix)
-	if !strings.Contains(lines[0], "🤖 Sonnet 4") {
+	if !strings.Contains(lines[0], "⚡ Sonnet 4") {
 		t.Errorf("full line 1 should contain model, got %q", lines[0])
 	}
-	if !strings.Contains(lines[0], "🔅 v1.0.80") {
+	if !strings.Contains(lines[0], "🍂 v1.0.80") {
 		t.Errorf("full line 1 should contain Claude version, got %q", lines[0])
 	}
-	if !strings.Contains(lines[0], "🗿 v1.2.0") {
+	if !strings.Contains(lines[0], "🏷️ v1.2.0") {
 		t.Errorf("full line 1 should contain AE version, got %q", lines[0])
 	}
 	// v3 does not render cost (REQ-V3-TIME-005)
@@ -130,7 +130,7 @@ func TestRender_VerboseMode_OmitsEmptyLines(t *testing.T) {
 	lines := strings.Split(strings.TrimRight(got, "\n"), "\n")
 	// Line 2 (directory/branch/git) should be omitted since all are unavailable
 	for _, line := range lines {
-		if strings.Contains(line, "📁") || strings.Contains(line, "🔀") || strings.Contains(line, "📊") {
+		if strings.Contains(line, "⚙️") || strings.Contains(line, "🌿") || strings.Contains(line, "📝") {
 			t.Errorf("verbose mode should omit empty line 2, but found git/dir segment in %q", line)
 		}
 	}
@@ -152,7 +152,7 @@ func TestRender_VerboseMode_CostRendering(t *testing.T) {
 		t.Errorf("full mode should NOT render cost in v3, got %q", got)
 	}
 	// Version info should still be displayed (no prefix in full mode)
-	if !strings.Contains(got, "🔅 v1.0.80") {
+	if !strings.Contains(got, "🍂 v1.0.80") {
 		t.Errorf("full mode should still contain Claude version, got %q", got)
 	}
 }
@@ -202,14 +202,14 @@ func TestRender_EmptyGit(t *testing.T) {
 	got := r.Render(data, ModeDefault)
 
 	// Should not contain any git info
-	if strings.Contains(got, "📊") {
+	if strings.Contains(got, "📝") {
 		t.Errorf("should not contain git status emoji when unavailable, got %q", got)
 	}
-	if strings.Contains(got, "🔀") {
+	if strings.Contains(got, "🌿") {
 		t.Errorf("should not contain branch emoji when unavailable, got %q", got)
 	}
 	// But should still have model and context
-	if !strings.Contains(got, "🤖") {
+	if !strings.Contains(got, "⚡") {
 		t.Errorf("should still contain model emoji, got %q", got)
 	}
 	if !strings.Contains(got, "🔋") {
@@ -227,7 +227,7 @@ func TestRender_EmptyMemory(t *testing.T) {
 
 	got := r.Render(data, ModeDefault)
 
-	if !strings.Contains(got, "🔀 main") {
+	if !strings.Contains(got, "🌿 main") {
 		t.Errorf("should contain git info, got %q", got)
 	}
 	// CW bar should not display when memory is unavailable
@@ -270,11 +270,11 @@ func TestRender_GitOnlyBranch(t *testing.T) {
 
 	got := r.Render(data, ModeDefault)
 
-	if !strings.Contains(got, "🔀 main") {
+	if !strings.Contains(got, "🌿 main") {
 		t.Errorf("should show branch name, got %q", got)
 	}
 	// Should not have git status emoji when all counts are zero
-	if strings.Contains(got, "📊") {
+	if strings.Contains(got, "📝") {
 		t.Errorf("should not show git status when all counts are zero, got %q", got)
 	}
 }
@@ -436,7 +436,7 @@ func TestRender_WithOutputStyle(t *testing.T) {
 
 	got := r.Render(data, ModeDefault)
 
-	if !strings.Contains(got, "💬 R2-D2") {
+	if !strings.Contains(got, "👁️ R2-D2") {
 		t.Errorf("should contain output style with emoji, got %q", got)
 	}
 }
@@ -456,7 +456,7 @@ func TestRender_VersionUpdateNotification(t *testing.T) {
 
 	got := r.Render(data, ModeDefault)
 
-	if !strings.Contains(got, "🗿 v2.0.0") {
+	if !strings.Contains(got, "🏷️ v2.0.0") {
 		t.Errorf("should contain current version, got %q", got)
 	}
 	if !strings.Contains(got, "⬆️ v2.0.1") {
@@ -478,7 +478,7 @@ func TestRender_VersionNoUpdate(t *testing.T) {
 
 	got := r.Render(data, ModeDefault)
 
-	if !strings.Contains(got, "🗿 v2.0.0") {
+	if !strings.Contains(got, "🏷️ v2.0.0") {
 		t.Errorf("should contain current version, got %q", got)
 	}
 	if strings.Contains(got, "⬆️") {
@@ -496,7 +496,7 @@ func TestRender_WithDirectory(t *testing.T) {
 
 	got := r.Render(data, ModeDefault)
 
-	if !strings.Contains(got, "📁 my-awesome-project") {
+	if !strings.Contains(got, "⚙️ my-awesome-project") {
 		t.Errorf("should contain directory with emoji, got %q", got)
 	}
 }
@@ -523,12 +523,12 @@ func TestRender_SegmentFiltering(t *testing.T) {
 		{
 			name:          "nil config shows all segments",
 			segmentConfig: nil,
-			wantContain:   []string{"🤖 Opus 4.5", "🔋", "💬 AE", "📁 ae-adk-go", "📊", "🔅 v1.0.80", "🗿 v2.3.1", "🔀 main"},
+			wantContain:   []string{"⚡ Opus 4.5", "🔋", "👁️ AE", "⚙️ ae-adk-go", "📝", "🍂 v1.0.80", "🏷️ v2.3.1", "🌿 main"},
 		},
 		{
 			name:          "empty config shows all segments",
 			segmentConfig: map[string]bool{},
-			wantContain:   []string{"🤖 Opus 4.5", "🔋", "💬 AE", "📁 ae-adk-go", "📊", "🔅 v1.0.80", "🗿 v2.3.1", "🔀 main"},
+			wantContain:   []string{"⚡ Opus 4.5", "🔋", "👁️ AE", "⚙️ ae-adk-go", "📝", "🍂 v1.0.80", "🏷️ v2.3.1", "🌿 main"},
 		},
 		{
 			name: "model disabled hides model",
@@ -537,8 +537,8 @@ func TestRender_SegmentFiltering(t *testing.T) {
 				SegmentDirectory: true, SegmentGitStatus: true, SegmentClaudeVersion: true,
 				SegmentAEVersion: true, SegmentGitBranch: true,
 			},
-			wantContain:    []string{"🔋", "💬 AE", "📁 ae-adk-go"},
-			wantNotContain: []string{"🤖"},
+			wantContain:    []string{"🔋", "👁️ AE", "⚙️ ae-adk-go"},
+			wantNotContain: []string{"⚡"},
 		},
 		{
 			name: "minimal preset config",
@@ -547,8 +547,8 @@ func TestRender_SegmentFiltering(t *testing.T) {
 				SegmentDirectory: false, SegmentGitStatus: true, SegmentClaudeVersion: false,
 				SegmentAEVersion: false, SegmentGitBranch: true,
 			},
-			wantContain:    []string{"🤖 Opus 4.5", "🔋", "📊", "🔀 main"},
-			wantNotContain: []string{"💬", "📁", "🔅", "🗿"},
+			wantContain:    []string{"⚡ Opus 4.5", "🔋", "📝", "🌿 main"},
+			wantNotContain: []string{"👁️", "⚙️", "🍂", "🏷️"},
 		},
 		{
 			name: "all segments disabled returns AE fallback",
@@ -566,7 +566,7 @@ func TestRender_SegmentFiltering(t *testing.T) {
 				"unknown_segment": false,
 				SegmentModel:      true,
 			},
-			wantContain: []string{"🤖 Opus 4.5", "🔋", "💬 AE", "📁 ae-adk-go"},
+			wantContain: []string{"⚡ Opus 4.5", "🔋", "👁️ AE", "⚙️ ae-adk-go"},
 		},
 		{
 			name: "only context disabled",
@@ -576,7 +576,7 @@ func TestRender_SegmentFiltering(t *testing.T) {
 				SegmentAEVersion: true, SegmentGitBranch: true,
 				SegmentUsage5H: false, SegmentUsage7D: false,
 			},
-			wantContain:    []string{"🤖 Opus 4.5", "💬 AE", "📁 ae-adk-go", "🔀 main"},
+			wantContain:    []string{"⚡ Opus 4.5", "👁️ AE", "⚙️ ae-adk-go", "🌿 main"},
 			wantNotContain: []string{"CW:"},
 		},
 	}
@@ -646,14 +646,14 @@ func TestRenderGitBranchV3(t *testing.T) {
 		git  GitStatusData
 		want string
 	}{
-		// REQ-V3-GIT-001: Ahead only → "🔀 main ↑3"
-		{"ahead only", GitStatusData{Branch: "main", Ahead: 3, Behind: 0, Available: true}, "🔀 main ↑3"},
-		// REQ-V3-GIT-002: Behind only → "🔀 main ↓2"
-		{"behind only", GitStatusData{Branch: "main", Ahead: 0, Behind: 2, Available: true}, "🔀 main ↓2"},
-		// REQ-V3-GIT-003: Both present → "🔀 feat/auth ↑2↓1"
-		{"both", GitStatusData{Branch: "feat/auth", Ahead: 2, Behind: 1, Available: true}, "🔀 feat/auth ↑2↓1"},
+		// REQ-V3-GIT-001: Ahead only → "🌿 main ↑3"
+		{"ahead only", GitStatusData{Branch: "main", Ahead: 3, Behind: 0, Available: true}, "🌿 main ↑3"},
+		// REQ-V3-GIT-002: Behind only → "🌿 main ↓2"
+		{"behind only", GitStatusData{Branch: "main", Ahead: 0, Behind: 2, Available: true}, "🌿 main ↓2"},
+		// REQ-V3-GIT-003: Both present → "🌿 feat/auth ↑2↓1"
+		{"both", GitStatusData{Branch: "feat/auth", Ahead: 2, Behind: 1, Available: true}, "🌿 feat/auth ↑2↓1"},
 		// REQ-V3-GIT-004: Neither present → branch name only
-		{"neither", GitStatusData{Branch: "main", Ahead: 0, Behind: 0, Available: true}, "🔀 main"},
+		{"neither", GitStatusData{Branch: "main", Ahead: 0, Behind: 0, Available: true}, "🌿 main"},
 		// Unavailable → empty string
 		{"unavailable", GitStatusData{Available: false}, ""},
 	}
@@ -675,18 +675,18 @@ func TestRenderSessionTime(t *testing.T) {
 		ms   int
 		want string
 	}{
-		// REQ-V3-TIME-002: 83min = "⏳ 1h 23m"
-		{"83 minutes", 4980000, "⏳ 1h 23m"},
-		// REQ-V3-TIME-002: under 45min = "⏳ 45m"
-		{"45 minutes", 2700000, "⏳ 45m"},
+		// REQ-V3-TIME-002: 83min = "⏱️ 1h 23m"
+		{"83 minutes", 4980000, "⏱️ 1h 23m"},
+		// REQ-V3-TIME-002: under 45min = "⏱️ 45m"
+		{"45 minutes", 2700000, "⏱️ 45m"},
 		// REQ-V3-TIME-004: 0ms → empty string
 		{"zero", 0, ""},
 		// REQ-V3-TIME-002: exactly 1 hour
-		{"exactly 1 hour", 3600000, "⏳ 1h 0m"},
-		// REQ-V3-TIME-002: 26 hours = "⏳ 1d 2h"
-		{"26 hours", 93600000, "⏳ 1d 2h"},
-		// REQ-V3-TIME-002: 48 hours = "⏳ 2d 0h"
-		{"48 hours", 172800000, "⏳ 2d 0h"},
+		{"exactly 1 hour", 3600000, "⏱️ 1h 0m"},
+		// REQ-V3-TIME-002: 26 hours = "⏱️ 1d 2h"
+		{"26 hours", 93600000, "⏱️ 1d 2h"},
+		// REQ-V3-TIME-002: 48 hours = "⏱️ 2d 0h"
+		{"48 hours", 172800000, "⏱️ 2d 0h"},
 	}
 
 	for _, tt := range tests {
@@ -762,7 +762,7 @@ func TestRenderDefaultV3_ThreeLines(t *testing.T) {
 		t.Errorf("default mode must be 3 lines, got: %d lines\noutput: %q", len(lines), got)
 	}
 	// Output style must be merged into L1
-	if !strings.Contains(lines[0], "💬 AE") {
+	if !strings.Contains(lines[0], "👁️ AE") {
 		t.Errorf("default L1 must contain output style, got: %q", lines[0])
 	}
 }
@@ -783,17 +783,17 @@ func TestRenderDefaultV3_Line1(t *testing.T) {
 	lines := strings.Split(got, "\n")
 	l1 := lines[0]
 
-	if !strings.Contains(l1, "🤖 Opus 4.6") {
+	if !strings.Contains(l1, "⚡ Opus 4.6") {
 		t.Errorf("default L1 must contain model, got: %q", l1)
 	}
-	if !strings.Contains(l1, "🔅 v2.1.50") {
+	if !strings.Contains(l1, "🍂 v2.1.50") {
 		t.Errorf("default L1 must contain Claude version, got: %q", l1)
 	}
-	if !strings.Contains(l1, "🗿 v2.8.0") {
+	if !strings.Contains(l1, "🏷️ v2.8.0") {
 		t.Errorf("default L1 must contain AE version, got: %q", l1)
 	}
 	// Session time (9240000ms = 154min = 2h 34m)
-	if !strings.Contains(l1, "⏳") {
+	if !strings.Contains(l1, "⏱️") {
 		t.Errorf("default L1 must contain session time, got: %q", l1)
 	}
 	if !strings.Contains(l1, "2h 34m") {
@@ -863,13 +863,13 @@ func TestRenderDefaultV3_Line3(t *testing.T) {
 	lines := strings.Split(got, "\n")
 	l3 := lines[2]
 
-	if !strings.Contains(l3, "📁 ae-adk-go") {
+	if !strings.Contains(l3, "⚙️ ae-adk-go") {
 		t.Errorf("default L3 must contain directory, got: %q", l3)
 	}
-	if !strings.Contains(l3, "🔀 feat/auth ↑2↓1") {
+	if !strings.Contains(l3, "🌿 feat/auth ↑2↓1") {
 		t.Errorf("default L3 must contain branch + ahead/behind, got: %q", l3)
 	}
-	if !strings.Contains(l3, "📊") {
+	if !strings.Contains(l3, "📝") {
 		t.Errorf("default L3 must contain git status, got: %q", l3)
 	}
 }
@@ -895,7 +895,7 @@ func TestRenderDefaultV3_StyleInL1(t *testing.T) {
 	}
 
 	// Output style must be merged into L1
-	if !strings.Contains(lines[0], "💬 AE") {
+	if !strings.Contains(lines[0], "👁️ AE") {
 		t.Errorf("default L1 must contain output style, got: %q", lines[0])
 	}
 	// Task (📋) is no longer displayed
@@ -939,7 +939,7 @@ func TestRenderFullV3_FiveLines(t *testing.T) {
 		t.Errorf("full mode must be 5 lines, got: %d lines\noutput:\n%s", len(lines), got)
 	}
 	// Output style must be merged into L1
-	if !strings.Contains(lines[0], "💬 AE") {
+	if !strings.Contains(lines[0], "👁️ AE") {
 		t.Errorf("full L1 must contain output style, got: %q", lines[0])
 	}
 }
@@ -964,17 +964,17 @@ func TestRenderFullV3_Line1_WithPrefixes(t *testing.T) {
 	lines := strings.Split(got, "\n")
 	l1 := lines[0]
 
-	if !strings.Contains(l1, "🤖 Opus 4.6") {
+	if !strings.Contains(l1, "⚡ Opus 4.6") {
 		t.Errorf("full L1 must contain model, got: %q", l1)
 	}
 	// full mode: no prefix, same as default
-	if !strings.Contains(l1, "🔅 v2.1.50") {
-		t.Errorf("full L1 should contain '🔅 v2.1.50', got: %q", l1)
+	if !strings.Contains(l1, "🍂 v2.1.50") {
+		t.Errorf("full L1 should contain '🍂 v2.1.50', got: %q", l1)
 	}
-	if !strings.Contains(l1, "🗿 v2.8.0") {
-		t.Errorf("full L1 should contain '🗿 v2.8.0', got: %q", l1)
+	if !strings.Contains(l1, "🏷️ v2.8.0") {
+		t.Errorf("full L1 should contain '🏷️ v2.8.0', got: %q", l1)
 	}
-	if !strings.Contains(l1, "⏳") {
+	if !strings.Contains(l1, "⏱️") {
 		t.Errorf("full L1 must contain session time, got: %q", l1)
 	}
 }
@@ -1055,13 +1055,13 @@ func TestRenderFullV3_Line5_DirBranchGit(t *testing.T) {
 	}
 	l5 := lines[4]
 
-	if !strings.Contains(l5, "📁 ae-adk-go") {
+	if !strings.Contains(l5, "⚙️ ae-adk-go") {
 		t.Errorf("full L5 must contain directory, got: %q", l5)
 	}
-	if !strings.Contains(l5, "🔀 feat/auth ↑2↓1") {
+	if !strings.Contains(l5, "🌿 feat/auth ↑2↓1") {
 		t.Errorf("full L5 must contain branch + ahead/behind, got: %q", l5)
 	}
-	if !strings.Contains(l5, "📊") {
+	if !strings.Contains(l5, "📝") {
 		t.Errorf("full L5 must contain git status, got: %q", l5)
 	}
 }
@@ -1091,7 +1091,7 @@ func TestRenderFullV3_StyleInL1(t *testing.T) {
 	}
 
 	// Output style must be merged into L1
-	if !strings.Contains(lines[0], "💬 AE") {
+	if !strings.Contains(lines[0], "👁️ AE") {
 		t.Errorf("full L1 must contain output style, got: %q", lines[0])
 	}
 }
@@ -1333,6 +1333,116 @@ func TestRenderFullV3_WithResetTimes(t *testing.T) {
 	// L4 (7D) should contain "Resets" with a date
 	if !strings.Contains(lines[3], "Resets") {
 		t.Errorf("7D line should contain 'Resets', got: %q", lines[3])
+	}
+}
+
+func TestFormatResetTimeShort(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name      string
+		input     string
+		wantPfx   string
+		wantEmpty bool
+	}{
+		{"empty string", "", "", true},
+		{"invalid format", "not-a-date", "", true},
+		{"future 3h", time.Now().Add(3*time.Hour + 10*time.Minute).UTC().Format(time.RFC3339), "3h", false},
+		{"future 45m", time.Now().Add(45 * time.Minute).UTC().Format(time.RFC3339), "4", false}, // 44-45m
+		{"past time", time.Now().Add(-1 * time.Hour).UTC().Format(time.RFC3339), "", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := formatResetTimeShort(tt.input)
+			if tt.wantEmpty && got != "" {
+				t.Errorf("expected empty, got %q", got)
+			}
+			if !tt.wantEmpty && !strings.HasPrefix(got, tt.wantPfx) {
+				t.Errorf("expected prefix %q, got %q", tt.wantPfx, got)
+			}
+		})
+	}
+}
+
+func TestFormatResetDateShort(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name      string
+		input     string
+		wantEmpty bool
+		wantSub   string
+	}{
+		{"empty string", "", true, ""},
+		{"invalid format", "not-a-date", true, ""},
+		{"valid RFC3339 Jan21", "2026-01-21T14:00:00Z", false, "01-"},
+		{"valid RFC3339 Apr10", "2026-04-10T14:00:00Z", false, "04-10"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := formatResetDateShort(tt.input)
+			if tt.wantEmpty && got != "" {
+				t.Errorf("expected empty, got %q", got)
+			}
+			if !tt.wantEmpty && !strings.Contains(got, tt.wantSub) {
+				t.Errorf("expected substring %q in %q", tt.wantSub, got)
+			}
+		})
+	}
+}
+
+func TestRenderUsageBarWithShortReset(t *testing.T) {
+	t.Parallel()
+
+	// Without reset
+	got := renderUsageBarWithShortReset("5H:", 45, 10, true, "")
+	if strings.Contains(got, "(") {
+		t.Errorf("should not contain parens when no reset, got %q", got)
+	}
+	if !strings.Contains(got, "45%") {
+		t.Errorf("should contain 45%%, got %q", got)
+	}
+
+	// With reset
+	got = renderUsageBarWithShortReset("5H:", 45, 10, true, "3h")
+	if !strings.Contains(got, "45%(3h)") {
+		t.Errorf("should contain '45%%(3h)', got %q", got)
+	}
+
+	// 7D with date
+	got = renderUsageBarWithShortReset("7D:", 82, 10, true, "04-10")
+	if !strings.Contains(got, "82%(04-10)") {
+		t.Errorf("should contain '82%%(04-10)', got %q", got)
+	}
+}
+
+func TestRenderDefaultV3_InlineBarsWithShortReset(t *testing.T) {
+	r := newTestRenderer()
+	resetTime5H := time.Now().Add(3*time.Hour + 10*time.Minute).UTC().Format(time.RFC3339)
+
+	data := &StatusData{
+		Metrics:   MetricsData{Model: "Opus 4.6", Available: true},
+		Memory:    MemoryData{TokensUsed: 100000, TokenBudget: 200000, Available: true},
+		Directory: "test-project",
+		Git:       GitStatusData{Branch: "main", Available: true},
+		Usage: &UsageResult{
+			Usage5H: &UsageData{Percentage: 45.0, ResetsAt: resetTime5H},
+			Usage7D: &UsageData{Percentage: 82.0, ResetsAt: "2026-04-10T14:00:00Z"},
+		},
+	}
+
+	got := r.Render(data, ModeDefault)
+	lines := strings.Split(got, "\n")
+
+	// L2 should contain short reset times
+	l2 := lines[1]
+	if !strings.Contains(l2, "45%(3h)") {
+		t.Errorf("default L2 5H should contain short reset '45%%(3h)', got: %q", l2)
+	}
+	if !strings.Contains(l2, "82%(04-") {
+		t.Errorf("default L2 7D should contain short reset date '82%%(04-...)', got: %q", l2)
 	}
 }
 

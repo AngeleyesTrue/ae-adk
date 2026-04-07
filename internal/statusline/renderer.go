@@ -115,9 +115,9 @@ func (r *Renderer) joinSegments(segments []string) string {
 
 // renderDefaultV3 renders the default mode 3-line layout.
 //
-// L1: 🤖 Model │ 🔅 v2.1.50 │ 🗿 v2.8.0 │ ⏳ 2h 34m │ 💬 AE
-// L2: CW: 🪫 ██████████ 88% │ 5H: 🔋 ██████████ 45% │ 7D: 🪫 ██████████ 82%
-// L3: 📁 ae-adk-go │ 🔀 feat/auth ↑2↓1 │ 📊 +3 M2 ?1
+// L1: ⚡ Model │ 🍂 v2.1.50 │ 🏷️ v2.8.0 │ ⏱️ 2h 34m │ 👁️ AE
+// L2: CW: 🪫 ██████████ 88% │ 5H: 🔋 ██████████ 45%(3h) │ 7D: 🪫 ██████████ 82%(04-10)
+// L3: ⚙️ ae-adk-go │ 🌿 feat/auth ↑2↓1 │ 📝 +3 M2 ?1
 func (r *Renderer) renderDefaultV3(data *StatusData) string {
 	var lines []string
 
@@ -147,11 +147,11 @@ func (r *Renderer) renderDefaultV3(data *StatusData) string {
 
 // renderFullV3 renders the full mode 5-line layout.
 //
-// L1: 🤖 Model │ 🔅 v2.1.50 │ 🗿 v2.8.0 │ ⏳ 2h 34m │ 💬 AE
+// L1: ⚡ Model │ 🍂 v2.1.50 │ 🏷️ v2.8.0 │ ⏱️ 2h 34m │ 👁️ AE
 // L2: CW: 🪫 ████████████████████████████████████░░░░ 88%
-// L3: 5H: 🔋 ██████████████████░░░░░░░░░░░░░░░░░░░░░░ 45%
-// L4: 7D: 🪫 ████████████████████████████████░░░░░░░░ 82%
-// L5: 📁 ae-adk-go │ 🔀 feat/auth ↑2↓1 │ 📊 +3 M2 ?1
+// L3: 5H: 🔋 ██████████████████░░░░░░░░░░░░░░░░░░░░░░ 45% (Resets in 3h 24m)
+// L4: 7D: 🪫 ████████████████████████████████░░░░░░░░ 82% (Resets Apr 10 at 2pm)
+// L5: ⚙️ ae-adk-go │ 🌿 feat/auth ↑2↓1 │ 📝 +3 M2 ?1
 func (r *Renderer) renderFullV3(data *StatusData) string {
 	var lines []string
 
@@ -209,15 +209,15 @@ func (r *Renderer) renderInfoLine(data *StatusData, withPrefix bool) string {
 
 	// Model
 	if r.isSegmentEnabled(SegmentModel) && data.Metrics.Available && data.Metrics.Model != "" {
-		segs = append(segs, fmt.Sprintf("🤖 %s", data.Metrics.Model))
+		segs = append(segs, fmt.Sprintf("⚡ %s", data.Metrics.Model))
 	}
 
 	// Claude version
 	if r.isSegmentEnabled(SegmentClaudeVersion) && data.ClaudeCodeVersion != "" {
 		if withPrefix {
-			segs = append(segs, fmt.Sprintf("🔅 Claude v%s", data.ClaudeCodeVersion))
+			segs = append(segs, fmt.Sprintf("🍂 Claude v%s", data.ClaudeCodeVersion))
 		} else {
-			segs = append(segs, fmt.Sprintf("🔅 v%s", data.ClaudeCodeVersion))
+			segs = append(segs, fmt.Sprintf("🍂 v%s", data.ClaudeCodeVersion))
 		}
 	}
 
@@ -225,9 +225,9 @@ func (r *Renderer) renderInfoLine(data *StatusData, withPrefix bool) string {
 	if r.isSegmentEnabled(SegmentAEVersion) && data.Version.Available && data.Version.Current != "" {
 		var versionStr string
 		if withPrefix {
-			versionStr = fmt.Sprintf("🗿 AE v%s", data.Version.Current)
+			versionStr = fmt.Sprintf("🏷️ AE v%s", data.Version.Current)
 		} else {
-			versionStr = fmt.Sprintf("🗿 v%s", data.Version.Current)
+			versionStr = fmt.Sprintf("🏷️ v%s", data.Version.Current)
 		}
 		if data.Version.UpdateAvailable && data.Version.Latest != "" {
 			versionStr += fmt.Sprintf(" ⬆️ v%s", data.Version.Latest)
@@ -244,7 +244,7 @@ func (r *Renderer) renderInfoLine(data *StatusData, withPrefix bool) string {
 
 	// Output style (integrated into L1)
 	if r.isSegmentEnabled(SegmentOutputStyle) && data.OutputStyle != "" {
-		segs = append(segs, fmt.Sprintf("💬 %s", data.OutputStyle))
+		segs = append(segs, fmt.Sprintf("👁️ %s", data.OutputStyle))
 	}
 
 	return r.joinSegments(segs)
@@ -261,35 +261,39 @@ func (r *Renderer) renderBarsInline(data *StatusData, width int) string {
 		segs = append(segs, renderUsageBar("CW:", pct, width, r.noColor))
 	}
 
-	// 5H bar - always shown, defaults to 0% when no data
+	// 5H bar - always shown, defaults to 0% when no data, with short reset time
 	if r.isSegmentEnabled(SegmentUsage5H) {
 		pct5H := 0
+		var reset5H string
 		if data.Usage != nil && data.Usage.Usage5H != nil {
 			pct5H = int(data.Usage.Usage5H.Percentage)
+			reset5H = formatResetTimeShort(data.Usage.Usage5H.ResetsAt)
 		}
-		segs = append(segs, renderUsageBar("5H:", pct5H, width, r.noColor))
+		segs = append(segs, renderUsageBarWithShortReset("5H:", pct5H, width, r.noColor, reset5H))
 	}
 
-	// 7D bar - always shown, defaults to 0% when no data
+	// 7D bar - always shown, defaults to 0% when no data, with short reset date
 	if r.isSegmentEnabled(SegmentUsage7D) {
 		pct7D := 0
+		var reset7D string
 		if data.Usage != nil && data.Usage.Usage7D != nil {
 			pct7D = int(data.Usage.Usage7D.Percentage)
+			reset7D = formatResetDateShort(data.Usage.Usage7D.ResetsAt)
 		}
-		segs = append(segs, renderUsageBar("7D:", pct7D, width, r.noColor))
+		segs = append(segs, renderUsageBarWithShortReset("7D:", pct7D, width, r.noColor, reset7D))
 	}
 
 	return r.joinSegments(segs)
 }
 
 // renderDirGitLine renders the directory + branch + git status line (default L3, full L5).
-// Format: 📁 ae-adk-go │ 🔀 feat/auth ↑2↓1 │ 📊 +3 M2 ?1
+// Format: ⚙️ ae-adk-go │ 🌿 feat/auth ↑2↓1 │ 📝 +3 M2 ?1
 func (r *Renderer) renderDirGitLine(data *StatusData) string {
 	var segs []string
 
 	// Directory
 	if r.isSegmentEnabled(SegmentDirectory) && data.Directory != "" {
-		segs = append(segs, fmt.Sprintf("📁 %s", data.Directory))
+		segs = append(segs, fmt.Sprintf("⚙️ %s", data.Directory))
 	}
 
 	// Branch + ahead/behind
@@ -302,7 +306,7 @@ func (r *Renderer) renderDirGitLine(data *StatusData) string {
 	// Git status
 	if r.isSegmentEnabled(SegmentGitStatus) {
 		if git := r.renderGitStatus(data); git != "" {
-			segs = append(segs, fmt.Sprintf("📊 %s", git))
+			segs = append(segs, fmt.Sprintf("📝 %s", git))
 		}
 	}
 
@@ -322,6 +326,16 @@ func renderUsageBar(label string, pct int, width int, noColor bool) string {
 	return fmt.Sprintf("%s %s %s %d%%", label, icon, bar, pct)
 }
 
+// renderUsageBarWithShortReset renders a usage bar with optional short reset suffix.
+// Format: {label} {icon} {bar} {pct}%({resetStr}) — used in default mode inline bars.
+func renderUsageBarWithShortReset(label string, pct int, width int, noColor bool, resetStr string) string {
+	base := renderUsageBar(label, pct, width, noColor)
+	if resetStr == "" {
+		return base
+	}
+	return fmt.Sprintf("%s(%s)", base, resetStr)
+}
+
 // renderUsageBarWithReset renders a usage bar with optional reset time suffix.
 // Format: {label} {icon} {bar} {pct}% (Resets {resetStr})
 func renderUsageBarWithReset(label string, pct int, width int, noColor bool, resetStr string) string {
@@ -330,6 +344,48 @@ func renderUsageBarWithReset(label string, pct int, width int, noColor bool, res
 		return base
 	}
 	return fmt.Sprintf("%s (Resets %s)", base, resetStr)
+}
+
+// formatResetTimeShort formats an ISO 8601 timestamp as short relative time: "3h" or "45m".
+// Used in default mode inline bars for compact display.
+func formatResetTimeShort(isoTimestamp string) string {
+	if isoTimestamp == "" {
+		return ""
+	}
+	t, err := time.Parse(time.RFC3339, isoTimestamp)
+	if err != nil {
+		t, err = time.Parse("2006-01-02T15:04:05", isoTimestamp)
+		if err != nil {
+			return ""
+		}
+	}
+	remaining := time.Until(t)
+	if remaining <= 0 {
+		return ""
+	}
+	hours := int(remaining.Hours())
+	if hours > 0 {
+		return fmt.Sprintf("%dh", hours)
+	}
+	minutes := int(remaining.Minutes())
+	return fmt.Sprintf("%dm", minutes)
+}
+
+// formatResetDateShort formats an ISO 8601 timestamp as short absolute date: "01-02".
+// Used in default mode inline bars for compact 7-day window display.
+func formatResetDateShort(isoTimestamp string) string {
+	if isoTimestamp == "" {
+		return ""
+	}
+	t, err := time.Parse(time.RFC3339, isoTimestamp)
+	if err != nil {
+		t, err = time.Parse("2006-01-02T15:04:05", isoTimestamp)
+		if err != nil {
+			return ""
+		}
+	}
+	t = t.Local()
+	return t.Format("01-02")
 }
 
 // formatResetTimeRelative formats an ISO 8601 timestamp as relative time "in Xh Ym".
@@ -395,10 +451,10 @@ func (r *Renderer) contextPercent(data *StatusData) int {
 }
 
 // renderGitBranch renders the git branch string with ahead/behind info.
-// REQ-V3-GIT-001: Ahead > 0 → "🔀 branch ↑N"
-// REQ-V3-GIT-002: Behind > 0 → "🔀 branch ↓N"
-// REQ-V3-GIT-003: Both → "🔀 branch ↑N↓M"
-// REQ-V3-GIT-004: Neither → "🔀 branch"
+// REQ-V3-GIT-001: Ahead > 0 → "🌿 branch ↑N"
+// REQ-V3-GIT-002: Behind > 0 → "🌿 branch ↓N"
+// REQ-V3-GIT-003: Both → "🌿 branch ↑N↓M"
+// REQ-V3-GIT-004: Neither → "🌿 branch"
 func renderGitBranch(data *StatusData) string {
 	if !data.Git.Available || data.Git.Branch == "" {
 		return ""
@@ -415,11 +471,11 @@ func renderGitBranch(data *StatusData) string {
 		suffix = fmt.Sprintf(" ↓%d", data.Git.Behind)
 	}
 
-	return fmt.Sprintf("🔀 %s%s", branch, suffix)
+	return fmt.Sprintf("🌿 %s%s", branch, suffix)
 }
 
-// renderSessionTime converts milliseconds to a session time string in "⏳ Xh Ym" format.
-// REQ-V3-TIME-002: >= 60min: "⏳ Xh Ym", < 60min: "⏳ Xm", >= 24h: "⏳ Xd Yh"
+// renderSessionTime converts milliseconds to a session time string in "⏱️ Xh Ym" format.
+// REQ-V3-TIME-002: >= 60min: "⏱️ Xh Ym", < 60min: "⏱️ Xm", >= 24h: "⏱️ Xd Yh"
 // REQ-V3-TIME-004: returns empty string when ms is 0
 func renderSessionTime(ms int) string {
 	if ms <= 0 {
@@ -429,21 +485,21 @@ func renderSessionTime(ms int) string {
 	totalMinutes := ms / 60000
 	totalHours := totalMinutes / 60
 
-	// >= 24 hours: "⏳ Xd Yh"
+	// >= 24 hours: "⏱️ Xd Yh"
 	if totalHours >= 24 {
 		days := totalHours / 24
 		hours := totalHours % 24
-		return fmt.Sprintf("⏳ %dd %dh", days, hours)
+		return fmt.Sprintf("⏱️ %dd %dh", days, hours)
 	}
 
-	// >= 1 hour: "⏳ Xh Ym"
+	// >= 1 hour: "⏱️ Xh Ym"
 	if totalHours >= 1 {
 		minutes := totalMinutes % 60
-		return fmt.Sprintf("⏳ %dh %dm", totalHours, minutes)
+		return fmt.Sprintf("⏱️ %dh %dm", totalHours, minutes)
 	}
 
-	// < 1 hour: "⏳ Xm"
-	return fmt.Sprintf("⏳ %dm", totalMinutes)
+	// < 1 hour: "⏱️ Xm"
+	return fmt.Sprintf("⏱️ %dm", totalMinutes)
 }
 
 // renderGitStatus renders git status in Python format.
