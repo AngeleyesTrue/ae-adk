@@ -86,7 +86,7 @@ func TestBuilder_Build_FullData(t *testing.T) {
 	}
 
 	// Default mode: model + context graph + output style + git status + version + branch
-	if !strings.Contains(got, "🤖 Sonnet 4") {
+	if !strings.Contains(got, "⚡ Sonnet 4") {
 		t.Errorf("should contain model name with emoji, got %q", got)
 	}
 	if !strings.Contains(got, "🔋 ") {
@@ -98,19 +98,19 @@ func TestBuilder_Build_FullData(t *testing.T) {
 	if !strings.Contains(got, "25%") {
 		t.Errorf("should contain context percentage, got %q", got)
 	}
-	if !strings.Contains(got, "💬 Mr.Alfred") {
+	if !strings.Contains(got, "👁️ Mr.Alfred") {
 		t.Errorf("should contain output style, got %q", got)
 	}
-	if !strings.Contains(got, "📁 my-project") {
+	if !strings.Contains(got, "⚙️ my-project") {
 		t.Errorf("should contain directory, got %q", got)
 	}
-	if !strings.Contains(got, "📊 +3 M2") {
+	if !strings.Contains(got, "📝 +3 M2") {
 		t.Errorf("should contain git status, got %q", got)
 	}
-	if !strings.Contains(got, "🗿 v1.2.0") {
-		t.Errorf("should contain AE version with 🗿 emoji, got %q", got)
+	if !strings.Contains(got, "🏷️ v1.2.0") {
+		t.Errorf("should contain AE version with 🏷️ emoji, got %q", got)
 	}
-	if !strings.Contains(got, "🔀 main") {
+	if !strings.Contains(got, "🌿 main") {
 		t.Errorf("should contain branch, got %q", got)
 	}
 }
@@ -188,7 +188,7 @@ func TestBuilder_Build_GitProviderFailure(t *testing.T) {
 	}
 
 	// Should still have model and context, without git
-	if !strings.Contains(got, "🤖 Opus 4.5") {
+	if !strings.Contains(got, "⚡ Opus 4.5") {
 		t.Errorf("should contain model despite git failure, got %q", got)
 	}
 	if !strings.Contains(got, "🔋 ") {
@@ -769,9 +769,9 @@ func TestIntegration_GradientBar(t *testing.T) {
 
 // TestIntegration_SessionTime verifies session time format (AC-V3-08).
 func TestIntegration_SessionTime(t *testing.T) {
-	// AC-V3-08: TotalDurationMS=4980000 → "⏳ 1h 23m"
+	// AC-V3-08: TotalDurationMS=4980000 → "⏱️ 1h 23m"
 	// 4980000 ms = 4980 seconds = 83 minutes = 1h 23m
-	t.Run("AC-V3-08: 4980000ms → ⏳ 1h 23m", func(t *testing.T) {
+	t.Run("AC-V3-08: 4980000ms → ⏱️ 1h 23m", func(t *testing.T) {
 		input := &StdinData{
 			Model: &ModelInfo{Name: "claude-opus-4-6-20250514"},
 			Cost:  &CostData{TotalDurationMS: 4980000},
@@ -788,8 +788,8 @@ func TestIntegration_SessionTime(t *testing.T) {
 			t.Fatalf("Build error: %v", err)
 		}
 
-		if !strings.Contains(got, "⏳ 1h 23m") {
-			t.Errorf("AC-V3-08: session time should be '⏳ 1h 23m'\noutput:\n%s", got)
+		if !strings.Contains(got, "⏱️ 1h 23m") {
+			t.Errorf("AC-V3-08: session time should be '⏱️ 1h 23m'\noutput:\n%s", got)
 		}
 	})
 }
