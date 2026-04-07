@@ -367,7 +367,7 @@ func TestRunDiagnostics(t *testing.T) {
 		}
 
 		// Windows 진단에는 최소 10개 이상의 체크가 있어야 함
-		// (UTF-8, MCP x3, Git Bash, WSL2, LongPaths, Hook Bash, Go, Node, Git, AE)
+		// (UTF-8, MCP x2, Git Bash, WSL2, LongPaths, Hook Bash, Go, Node, Git, AE)
 		if len(profile.Checks) < 10 {
 			t.Errorf("Windows 체크 수 = %d, want >= 10", len(profile.Checks))
 		}

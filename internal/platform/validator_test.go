@@ -312,7 +312,7 @@ func TestWindowsValidator_checkMCPServerPaths(t *testing.T) {
 		checks := v.checkMCPServerPaths()
 
 		if len(checks) != 2 {
-			t.Fatalf("checkMCPServerPaths() returned %d checks, want 3", len(checks))
+			t.Fatalf("checkMCPServerPaths() returned %d checks, want 2", len(checks))
 		}
 		for _, c := range checks {
 			if c.Status != StatusOK {

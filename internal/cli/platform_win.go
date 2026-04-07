@@ -13,7 +13,7 @@ var winCmd = &cobra.Command{
 
 검증 항목:
   - UTF-8 코드페이지 (chcp 65001)
-  - MCP 서버 경로 (npx, pwsh 등)
+  - MCP 서버 경로 (npx, npx.cmd)
   - Git Bash 환경 감지
   - WSL2 상태 확인
   - 260자 경로 길이 제한 (LongPathsEnabled)

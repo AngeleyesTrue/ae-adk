@@ -8,7 +8,7 @@ ae-adk 소스 코드에서 Windows 호환성을 위해 수정된 부분.
 | 파일 | 변경 내용 | 영향 시점 |
 |------|----------|----------|
 | `internal/template/settings.go` | `BuildSmartPATH()` Windows 분기 추가 | `ae init` / `ae update` |
-| `internal/template/templates/.mcp.json.tmpl` | Windows에서 `pwsh.exe` 사용 | `ae init` |
+| `internal/template/templates/.mcp.json.tmpl` | 모든 플랫폼에서 `npx` 직접 실행 | `ae init` |
 | `Makefile` | 크로스 플랫폼 호환성 개선 | `make` 실행 시 |
 | `internal/cmd/datestamp/main.go` | `date -u` 대체 유틸리티 | `make` 실행 시 |
 
@@ -51,14 +51,14 @@ ae-adk 소스 코드에서 Windows 호환성을 위해 수정된 부분.
 
 ## .mcp.json.tmpl 변경
 
-Windows 분기에서 `cmd.exe` → `pwsh.exe`로 변경:
+플랫폼별 셸 분기를 제거하고 `npx` 직접 실행으로 통일 (SPEC-FIX-001):
 
 ```
-Before: "command": "cmd.exe", "args": ["/c", "npx -y ..."]
-After:  "command": "pwsh.exe", "args": ["-NoProfile", "-Command", "npx -y ..."]
+Before: 플랫폼별 분기 (Windows: pwsh.exe, macOS/Linux: /bin/bash)
+After:  "command": "npx", "args": ["-y", "@package"]
 ```
 
-이유: `cmd.exe`는 PATH 해석이 제한적이고, `npx.cmd` 실행에 문제 발생.
+이유: `pwsh.exe`(PowerShell 7)는 대다수 Windows에 기본 설치되어 있지 않아 MCP 서버 시작 실패. `npx`는 Node.js와 함께 설치되므로 모든 플랫폼에서 동작.
 
 ## Makefile 변경
 
@@ -80,5 +80,5 @@ go test ./internal/template/ -run "TestMCPTemplatePlatformCommands" -v
 
 ---
 
-Version: 1.0.0
-Last Updated: 2026-03-18
+Version: 1.1.0
+Last Updated: 2026-04-07
