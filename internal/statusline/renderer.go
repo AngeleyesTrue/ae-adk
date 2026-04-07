@@ -116,7 +116,7 @@ func (r *Renderer) joinSegments(segments []string) string {
 // renderDefaultV3 renders the default mode 3-line layout.
 //
 // L1: ⚡ Model │ 🍂 v2.1.50 │ 🏷️ v2.8.0 │ ⏱️ 2h 34m │ 👁️ AE
-// L2: CW: 🪫 ██████████ 88% │ 5H: 🔋 ██████████ 45%(3h) │ 7D: 🪫 ██████████ 82%(Apr10)
+// L2: CW: 🪫 ██████████ 88% │ 5H: 🔋 ██████████ 45%(3h) │ 7D: 🪫 ██████████ 82%(04-10)
 // L3: ⚙️ ae-adk-go │ 🌿 feat/auth ↑2↓1 │ 📝 +3 M2 ?1
 func (r *Renderer) renderDefaultV3(data *StatusData) string {
 	var lines []string
@@ -371,8 +371,8 @@ func formatResetTimeShort(isoTimestamp string) string {
 	return fmt.Sprintf("%dm", minutes)
 }
 
-// formatResetDateShort formats an ISO 8601 timestamp as short absolute date: "Apr10".
-// Used in default mode inline bars for compact display.
+// formatResetDateShort formats an ISO 8601 timestamp as short absolute date: "01-02".
+// Used in default mode inline bars for compact 7-day window display.
 func formatResetDateShort(isoTimestamp string) string {
 	if isoTimestamp == "" {
 		return ""
@@ -385,7 +385,7 @@ func formatResetDateShort(isoTimestamp string) string {
 		}
 	}
 	t = t.Local()
-	return fmt.Sprintf("%s%d", t.Format("Jan"), t.Day())
+	return t.Format("01-02")
 }
 
 // formatResetTimeRelative formats an ISO 8601 timestamp as relative time "in Xh Ym".

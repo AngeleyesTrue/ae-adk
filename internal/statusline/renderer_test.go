@@ -1376,8 +1376,8 @@ func TestFormatResetDateShort(t *testing.T) {
 	}{
 		{"empty string", "", true, ""},
 		{"invalid format", "not-a-date", true, ""},
-		{"valid RFC3339 Jan21", "2026-01-21T14:00:00Z", false, "Jan"},
-		{"valid RFC3339 Apr10", "2026-04-10T14:00:00Z", false, "Apr"},
+		{"valid RFC3339 Jan21", "2026-01-21T14:00:00Z", false, "01-"},
+		{"valid RFC3339 Apr10", "2026-04-10T14:00:00Z", false, "04-10"},
 	}
 
 	for _, tt := range tests {
@@ -1412,9 +1412,9 @@ func TestRenderUsageBarWithShortReset(t *testing.T) {
 	}
 
 	// 7D with date
-	got = renderUsageBarWithShortReset("7D:", 82, 10, true, "Apr10")
-	if !strings.Contains(got, "82%(Apr10)") {
-		t.Errorf("should contain '82%%(Apr10)', got %q", got)
+	got = renderUsageBarWithShortReset("7D:", 82, 10, true, "04-10")
+	if !strings.Contains(got, "82%(04-10)") {
+		t.Errorf("should contain '82%%(04-10)', got %q", got)
 	}
 }
 
@@ -1441,8 +1441,8 @@ func TestRenderDefaultV3_InlineBarsWithShortReset(t *testing.T) {
 	if !strings.Contains(l2, "45%(3h)") {
 		t.Errorf("default L2 5H should contain short reset '45%%(3h)', got: %q", l2)
 	}
-	if !strings.Contains(l2, "82%(Apr") {
-		t.Errorf("default L2 7D should contain short reset date '82%%(Apr...)', got: %q", l2)
+	if !strings.Contains(l2, "82%(04-") {
+		t.Errorf("default L2 7D should contain short reset date '82%%(04-...)', got: %q", l2)
 	}
 }
 
