@@ -563,21 +563,20 @@ func TestMCPTemplateRequiredServers(t *testing.T) {
 }
 
 func TestMCPTemplatePlatformCommands(t *testing.T) {
-	t.Run("darwin_uses_bash", func(t *testing.T) {
-		ctx := testContext("darwin")
-		output := renderTemplate(t, ".mcp.json.tmpl", ctx)
+	t.Run("all_platforms_use_npx", func(t *testing.T) {
+		for _, platform := range []string{"darwin", "linux", "windows"} {
+			ctx := testContext(platform)
+			output := renderTemplate(t, ".mcp.json.tmpl", ctx)
 
-		if !strings.Contains(output, "/bin/bash") {
-			t.Error("darwin should use /bin/bash")
-		}
-	})
-
-	t.Run("windows_uses_pwsh", func(t *testing.T) {
-		ctx := testContext("windows")
-		output := renderTemplate(t, ".mcp.json.tmpl", ctx)
-
-		if !strings.Contains(output, "pwsh.exe") {
-			t.Error("windows should use pwsh.exe")
+			if !strings.Contains(output, `"command": "npx"`) {
+				t.Errorf("%s should use npx as command", platform)
+			}
+			if strings.Contains(output, "pwsh.exe") {
+				t.Errorf("%s should NOT contain pwsh.exe", platform)
+			}
+			if strings.Contains(output, "/bin/bash") {
+				t.Errorf("%s should NOT contain /bin/bash (platform-specific)", platform)
+			}
 		}
 	})
 }

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "defaultMode": "auto"
+  },
+  "enabledPlugins": {
+    "telegram@claude-plugins-official": true
+  },
+  "channelsEnabled": true
+}
