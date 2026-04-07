@@ -102,7 +102,6 @@ func (v *WindowsValidator) checkMCPServerPaths() []PlatformCheck {
 	}{
 		{"npx", "npx"},
 		{"npx.cmd", "npx.cmd"},
-		{"pwsh.exe", "pwsh.exe"},
 	}
 
 	checks := make([]PlatformCheck, 0, len(mcpTools))

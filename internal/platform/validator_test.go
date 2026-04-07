@@ -196,7 +196,6 @@ func TestWindowsValidator_RunChecks(t *testing.T) {
 		// MCP Server Paths
 		mock.Commands["where.exe npx"] = "C:\\nodejs\\npx"
 		mock.Commands["where.exe npx.cmd"] = "C:\\nodejs\\npx.cmd"
-		mock.Commands["where.exe pwsh.exe"] = "C:\\Windows\\pwsh.exe"
 
 		// Git Bash (MSYSTEM 환경 변수)
 		mock.EnvVars["MSYSTEM"] = "MINGW64"
@@ -308,12 +307,11 @@ func TestWindowsValidator_checkMCPServerPaths(t *testing.T) {
 		mock := NewMockSystemInfo()
 		mock.Commands["where.exe npx"] = "C:\\npx"
 		mock.Commands["where.exe npx.cmd"] = "C:\\npx.cmd"
-		mock.Commands["where.exe pwsh.exe"] = "C:\\pwsh.exe"
 
 		v := &WindowsValidator{sys: mock}
 		checks := v.checkMCPServerPaths()
 
-		if len(checks) != 3 {
+		if len(checks) != 2 {
 			t.Fatalf("checkMCPServerPaths() returned %d checks, want 3", len(checks))
 		}
 		for _, c := range checks {
@@ -331,8 +329,6 @@ func TestWindowsValidator_checkMCPServerPaths(t *testing.T) {
 		mock.Commands["which npx"] = "/usr/bin/npx"
 		mock.CommandErrors["where.exe npx.cmd"] = fmt.Errorf("not found")
 		mock.Commands["which npx.cmd"] = "/usr/bin/npx.cmd"
-		mock.CommandErrors["where.exe pwsh.exe"] = fmt.Errorf("not found")
-		mock.Commands["which pwsh.exe"] = "/usr/bin/pwsh.exe"
 
 		v := &WindowsValidator{sys: mock}
 		checks := v.checkMCPServerPaths()
@@ -352,8 +348,6 @@ func TestWindowsValidator_checkMCPServerPaths(t *testing.T) {
 		mock.CommandErrors["which npx"] = fmt.Errorf("not found")
 		mock.CommandErrors["where.exe npx.cmd"] = fmt.Errorf("not found")
 		mock.CommandErrors["which npx.cmd"] = fmt.Errorf("not found")
-		mock.CommandErrors["where.exe pwsh.exe"] = fmt.Errorf("not found")
-		mock.CommandErrors["which pwsh.exe"] = fmt.Errorf("not found")
 
 		v := &WindowsValidator{sys: mock}
 		checks := v.checkMCPServerPaths()

@@ -346,7 +346,6 @@ func TestRunDiagnostics(t *testing.T) {
 		mock.Commands["cmd.exe /c chcp"] = "Active code page: 65001"
 		mock.Commands["where.exe npx"] = "C:\\nodejs\\npx"
 		mock.Commands["where.exe npx.cmd"] = "C:\\nodejs\\npx.cmd"
-		mock.Commands["where.exe pwsh.exe"] = "C:\\Windows\\pwsh.exe"
 		mock.Commands["wsl.exe --status"] = "WSL version 2"
 		mock.Commands["reg query HKLM\\SYSTEM\\CurrentControlSet\\Control\\FileSystem /v LongPathsEnabled"] = "LongPathsEnabled    REG_DWORD    0x1"
 		mock.Files[`C:\Program Files\Git\bin\bash.exe`] = []byte{}
