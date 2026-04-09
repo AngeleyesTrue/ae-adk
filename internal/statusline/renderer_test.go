@@ -100,15 +100,15 @@ func TestRender_VerboseMode_MultiLine(t *testing.T) {
 
 	lines := strings.Split(got, "\n")
 
-	// v3 full L1: Model, Claude version, AE version (no prefix)
+	// v3 full L1: Model, Claude version (접두사 포함), AE version (접두사 포함)
 	if !strings.Contains(lines[0], "⚡ Sonnet 4") {
 		t.Errorf("full line 1 should contain model, got %q", lines[0])
 	}
-	if !strings.Contains(lines[0], "🍂 v1.0.80") {
-		t.Errorf("full line 1 should contain Claude version, got %q", lines[0])
+	if !strings.Contains(lines[0], "🍂 Claude v1.0.80") {
+		t.Errorf("full line 1 should contain Claude version with prefix, got %q", lines[0])
 	}
-	if !strings.Contains(lines[0], "🏷️ v1.2.0") {
-		t.Errorf("full line 1 should contain AE version, got %q", lines[0])
+	if !strings.Contains(lines[0], "🏷️ AE v1.2.0") {
+		t.Errorf("full line 1 should contain AE version with prefix, got %q", lines[0])
 	}
 	// v3 does not render cost (REQ-V3-TIME-005)
 	if strings.Contains(got, "$") {
@@ -151,9 +151,9 @@ func TestRender_VerboseMode_CostRendering(t *testing.T) {
 	if strings.Contains(got, "$1.23") || strings.Contains(got, "$") {
 		t.Errorf("full mode should NOT render cost in v3, got %q", got)
 	}
-	// Version info should still be displayed (no prefix in full mode)
-	if !strings.Contains(got, "🍂 v1.0.80") {
-		t.Errorf("full mode should still contain Claude version, got %q", got)
+	// Version info should still be displayed (full 모드는 접두사 포함)
+	if !strings.Contains(got, "🍂 Claude v1.0.80") {
+		t.Errorf("full mode should contain Claude version with prefix, got %q", got)
 	}
 }
 
@@ -967,12 +967,12 @@ func TestRenderFullV3_Line1_WithPrefixes(t *testing.T) {
 	if !strings.Contains(l1, "⚡ Opus 4.6") {
 		t.Errorf("full L1 must contain model, got: %q", l1)
 	}
-	// full mode: no prefix, same as default
-	if !strings.Contains(l1, "🍂 v2.1.50") {
-		t.Errorf("full L1 should contain '🍂 v2.1.50', got: %q", l1)
+	// full 모드: 접두사 포함 ("Claude", "AE")
+	if !strings.Contains(l1, "🍂 Claude v2.1.50") {
+		t.Errorf("full L1 should contain '🍂 Claude v2.1.50', got: %q", l1)
 	}
-	if !strings.Contains(l1, "🏷️ v2.8.0") {
-		t.Errorf("full L1 should contain '🏷️ v2.8.0', got: %q", l1)
+	if !strings.Contains(l1, "🏷️ AE v2.8.0") {
+		t.Errorf("full L1 should contain '🏷️ AE v2.8.0', got: %q", l1)
 	}
 	if !strings.Contains(l1, "⏱️") {
 		t.Errorf("full L1 must contain session time, got: %q", l1)
@@ -1459,5 +1459,118 @@ func TestRenderUsageBarWithReset(t *testing.T) {
 	got = renderUsageBarWithReset("5H:", 25, 10, true, "in 2h15m")
 	if !strings.Contains(got, "(Resets in 2h15m)") {
 		t.Errorf("should contain '(Resets in 2h15m)', got %q", got)
+	}
+}
+
+// --- Sync Indicator 테스트 (SPEC-FIX-002, REQ-FIX-002-002) ---
+
+// TestRender_SyncIndicator_DefaultMode 는 SyncNeeded=true, UpdateAvailable=false 일 때
+// 기본 모드에서 🔄 동기화 표시기가 출력되고, ⬆️ 는 출력되지 않음을 검증한다.
+func TestRender_SyncIndicator_DefaultMode(t *testing.T) {
+	r := newTestRenderer()
+	data := &StatusData{
+		Metrics: MetricsData{Model: "Opus 4.5", Available: true},
+		Memory:  MemoryData{TokensUsed: 50000, TokenBudget: 200000, Available: true},
+		Version: VersionData{
+			Current:         "1.2.4",
+			SyncNeeded:      true,
+			TemplateVersion: "1.2.3",
+			UpdateAvailable: false,
+			Available:       true,
+		},
+	}
+
+	got := r.Render(data, ModeDefault)
+
+	if !strings.Contains(got, "🏷️ v1.2.4 🔄 v1.2.3") {
+		t.Errorf("default 모드에서 동기화 표시기가 포함되어야 함, got %q", got)
+	}
+	if strings.Contains(got, "⬆️") {
+		t.Errorf("UpdateAvailable=false일 때 ⬆️가 표시되면 안 됨, got %q", got)
+	}
+}
+
+// TestRender_SyncIndicator_FullMode 는 SyncNeeded=true, UpdateAvailable=false 일 때
+// full 모드에서 🔄 동기화 표시기가 출력되고, ⬆️ 는 출력되지 않음을 검증한다.
+// full 모드는 renderInfoLine(data, true)를 호출하므로 "AE" 접두사가 포함되어 출력된다.
+func TestRender_SyncIndicator_FullMode(t *testing.T) {
+	r := newTestRenderer()
+	data := &StatusData{
+		Metrics: MetricsData{Model: "Opus 4.5", Available: true},
+		Memory:  MemoryData{TokensUsed: 50000, TokenBudget: 200000, Available: true},
+		Version: VersionData{
+			Current:         "1.2.4",
+			SyncNeeded:      true,
+			TemplateVersion: "1.2.3",
+			UpdateAvailable: false,
+			Available:       true,
+		},
+		Directory: "ae-adk",
+		Git:       GitStatusData{Branch: "main", Available: true},
+	}
+
+	got := r.Render(data, ModeFull)
+
+	// full 모드: "AE" 접두사 포함 (AC-003)
+	if !strings.Contains(got, "🏷️ AE v1.2.4 🔄 v1.2.3") {
+		t.Errorf("full 모드에서 AE 접두사와 동기화 표시기가 포함되어야 함, got %q", got)
+	}
+	if strings.Contains(got, "⬆️") {
+		t.Errorf("UpdateAvailable=false일 때 ⬆️가 표시되면 안 됨, got %q", got)
+	}
+}
+
+// TestRender_UpdateTakesPriorityOverSync 는 UpdateAvailable=true AND SyncNeeded=true 일 때
+// ⬆️ 업데이트 표시가 🔄 동기화 표시보다 우선됨을 검증한다.
+func TestRender_UpdateTakesPriorityOverSync(t *testing.T) {
+	r := newTestRenderer()
+	data := &StatusData{
+		Metrics: MetricsData{Model: "Opus 4.5", Available: true},
+		Memory:  MemoryData{TokensUsed: 50000, TokenBudget: 200000, Available: true},
+		Version: VersionData{
+			Current:         "1.2.4",
+			Latest:          "1.3.0",
+			UpdateAvailable: true,
+			SyncNeeded:      true,
+			TemplateVersion: "1.2.3",
+			Available:       true,
+		},
+	}
+
+	got := r.Render(data, ModeDefault)
+
+	if !strings.Contains(got, "⬆️ v1.3.0") {
+		t.Errorf("UpdateAvailable=true일 때 ⬆️가 표시되어야 함, got %q", got)
+	}
+	if strings.Contains(got, "🔄") {
+		t.Errorf("UpdateAvailable=true일 때 🔄가 표시되면 안 됨 (업데이트 우선), got %q", got)
+	}
+}
+
+// TestRender_NoIndicatorWhenVersionsMatch 는 SyncNeeded=false, UpdateAvailable=false 일 때
+// 🔄 와 ⬆️ 모두 표시되지 않음을 검증한다.
+func TestRender_NoIndicatorWhenVersionsMatch(t *testing.T) {
+	r := newTestRenderer()
+	data := &StatusData{
+		Metrics: MetricsData{Model: "Opus 4.5", Available: true},
+		Memory:  MemoryData{TokensUsed: 50000, TokenBudget: 200000, Available: true},
+		Version: VersionData{
+			Current:         "1.2.4",
+			SyncNeeded:      false,
+			UpdateAvailable: false,
+			Available:       true,
+		},
+	}
+
+	got := r.Render(data, ModeDefault)
+
+	if !strings.Contains(got, "🏷️ v1.2.4") {
+		t.Errorf("현재 버전이 표시되어야 함, got %q", got)
+	}
+	if strings.Contains(got, "🔄") {
+		t.Errorf("SyncNeeded=false일 때 🔄가 표시되면 안 됨, got %q", got)
+	}
+	if strings.Contains(got, "⬆️") {
+		t.Errorf("UpdateAvailable=false일 때 ⬆️가 표시되면 안 됨, got %q", got)
 	}
 }

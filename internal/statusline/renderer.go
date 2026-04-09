@@ -155,8 +155,8 @@ func (r *Renderer) renderDefaultV3(data *StatusData) string {
 func (r *Renderer) renderFullV3(data *StatusData) string {
 	var lines []string
 
-	// L1: model, Claude version, AE version, session time, output style (no prefix)
-	l1 := r.renderInfoLine(data, false)
+	// L1: model, Claude version, AE version, session time, output style (full 모드는 접두사 포함)
+	l1 := r.renderInfoLine(data, true)
 	if l1 != "" {
 		lines = append(lines, l1)
 	}
@@ -230,7 +230,11 @@ func (r *Renderer) renderInfoLine(data *StatusData, withPrefix bool) string {
 			versionStr = fmt.Sprintf("🏷️ v%s", data.Version.Current)
 		}
 		if data.Version.UpdateAvailable && data.Version.Latest != "" {
+			// 업데이트 가능 시 ⬆️ 표시 (업데이트가 동기화보다 우선)
 			versionStr += fmt.Sprintf(" ⬆️ v%s", data.Version.Latest)
+		} else if data.Version.SyncNeeded && data.Version.TemplateVersion != "" {
+			// 템플릿 버전과 바이너리 버전이 다를 때 🔄 동기화 표시
+			versionStr += fmt.Sprintf(" 🔄 v%s", data.Version.TemplateVersion)
 		}
 		segs = append(segs, versionStr)
 	}
