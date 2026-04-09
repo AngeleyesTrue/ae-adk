@@ -211,6 +211,7 @@ dist-ssr/
 .claude/agents/
 .claude/skills/*
 !.claude/skills/ae-lang-csharp/
+!.claude/skills/ae-design-impeccable/
 .claude/rules/
 .claude/hooks/
 .claude/output-styles/
