@@ -163,10 +163,14 @@ type MetricsData struct {
 }
 
 // VersionData holds version and update information.
+// Current는 실행 중인 바이너리 버전을 표시하며,
+// SyncNeeded는 바이너리와 템플릿 버전이 다를 때 true로 설정된다.
 type VersionData struct {
 	Current         string
 	Latest          string
 	UpdateAvailable bool
+	SyncNeeded      bool
+	TemplateVersion string
 	Available       bool
 }
 

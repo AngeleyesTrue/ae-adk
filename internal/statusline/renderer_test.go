@@ -1461,3 +1461,115 @@ func TestRenderUsageBarWithReset(t *testing.T) {
 		t.Errorf("should contain '(Resets in 2h15m)', got %q", got)
 	}
 }
+
+// --- Sync Indicator 테스트 (SPEC-FIX-002, REQ-FIX-002-002) ---
+
+// TestRender_SyncIndicator_DefaultMode 는 SyncNeeded=true, UpdateAvailable=false 일 때
+// 기본 모드에서 🔄 동기화 표시기가 출력되고, ⬆️ 는 출력되지 않음을 검증한다.
+func TestRender_SyncIndicator_DefaultMode(t *testing.T) {
+	r := newTestRenderer()
+	data := &StatusData{
+		Metrics: MetricsData{Model: "Opus 4.5", Available: true},
+		Memory:  MemoryData{TokensUsed: 50000, TokenBudget: 200000, Available: true},
+		Version: VersionData{
+			Current:         "1.2.4",
+			SyncNeeded:      true,
+			TemplateVersion: "1.2.3",
+			UpdateAvailable: false,
+			Available:       true,
+		},
+	}
+
+	got := r.Render(data, ModeDefault)
+
+	if !strings.Contains(got, "🏷️ v1.2.4 🔄 v1.2.3") {
+		t.Errorf("default 모드에서 동기화 표시기가 포함되어야 함, got %q", got)
+	}
+	if strings.Contains(got, "⬆️") {
+		t.Errorf("UpdateAvailable=false일 때 ⬆️가 표시되면 안 됨, got %q", got)
+	}
+}
+
+// TestRender_SyncIndicator_FullMode 는 SyncNeeded=true, UpdateAvailable=false 일 때
+// full 모드에서 🔄 동기화 표시기가 출력되고, ⬆️ 는 출력되지 않음을 검증한다.
+// full 모드도 renderInfoLine(data, false)를 호출하므로 AE 접두사 없이 출력된다.
+func TestRender_SyncIndicator_FullMode(t *testing.T) {
+	r := newTestRenderer()
+	data := &StatusData{
+		Metrics: MetricsData{Model: "Opus 4.5", Available: true},
+		Memory:  MemoryData{TokensUsed: 50000, TokenBudget: 200000, Available: true},
+		Version: VersionData{
+			Current:         "1.2.4",
+			SyncNeeded:      true,
+			TemplateVersion: "1.2.3",
+			UpdateAvailable: false,
+			Available:       true,
+		},
+		Directory: "ae-adk",
+		Git:       GitStatusData{Branch: "main", Available: true},
+	}
+
+	got := r.Render(data, ModeFull)
+
+	if !strings.Contains(got, "🏷️ v1.2.4 🔄 v1.2.3") {
+		t.Errorf("full 모드에서 동기화 표시기가 포함되어야 함, got %q", got)
+	}
+	if strings.Contains(got, "⬆️") {
+		t.Errorf("UpdateAvailable=false일 때 ⬆️가 표시되면 안 됨, got %q", got)
+	}
+}
+
+// TestRender_UpdateTakesPriorityOverSync 는 UpdateAvailable=true AND SyncNeeded=true 일 때
+// ⬆️ 업데이트 표시가 🔄 동기화 표시보다 우선됨을 검증한다.
+func TestRender_UpdateTakesPriorityOverSync(t *testing.T) {
+	r := newTestRenderer()
+	data := &StatusData{
+		Metrics: MetricsData{Model: "Opus 4.5", Available: true},
+		Memory:  MemoryData{TokensUsed: 50000, TokenBudget: 200000, Available: true},
+		Version: VersionData{
+			Current:         "1.2.4",
+			Latest:          "1.3.0",
+			UpdateAvailable: true,
+			SyncNeeded:      true,
+			TemplateVersion: "1.2.3",
+			Available:       true,
+		},
+	}
+
+	got := r.Render(data, ModeDefault)
+
+	if !strings.Contains(got, "⬆️ v1.3.0") {
+		t.Errorf("UpdateAvailable=true일 때 ⬆️가 표시되어야 함, got %q", got)
+	}
+	if strings.Contains(got, "🔄") {
+		t.Errorf("UpdateAvailable=true일 때 🔄가 표시되면 안 됨 (업데이트 우선), got %q", got)
+	}
+}
+
+// TestRender_NoIndicatorWhenVersionsMatch 는 SyncNeeded=false, UpdateAvailable=false 일 때
+// 🔄 와 ⬆️ 모두 표시되지 않음을 검증한다.
+func TestRender_NoIndicatorWhenVersionsMatch(t *testing.T) {
+	r := newTestRenderer()
+	data := &StatusData{
+		Metrics: MetricsData{Model: "Opus 4.5", Available: true},
+		Memory:  MemoryData{TokensUsed: 50000, TokenBudget: 200000, Available: true},
+		Version: VersionData{
+			Current:         "1.2.4",
+			SyncNeeded:      false,
+			UpdateAvailable: false,
+			Available:       true,
+		},
+	}
+
+	got := r.Render(data, ModeDefault)
+
+	if !strings.Contains(got, "🏷️ v1.2.4") {
+		t.Errorf("현재 버전이 표시되어야 함, got %q", got)
+	}
+	if strings.Contains(got, "🔄") {
+		t.Errorf("SyncNeeded=false일 때 🔄가 표시되면 안 됨, got %q", got)
+	}
+	if strings.Contains(got, "⬆️") {
+		t.Errorf("UpdateAvailable=false일 때 ⬆️가 표시되면 안 됨, got %q", got)
+	}
+}
