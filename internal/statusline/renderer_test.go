@@ -1492,7 +1492,7 @@ func TestRender_SyncIndicator_DefaultMode(t *testing.T) {
 
 // TestRender_SyncIndicator_FullMode 는 SyncNeeded=true, UpdateAvailable=false 일 때
 // full 모드에서 🔄 동기화 표시기가 출력되고, ⬆️ 는 출력되지 않음을 검증한다.
-// full 모드도 renderInfoLine(data, false)를 호출하므로 AE 접두사 없이 출력된다.
+// full 모드는 renderInfoLine(data, true)를 호출하므로 "AE" 접두사가 포함되어 출력된다.
 func TestRender_SyncIndicator_FullMode(t *testing.T) {
 	r := newTestRenderer()
 	data := &StatusData{
