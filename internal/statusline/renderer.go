@@ -155,8 +155,8 @@ func (r *Renderer) renderDefaultV3(data *StatusData) string {
 func (r *Renderer) renderFullV3(data *StatusData) string {
 	var lines []string
 
-	// L1: model, Claude version, AE version, session time, output style (no prefix)
-	l1 := r.renderInfoLine(data, false)
+	// L1: model, Claude version, AE version, session time, output style (full 모드는 접두사 포함)
+	l1 := r.renderInfoLine(data, true)
 	if l1 != "" {
 		lines = append(lines, l1)
 	}
