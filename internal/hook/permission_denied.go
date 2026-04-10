@@ -13,7 +13,6 @@ var readOnlyTools = map[string]bool{
 	"Glob":                 true,
 	"WebFetch":             true,
 	"WebSearch":            true,
-	"Skill":                true,
 	"ListMcpResourcesTool": true,
 	"ReadMcpResourceTool":  true,
 }
@@ -34,9 +33,9 @@ func (h *permissionDeniedHandler) EventType() EventType {
 }
 
 // Handle processes a PermissionDenied event.
-// Read-only tools (Read, Grep, Glob, WebFetch, WebSearch, Skill, ListMcpResourcesTool,
+// Read-only tools (Read, Grep, Glob, WebFetch, WebSearch, ListMcpResourcesTool,
 // ReadMcpResourceTool) are safe to retry because they do not modify any state.
-// Write operations are not retried to prevent unintended side effects.
+// Write operations and Skill (which can trigger code execution) are not retried.
 func (h *permissionDeniedHandler) Handle(ctx context.Context, input *HookInput) (*HookOutput, error) {
 	if readOnlyTools[input.ToolName] {
 		slog.Info("permission denied for read-only tool, signaling retry",

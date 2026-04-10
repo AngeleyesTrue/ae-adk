@@ -45,9 +45,9 @@ func TestPermissionDeniedHandler_Handle(t *testing.T) {
 			wantRetry: true,
 		},
 		{
-			name:      "Skill tool retries",
+			name:      "Skill tool does not retry (can execute code)",
 			input:     &HookInput{SessionID: "sess-001", ToolName: "Skill"},
-			wantRetry: true,
+			wantRetry: false,
 		},
 		{
 			name:      "ListMcpResourcesTool retries",

@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"unicode/utf8"
 )
 
 // charsPerToken is the approximate number of UTF-8 characters per token
@@ -93,6 +94,9 @@ func splitSections(content string) []string {
 }
 
 // estimateTokens returns an approximate token count for the given string.
+// Uses rune count (not byte length) so multi-byte UTF-8 characters
+// (e.g. Korean, CJK) are counted correctly.
 func estimateTokens(s string) int {
-	return (len(s) + charsPerToken - 1) / charsPerToken
+	n := utf8.RuneCountInString(s)
+	return (n + charsPerToken - 1) / charsPerToken
 }

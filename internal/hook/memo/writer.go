@@ -43,11 +43,11 @@ func Write(projectDir string, sections []Section) error {
 
 	dest := filepath.Join(projectDir, memoFileName)
 
-	if err := os.MkdirAll(filepath.Dir(dest), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(dest), 0o700); err != nil {
 		return fmt.Errorf("memo: create state dir: %w", err)
 	}
 
-	if err := os.WriteFile(dest, []byte(sb.String()), 0o644); err != nil {
+	if err := os.WriteFile(dest, []byte(sb.String()), 0o600); err != nil {
 		return fmt.Errorf("memo: write file: %w", err)
 	}
 

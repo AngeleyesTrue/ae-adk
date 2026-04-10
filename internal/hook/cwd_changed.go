@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // cwdChangedHandler processes CwdChanged events.
@@ -49,7 +50,15 @@ func (h *cwdChangedHandler) Handle(ctx context.Context, input *HookInput) (*Hook
 // writeEnvFile appends project-specific environment variables to CLAUDE_ENV_FILE.
 // Non-blocking: errors are logged but never propagated.
 func (h *cwdChangedHandler) writeEnvFile(envFile, cwd string) {
-	// Check if the new directory has a .envrc or .env file
+	// Reject paths containing shell metacharacters to prevent injection
+	// when the env file is sourced by Bash.
+	if containsShellMetachars(cwd) {
+		slog.Warn("cwd_changed: refusing to write env file with unsafe path",
+			"cwd", cwd,
+		)
+		return
+	}
+
 	var exports []string
 
 	// If .ae/config exists, export AE_PROJECT_DIR
@@ -66,7 +75,7 @@ func (h *cwdChangedHandler) writeEnvFile(envFile, cwd string) {
 		content += e + "\n"
 	}
 
-	if err := os.WriteFile(envFile, []byte(content), 0o644); err != nil {
+	if err := os.WriteFile(envFile, []byte(content), 0o600); err != nil {
 		slog.Warn("cwd_changed: failed to write CLAUDE_ENV_FILE",
 			"error", err,
 			"env_file", envFile,
@@ -77,4 +86,17 @@ func (h *cwdChangedHandler) writeEnvFile(envFile, cwd string) {
 			"exports", len(exports),
 		)
 	}
+}
+
+// containsShellMetachars returns true if the path contains characters
+// that could break out of a double-quoted string in Bash when the env file
+// is sourced. Inside double quotes, only these are dangerous:
+//   - " breaks out of the string
+//   - $ triggers variable/command expansion
+//   - ` triggers command substitution (legacy syntax)
+//   - \n / \r can inject new commands after the closing quote
+//
+// Backslash is NOT flagged because it is the Windows path separator.
+func containsShellMetachars(path string) bool {
+	return strings.ContainsAny(path, "\"`$\n\r")
 }

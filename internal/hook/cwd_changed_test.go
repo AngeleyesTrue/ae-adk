@@ -108,3 +108,65 @@ func TestCwdChangedHandler_NoEnvFileWithoutAeDir(t *testing.T) {
 		t.Error("env file should not exist when no .ae/config present")
 	}
 }
+
+func TestCwdChangedHandler_ShellInjectionBlocked(t *testing.T) {
+	tmpDir := t.TempDir()
+	envFile := filepath.Join(tmpDir, "claude-env")
+
+	// Create a directory with shell metacharacters in path (simulated via cwd string)
+	maliciousCwd := tmpDir + `"; rm -rf /; #`
+
+	// Create .ae/config in tmpDir to trigger the export
+	aeDir := filepath.Join(tmpDir, ".ae", "config")
+	if err := os.MkdirAll(aeDir, 0o755); err != nil {
+		t.Fatalf("failed to create ae config dir: %v", err)
+	}
+
+	t.Setenv("CLAUDE_ENV_FILE", envFile)
+
+	h := NewCwdChangedHandler()
+	_, err := h.Handle(context.Background(), &HookInput{
+		SessionID: "sess-inject",
+		CWD:       maliciousCwd,
+		NewCwd:    maliciousCwd,
+	})
+	if err != nil {
+		t.Fatalf("Handle() error = %v", err)
+	}
+
+	// Env file should NOT be created because the path contains shell metacharacters
+	if _, err := os.Stat(envFile); err == nil {
+		t.Error("env file should not be written when cwd contains shell metacharacters")
+	}
+}
+
+func TestContainsShellMetachars(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		path string
+		want bool
+	}{
+		{"/Users/user/project", false},
+		{"/tmp/safe-dir_123", false},
+		{"C:/Users/dev/project", false},
+		{`C:\Users\dev\project`, false},       // Windows path: backslash is safe
+		{"/tmp/a;b", false},                    // semicolons are safe inside double quotes
+		{"/tmp/a|b", false},                    // pipes are safe inside double quotes
+		{"/tmp/a&b", false},                    // ampersand is safe inside double quotes
+		{"/tmp/a'b", false},                    // single quotes are safe inside double quotes
+		{`/tmp/"; rm -rf /; #`, true},          // double quote breaks out
+		{"/tmp/$(whoami)", true},               // $ triggers command expansion
+		{"/tmp/`id`", true},                    // backtick triggers command substitution
+		{"/tmp/foo\nbar", true},                // newline can inject commands
+		{"/tmp/foo\rbar", true},                // carriage return also dangerous
+		{"", false},
+	}
+
+	for _, tt := range tests {
+		got := containsShellMetachars(tt.path)
+		if got != tt.want {
+			t.Errorf("containsShellMetachars(%q) = %v, want %v", tt.path, got, tt.want)
+		}
+	}
+}

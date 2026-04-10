@@ -154,6 +154,8 @@ func TestEstimateTokens(t *testing.T) {
 		{"abcd", 1},      // 4 chars = 1 token
 		{"abcde", 2},     // 5 chars = ceil(5/4) = 2 tokens
 		{"abcdefgh", 2},  // 8 chars = 2 tokens
+		{"한글", 1},        // 2 runes = ceil(2/4) = 1 token (NOT 6 bytes / 4 = 2)
+		{"한글테스트입니다", 2}, // 7 runes = ceil(7/4) = 2 tokens
 	}
 
 	for _, tt := range tests {

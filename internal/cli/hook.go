@@ -43,6 +43,17 @@ func init() {
 		{"subagent-stop", "Handle subagent stop event", hook.EventSubagentStop},
 		{"worktree-create", "Handle worktree create event", hook.EventWorktreeCreate},
 		{"worktree-remove", "Handle worktree remove event", hook.EventWorktreeRemove},
+		{"post-compact", "Handle post-compact event", hook.EventPostCompact},
+		{"instructions-loaded", "Handle instructions loaded event", hook.EventInstructionsLoaded},
+		{"stop-failure", "Handle stop failure event", hook.EventStopFailure},
+		{"setup", "Handle setup event", hook.EventSetup},
+		{"config-change", "Handle config change event", hook.EventConfigChange},
+		{"task-created", "Handle task created event", hook.EventTaskCreated},
+		{"cwd-changed", "Handle cwd changed event", hook.EventCwdChanged},
+		{"file-changed", "Handle file changed event", hook.EventFileChanged},
+		{"elicitation", "Handle elicitation event", hook.EventElicitation},
+		{"elicitation-result", "Handle elicitation result event", hook.EventElicitationResult},
+		{"permission-denied", "Handle permission denied event", hook.EventPermissionDenied},
 	}
 
 	for _, sub := range hookSubcommands {
