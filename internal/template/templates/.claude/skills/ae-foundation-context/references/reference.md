@@ -235,7 +235,7 @@ Target Metrics:
 
 ### Related Skills
 
-- `ae-foundation-claude`: Claude Code authoring and configuration
+- `ae-foundation-cc`: Claude Code authoring and configuration
 - `ae-foundation-core`: Core execution patterns and SPEC workflow
 - `ae-workflow-project`: Project management and documentation
 - `ae-cc-memory`: Memory management and persistence

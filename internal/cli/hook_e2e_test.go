@@ -145,6 +145,12 @@ func TestHookDepsWiring_AllHandlersRegistered(t *testing.T) {
 		hook.EventPermissionRequest,
 		hook.EventTeammateIdle,
 		hook.EventTaskCompleted,
+		hook.EventWorktreeCreate,
+		hook.EventWorktreeRemove,
+		hook.EventPostCompact,
+		hook.EventConfigChange,
+		hook.EventCwdChanged,
+		hook.EventPermissionDenied,
 	}
 
 	// Events that may not have a handler (conditionally registered).
@@ -160,7 +166,7 @@ func TestHookDepsWiring_AllHandlersRegistered(t *testing.T) {
 	}
 }
 
-// --- Test 4: ValidEventTypes returns exactly 16 event types ---
+// --- Test 4: ValidEventTypes returns exactly 27 event types ---
 
 func TestHookValidEventTypes_Complete(t *testing.T) {
 	t.Parallel()
@@ -175,13 +181,24 @@ func TestHookValidEventTypes_Complete(t *testing.T) {
 		hook.EventTaskCompleted,
 		hook.EventWorktreeCreate,
 		hook.EventWorktreeRemove,
+		hook.EventPostCompact,
+		hook.EventInstructionsLoaded,
+		hook.EventStopFailure,
+		hook.EventSetup,
+		hook.EventConfigChange,
+		hook.EventTaskCreated,
+		hook.EventCwdChanged,
+		hook.EventFileChanged,
+		hook.EventElicitation,
+		hook.EventElicitationResult,
+		hook.EventPermissionDenied,
 	}
 
 	validTypes := hook.ValidEventTypes()
 
 	// Verify exact count.
-	if got := len(validTypes); got != 16 {
-		t.Errorf("ValidEventTypes() returned %d types, want 16", got)
+	if got := len(validTypes); got != 27 {
+		t.Errorf("ValidEventTypes() returned %d types, want 27", got)
 	}
 
 	// Build a lookup set for quick membership checks.
@@ -289,6 +306,17 @@ func TestHookValidEventTypes_AllHaveSubcommands(t *testing.T) {
 		hook.EventSubagentStop:       "subagent-stop",
 		hook.EventWorktreeCreate:     "worktree-create",
 		hook.EventWorktreeRemove:     "worktree-remove",
+		hook.EventPostCompact:        "post-compact",
+		hook.EventInstructionsLoaded: "instructions-loaded",
+		hook.EventStopFailure:        "stop-failure",
+		hook.EventSetup:              "setup",
+		hook.EventConfigChange:       "config-change",
+		hook.EventTaskCreated:        "task-created",
+		hook.EventCwdChanged:         "cwd-changed",
+		hook.EventFileChanged:        "file-changed",
+		hook.EventElicitation:        "elicitation",
+		hook.EventElicitationResult:  "elicitation-result",
+		hook.EventPermissionDenied:   "permission-denied",
 	}
 
 	registeredNames := make(map[string]bool)

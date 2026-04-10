@@ -248,7 +248,7 @@ print(f"Warnings: {status.warnings}")
 ### Related Skills
 
 - ae-foundation-core - Core execution patterns and SPEC workflow
-- ae-foundation-claude - Claude Code integration patterns
+- ae-foundation-cc - Claude Code integration patterns
 - ae-workflow-docs - Unified documentation management
 - ae-workflow-templates - Template optimization strategies
 - ae-library-nextra - Advanced documentation architecture

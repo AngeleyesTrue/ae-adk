@@ -1,0 +1,59 @@
+name: Claude Code
+
+on:
+  # Issues only: PR lifecycle events (opened, ready_for_review, reopened) are handled in claude-code-review.yml
+  issue_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
+
+# I1 Fix: Added concurrency control to prevent duplicate parallel runs on the same issue/PR.
+concurrency:
+  group: claude-${{ github.event.issue.number || github.event.pull_request.number || github.event.comment.id }}
+  cancel-in-progress: false
+
+jobs:
+  claude:
+    if: |
+      (github.event_name == 'issue_comment' && !github.event.issue.pull_request && contains(github.event.comment.body, '@claude') &&
+       (github.event.comment.author_association == 'OWNER' || github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'COLLABORATOR')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')) &&
+       (github.event.issue.author_association == 'OWNER' || github.event.issue.author_association == 'MEMBER' || github.event.issue.author_association == 'COLLABORATOR'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
+      # C2 Fix: id-token: write is required by claude-code-action for OIDC-based
+      # authentication to Anthropic's API when using OAuth tokens.
+      id-token: write
+    steps:
+      - name: Checkout repository
+        # C1 Fix: Pinned to commit SHA to prevent supply chain attacks via floating tags.
+        # Tag: v4.3.1 | SHA: 34e114876b0b11c390a56381ad16ebd13914f8d5
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          fetch-depth: 1
+
+      # C5 Fix: Restored setup-go step so @claude can run Go commands (go test, go build, etc.)
+      - name: Setup Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff
+        with:
+          go-version: "1.26"
+          cache: true
+
+      - name: Run Claude Code
+        id: claude
+        # C1 Fix: Pinned to commit SHA to prevent supply chain attacks via floating tags.
+        # Tag: v1.0.82 | SHA: 88c168b39e7e64da0286d812b6e9fbebb6708185
+        uses: anthropics/claude-code-action@6e2bd52842c65e914eba5c8badd17560bd26b5de
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
+          # C4 Fix: Use claude_args for max-turns (max_turns input is deprecated).
+          # max-turns 40: Issue analysis/implementation involves complex multi-step tasks where 20 is sometimes insufficient.
+          # Use Opus model with high effort for better reasoning on issue fixes.
+          # C4b Fix: Increased from 20 to 40 to prevent error_max_turns on complex tasks.
+          claude_args: |
+            --model opus
+            --effort high
+            --max-turns 40

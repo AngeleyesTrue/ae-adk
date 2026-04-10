@@ -59,8 +59,8 @@ Last Updated: 2025-11-29
  - Reference: [ae-workflow-project modules](ae-workflow-project/modules/)
  - Integration: Project setup with worktree support
 
-- ae-foundation-claude: Claude Code execution patterns
- - Reference: [ae-foundation-claude modules](ae-foundation-claude/modules/)
+- ae-foundation-cc: Claude Code execution patterns
+ - Reference: [ae-foundation-cc modules](ae-foundation-cc/modules/)
  - Integration: Command and agent execution patterns
 
 ### Complementary Tools
@@ -200,7 +200,7 @@ jobs:
 
  - name: Setup ae-worktree
  run: |
- go install github.com/modu-ai/ae-adk/cmd/ae@latest
+ go install github.com/AngeleyesTrue/ae-adk/cmd/ae@latest
  echo "Setting up worktree environment..."
 
  - name: Test Worktree Operations
@@ -226,7 +226,7 @@ pipeline {
  stage('Setup') {
  steps {
  sh '''
- go install github.com/modu-ai/ae-adk/cmd/ae@latest
+ go install github.com/AngeleyesTrue/ae-adk/cmd/ae@latest
  ae-worktree config set worktree_root $WORKSPACE/worktrees
  '''
  }

@@ -126,6 +126,10 @@ func InitDependencies() {
 	deps.HookRegistry.Register(hook.NewTaskCompletedHandler())
 	deps.HookRegistry.Register(hook.NewWorktreeCreateHandler())
 	deps.HookRegistry.Register(hook.NewWorktreeRemoveHandler())
+	deps.HookRegistry.Register(hook.NewPostCompactHandler())
+	deps.HookRegistry.Register(hook.NewConfigChangeHandler())
+	deps.HookRegistry.Register(hook.NewCwdChangedHandler())
+	deps.HookRegistry.Register(hook.NewPermissionDeniedHandler())
 }
 
 // GetDeps returns the current Dependencies instance.

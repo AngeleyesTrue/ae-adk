@@ -37,7 +37,7 @@ Analyze user request to determine routing:
 
 Core Skills (load when needed):
 
-- Skill("ae-foundation-claude") for orchestration patterns
+- Skill("ae-foundation-cc") for orchestration patterns
 - Skill("ae-foundation-core") for SPEC system and workflows
 - Skill("ae-workflow-project") for project management
 
@@ -531,4 +531,4 @@ Last Updated: 2026-04-04
 Language: English
 Core Rule: AE is an orchestrator; direct implementation is prohibited
 
-For detailed patterns on plugins, sandboxing, headless mode, and version management, see Skill("ae-foundation-claude").
+For detailed patterns on plugins, sandboxing, headless mode, and version management, see Skill("ae-foundation-cc").

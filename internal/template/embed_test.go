@@ -88,8 +88,9 @@ func TestEmbeddedTemplates_SkillDefinitions(t *testing.T) {
 		return nil
 	})
 
-	if skillCount < 350 {
-		t.Errorf("expected at least 350 skill .md files, got %d", skillCount)
+	// SPEC-UPDATE-003: 16 lang skills deleted, reduced from ~350 to ~310
+	if skillCount < 300 {
+		t.Errorf("expected at least 300 skill .md files (post SPEC-UPDATE-003 lang migration), got %d", skillCount)
 	}
 }
 

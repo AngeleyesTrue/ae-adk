@@ -132,6 +132,16 @@ func (r *registry) Dispatch(ctx context.Context, event EventType, input *HookInp
 				merged.SystemMessage = output.SystemMessage
 			}
 		}
+
+		// Merge HookSpecificOutput (additionalContext) returned by UserPromptSubmit handlers.
+		// Perform a nil check before setting to prevent later-registered handlers from overwriting values set earlier.
+		if output != nil && output.HookSpecificOutput != nil {
+			if merged.HookSpecificOutput == nil {
+				merged.HookSpecificOutput = output.HookSpecificOutput
+			} else if output.HookSpecificOutput.AdditionalContext != "" && merged.HookSpecificOutput.AdditionalContext == "" {
+				merged.HookSpecificOutput.AdditionalContext = output.HookSpecificOutput.AdditionalContext
+			}
+		}
 	}
 
 	return merged, nil
@@ -174,7 +184,11 @@ func (r *registry) defaultOutputForEvent(event EventType) *HookOutput {
 	case EventStop, EventSessionEnd, EventSessionStart, EventPreCompact,
 		EventSubagentStop, EventPostToolUseFailure, EventNotification,
 		EventSubagentStart, EventUserPromptSubmit, EventTeammateIdle,
-		EventTaskCompleted, EventWorktreeCreate, EventWorktreeRemove:
+		EventTaskCompleted, EventWorktreeCreate, EventWorktreeRemove,
+		EventPostCompact, EventInstructionsLoaded, EventStopFailure,
+		EventSetup, EventConfigChange, EventTaskCreated, EventCwdChanged,
+		EventFileChanged, EventElicitation, EventElicitationResult,
+		EventPermissionDenied:
 		// These events do NOT use hookSpecificOutput per Claude Code protocol
 		// Return empty JSON {}
 		return &HookOutput{}
