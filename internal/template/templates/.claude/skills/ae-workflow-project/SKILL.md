@@ -292,7 +292,7 @@ File Size Impact:
 ## Works Well With
 
 - ae-foundation-core: Core execution patterns and SPEC-driven development workflows
-- ae-foundation-claude: Claude Code integration and configuration
+- ae-foundation-cc: Claude Code integration and configuration
 - ae-workflow-docs: Unified documentation management
 - ae-workflow-templates: Template optimization strategies
 - ae-library-nextra: Advanced documentation architecture

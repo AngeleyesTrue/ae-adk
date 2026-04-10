@@ -507,7 +507,7 @@ func TestSettingsTemplateHookEventCount(t *testing.T) {
 		t.Fatal("missing hooks section")
 	}
 
-	const expectedCount = 24 // SPEC-UPDATE-002: PermissionDenied + 7 events 추가로 16 → 24
+	const expectedCount = 26 // SPEC-UPDATE-003: ConfigChange, CwdChanged 추가로 24 → 26
 	if len(hooks) != expectedCount {
 		t.Errorf("hook event count = %d, want %d; events: %v", len(hooks), expectedCount, hookKeys(hooks))
 	}

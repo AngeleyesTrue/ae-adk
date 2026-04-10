@@ -28,7 +28,7 @@ Standard MCP servers in AE-ADK:
 
 - context7: Library documentation lookup
 - sequential-thinking: Complex problem analysis
-- pencil: .pen file design editing. Used by expert-frontend (sub-agent mode) and designer teammates (team mode).
+- pencil: .pen file design editing. Used by expert-frontend (sub-agent mode) and team-designer (team mode).
 - claude-in-chrome: Browser automation
 
 MCP tools are deferred and must be loaded before use:
@@ -124,7 +124,7 @@ Tool permissions in settings.json:
 
 - Read, Write, Edit: File operations
 - Bash: Shell command execution
-- Task: Agent delegation
+- Agent: Sub-agent delegation
 - AskUserQuestion: User interaction
 
 ## Quality Configuration
@@ -172,7 +172,6 @@ Team behavior is controlled by the `workflow.team` section in `.ae/config/sectio
 | team.default_model | string | inherit | Default model for teammates (inherit/haiku/sonnet/opus) |
 | team.require_plan_approval | boolean | true | Require plan approval before implementing |
 | team.delegate_mode | boolean | true | Team lead coordination-only mode (no direct implementation) |
-| team.teammate_display | string | auto | Display mode: auto, in-process, or tmux |
 
 ### Auto-Selection Thresholds
 
@@ -193,4 +192,3 @@ When `workflow.execution_mode` is `auto`, these thresholds determine when team m
 - StatusLine uses relative paths only (no env var expansion)
 - Template sources (.tmpl files) belong in `internal/template/templates/` only
 - Local projects should contain rendered results, not template sources
-

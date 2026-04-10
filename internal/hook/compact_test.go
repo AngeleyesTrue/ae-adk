@@ -105,6 +105,128 @@ func TestCompactHandler_Handle(t *testing.T) {
 	}
 }
 
+func TestReadPersistentMode(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name    string
+		setup   func(dir string)
+		wantLen int // 0 = empty string expected
+	}{
+		{
+			name:    "file does not exist",
+			setup:   func(dir string) {},
+			wantLen: 0,
+		},
+		{
+			name: "valid JSON",
+			setup: func(dir string) {
+				stateDir := filepath.Join(dir, ".ae", "state")
+				_ = os.MkdirAll(stateDir, 0o755)
+				_ = os.WriteFile(filepath.Join(stateDir, "persistent-mode.json"),
+					[]byte(`{"enabled":true,"mode":"standard"}`), 0o644)
+			},
+			wantLen: 1, // non-empty
+		},
+		{
+			name: "invalid JSON returns raw content",
+			setup: func(dir string) {
+				stateDir := filepath.Join(dir, ".ae", "state")
+				_ = os.MkdirAll(stateDir, 0o755)
+				_ = os.WriteFile(filepath.Join(stateDir, "persistent-mode.json"),
+					[]byte(`not valid json`), 0o644)
+			},
+			wantLen: 1, // non-empty (raw content)
+		},
+		{
+			name: "empty file",
+			setup: func(dir string) {
+				stateDir := filepath.Join(dir, ".ae", "state")
+				_ = os.MkdirAll(stateDir, 0o755)
+				_ = os.WriteFile(filepath.Join(stateDir, "persistent-mode.json"),
+					[]byte(``), 0o644)
+			},
+			wantLen: 0, // empty JSON unmarshal fails, raw is empty
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			dir := t.TempDir()
+			tt.setup(dir)
+			got := readPersistentMode(dir)
+			if tt.wantLen == 0 && got != "" {
+				t.Errorf("expected empty string, got %q", got)
+			}
+			if tt.wantLen > 0 && got == "" {
+				t.Error("expected non-empty string, got empty")
+			}
+		})
+	}
+}
+
+func TestReadWorktrees(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name    string
+		setup   func(dir string)
+		wantLen int
+	}{
+		{
+			name:    "file does not exist",
+			setup:   func(dir string) {},
+			wantLen: 0,
+		},
+		{
+			name: "valid JSON array",
+			setup: func(dir string) {
+				stateDir := filepath.Join(dir, ".ae", "state")
+				_ = os.MkdirAll(stateDir, 0o755)
+				_ = os.WriteFile(filepath.Join(stateDir, "worktrees.json"),
+					[]byte(`[{"path":"/tmp/wt1","spec":"SPEC-001"}]`), 0o644)
+			},
+			wantLen: 1,
+		},
+		{
+			name: "invalid JSON returns raw content",
+			setup: func(dir string) {
+				stateDir := filepath.Join(dir, ".ae", "state")
+				_ = os.MkdirAll(stateDir, 0o755)
+				_ = os.WriteFile(filepath.Join(stateDir, "worktrees.json"),
+					[]byte(`{broken json`), 0o644)
+			},
+			wantLen: 1,
+		},
+		{
+			name: "empty file",
+			setup: func(dir string) {
+				stateDir := filepath.Join(dir, ".ae", "state")
+				_ = os.MkdirAll(stateDir, 0o755)
+				_ = os.WriteFile(filepath.Join(stateDir, "worktrees.json"),
+					[]byte(``), 0o644)
+			},
+			wantLen: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			dir := t.TempDir()
+			tt.setup(dir)
+			got := readWorktrees(dir)
+			if tt.wantLen == 0 && got != "" {
+				t.Errorf("expected empty string, got %q", got)
+			}
+			if tt.wantLen > 0 && got == "" {
+				t.Error("expected non-empty string, got empty")
+			}
+		})
+	}
+}
+
 func TestCompactHandler_Handle_DataContainsSessionID(t *testing.T) {
 	t.Parallel()
 

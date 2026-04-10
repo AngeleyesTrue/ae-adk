@@ -9,7 +9,7 @@ workflow:
         markers:
             complete: <ae>COMPLETE</ae>
             done: <ae>DONE</ae>
-    execution_mode: team
+    execution_mode: auto
     loop_prevention:
         failure_pattern_detection: true
         max_iterations: 100
@@ -20,39 +20,46 @@ workflow:
                 mode: plan
                 model: haiku
                 isolation: none
+                description: "Read-only codebase exploration and analysis"
                 tools: "Read,Grep,Glob,Bash"
                 skills: "ae-foundation-thinking"
             analyst:
                 mode: plan
                 model: sonnet
                 isolation: none
+                description: "Requirements analysis and validation"
                 tools: "Read,Grep,Glob,Bash"
             architect:
                 mode: plan
                 model: sonnet
                 isolation: none
+                description: "Solution design and architecture decisions"
                 tools: "Read,Grep,Glob,Bash"
             implementer:
                 mode: acceptEdits
                 model: sonnet
                 isolation: worktree
+                description: "Code implementation (backend, frontend, full-stack)"
                 tools: "Read,Write,Edit,Bash,Grep,Glob"
             tester:
                 mode: acceptEdits
                 model: sonnet
                 isolation: worktree
+                description: "Test creation and coverage validation"
                 tools: "Read,Write,Edit,Bash,Grep,Glob"
                 skills: "ae-workflow-testing,ae-foundation-quality"
             designer:
                 mode: acceptEdits
                 model: sonnet
                 isolation: worktree
+                description: "UI/UX design with MCP design tools"
                 tools: "Read,Write,Edit,Bash,Grep,Glob"
                 skills: "ae-domain-uiux,ae-design-tools"
             reviewer:
                 mode: plan
                 model: haiku
                 isolation: none
+                description: "Code review and quality validation"
                 tools: "Read,Grep,Glob,Bash"
                 skills: "ae-foundation-quality"
         auto_selection:
@@ -113,9 +120,9 @@ workflow:
         teammate_display: auto
     worktree:
         auto_create: true
-        auto_merge: false
+        auto_merge: true
         auto_cleanup: true
-        tmux_preferred: false
+        tmux_preferred: true
         session_name_pattern: "ae-{ProjectName}-{SPEC-ID}"
     token_budget:
         plan: 30000

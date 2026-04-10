@@ -9,8 +9,8 @@ func TestValidEventTypes(t *testing.T) {
 	t.Parallel()
 
 	events := ValidEventTypes()
-	if len(events) != 16 {
-		t.Errorf("ValidEventTypes() returned %d events, want 16", len(events))
+	if len(events) != 27 {
+		t.Errorf("ValidEventTypes() returned %d events, want 27", len(events))
 	}
 
 	expected := map[EventType]bool{
@@ -30,6 +30,17 @@ func TestValidEventTypes(t *testing.T) {
 		EventTaskCompleted:      true,
 		EventWorktreeCreate:     true,
 		EventWorktreeRemove:     true,
+		EventPostCompact:        true,
+		EventInstructionsLoaded: true,
+		EventStopFailure:        true,
+		EventSetup:              true,
+		EventConfigChange:       true,
+		EventTaskCreated:        true,
+		EventCwdChanged:         true,
+		EventFileChanged:        true,
+		EventElicitation:        true,
+		EventElicitationResult:  true,
+		EventPermissionDenied:   true,
 	}
 
 	for _, et := range events {
@@ -194,6 +205,30 @@ func TestNewTaskRejectedOutput(t *testing.T) {
 	out := NewTaskRejectedOutput()
 	if out.ExitCode != 2 {
 		t.Errorf("ExitCode = %d, want 2", out.ExitCode)
+	}
+}
+
+func TestNewDeferOutput(t *testing.T) {
+	t.Parallel()
+
+	out := NewDeferOutput("needs human review")
+	if out.HookSpecificOutput == nil {
+		t.Fatal("HookSpecificOutput is nil")
+	}
+	if out.HookSpecificOutput.PermissionDecision != DecisionDefer {
+		t.Errorf("PermissionDecision = %q, want %q", out.HookSpecificOutput.PermissionDecision, DecisionDefer)
+	}
+	if out.HookSpecificOutput.PermissionDecisionReason != "needs human review" {
+		t.Errorf("PermissionDecisionReason = %q, want %q", out.HookSpecificOutput.PermissionDecisionReason, "needs human review")
+	}
+}
+
+func TestNewPermissionDeniedRetryOutput(t *testing.T) {
+	t.Parallel()
+
+	out := NewPermissionDeniedRetryOutput()
+	if !out.Retry {
+		t.Error("Retry = false, want true")
 	}
 }
 

@@ -674,9 +674,9 @@ func TestUpdate002_TemplateFileCount(t *testing.T) {
 		return nil
 	})
 
-	// 494 original + ~29 new = ~523 minimum
-	if totalFiles < 520 {
-		t.Errorf("expected at least 520 embedded files (494 original + ~29 new), got %d", totalFiles)
+	// SPEC-UPDATE-003: 494 - ~75 (lang skills deleted) + ~32 (new files) ≈ 451 minimum
+	if totalFiles < 450 {
+		t.Errorf("expected at least 450 embedded files (post SPEC-UPDATE-003), got %d", totalFiles)
 	}
 	t.Logf("total embedded files: %d", totalFiles)
 }
@@ -735,10 +735,13 @@ func TestUpdate002_AeLangCsharpPreserved(t *testing.T) {
 		t.Fatalf("EmbeddedTemplates() error: %v", err)
 	}
 
-	// ae-lang-csharp skill must still exist (SPEC-SKILL-001 preservation)
-	_, err = fs.ReadFile(fsys, ".claude/skills/ae-lang-csharp/SKILL.md")
+	// SPEC-UPDATE-003: ae-lang-csharp template skill deleted (REQ-04).
+	// The PROJECT ROOT ae-lang-csharp skill (.claude/skills/ae-lang-csharp/) is preserved,
+	// but the TEMPLATE version is removed as part of the lang skill → rules migration.
+	// Instead, verify the language rule file exists.
+	_, err = fs.ReadFile(fsys, ".claude/rules/ae/languages/csharp.md")
 	if err != nil {
-		t.Error("ae-lang-csharp skill should be preserved unchanged")
+		t.Error("csharp language rule should exist after lang skill migration")
 	}
 }
 

@@ -68,6 +68,9 @@ func NewDefaultConfig() *Config {
 		Loop:          NewDefaultLoopConfig(),
 		Workflow:      NewDefaultWorkflowConfig(),
 		State:         NewDefaultStateConfig(),
+		Gate:          NewDefaultGateConfig(),
+		Sunset:        NewDefaultSunsetConfig(),
+		Research:      NewDefaultResearchConfig(),
 	}
 }
 
@@ -180,9 +183,11 @@ func NewDefaultPricingConfig() PricingConfig {
 // NewDefaultLoopConfig returns a LoopConfig with default values.
 func NewDefaultLoopConfig() LoopConfig {
 	return LoopConfig{
-		MaxIterations: DefaultMaxIterations,
-		AutoConverge:  true,
-		HumanReview:   true,
+		MaxIterations:     DefaultMaxIterations,
+		AutoConverge:      true,
+		HumanReview:       true,
+		LintAsInstruction: true,  // REQ-LAI-003: enabled by default
+		WarnAsInstruction: false, // REQ-LAI-006: disabled by default
 	}
 }
 
@@ -200,6 +205,63 @@ func NewDefaultWorkflowConfig() WorkflowConfig {
 func NewDefaultStateConfig() StateConfig {
 	return StateConfig{
 		StateDir: DefaultStateDir,
+	}
+}
+
+// NewDefaultGateConfig returns a GateConfig with production-safe defaults.
+func NewDefaultGateConfig() GateConfig {
+	return GateConfig{
+		Enabled:   true,
+		SkipTests: false,
+		Timeouts: GateTimeouts{
+			Vet:  30,
+			Lint: 60,
+			Test: 120,
+		},
+	}
+}
+
+// NewDefaultSunsetConfig returns a SunsetConfig with default values.
+func NewDefaultSunsetConfig() SunsetConfig {
+	return SunsetConfig{
+		Enabled:    false,
+		Conditions: nil,
+	}
+}
+
+// NewDefaultResearchConfig returns a ResearchConfig with safe defaults.
+func NewDefaultResearchConfig() ResearchConfig {
+	return ResearchConfig{
+		Enabled: false,
+		Passive: ResearchPassiveConfig{
+			Enabled:                 true,
+			CorrectionWindowSeconds: 60,
+			PatternThresholds: ResearchPatternThresholds{
+				Heuristic:      3,
+				Rule:           5,
+				HighConfidence: 10,
+			},
+		},
+		Active: ResearchActiveConfig{
+			RunsPerExperiment: 3,
+			MaxExperiments:    20,
+			PassThreshold:     0.80,
+			TargetScore:       0.95,
+			BudgetCapTokens:   500000,
+		},
+		Safety: ResearchSafetyConfig{
+			WorktreeIsolation:         true,
+			CanaryRegressionThreshold: 0.10,
+			RateLimits: ResearchRateLimitConfig{
+				MaxExperimentsPerSession: 20,
+				MaxAcceptedPerSession:    5,
+				MaxAutoResearchPerWeek:   3,
+			},
+		},
+		Dashboard: ResearchDashboardConfig{
+			DefaultMode:    "terminal",
+			HTMLOpenBrowser: true,
+		},
 	}
 }
 

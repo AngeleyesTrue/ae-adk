@@ -84,7 +84,7 @@ Pass to manager-quality:
 
 ### Issue Creation Command
 
-The manager-quality agent executes: gh issue create --repo modu-ai/ae-adk
+The manager-quality agent executes: gh issue create --repo AngeleyesTrue/ae-adk
 
 Issue body uses a consistent template including:
 

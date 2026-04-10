@@ -3,6 +3,7 @@
   "hooks": {
     "SessionStart": [
       {
+        "matcher": "startup|resume",
         "hooks": [
           {
 {{- if eq .Platform "windows"}}
@@ -18,6 +19,7 @@
     ],
     "PreCompact": [
       {
+        "matcher": "manual|auto",
         "hooks": [
           {
 {{- if eq .Platform "windows"}}
@@ -168,21 +170,6 @@
         ]
       }
     ],
-    "PermissionRequest": [
-      {
-        "hooks": [
-          {
-{{- if eq .Platform "windows"}}
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-permission-request.sh\"",
-{{- else}}
-            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-permission-request.sh\"",
-{{- end}}
-            "timeout": 5,
-            "type": "command"
-          }
-        ]
-      }
-    ],
     "TeammateIdle": [
       {
         "hooks": [
@@ -243,6 +230,52 @@
         ]
       }
     ],
+    "TaskCreated": [
+      {
+        "hooks": [
+          {
+{{- if eq .Platform "windows"}}
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-task-created.sh\"",
+{{- else}}
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-task-created.sh\"",
+{{- end}}
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "ConfigChange": [
+      {
+        "matcher": "project_settings|local_settings|skills",
+        "hooks": [
+          {
+{{- if eq .Platform "windows"}}
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-config-change.sh\"",
+{{- else}}
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-config-change.sh\"",
+{{- end}}
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+{{- if eq .Platform "windows"}}
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-permission-request.sh\"",
+{{- else}}
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-permission-request.sh\"",
+{{- end}}
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      }
+    ],
     "PermissionDenied": [
       {
         "hooks": [
@@ -258,25 +291,129 @@
         ]
       }
     ],
-    "StopFailure": [],
-    "PostCompact": [],
-    "InstructionsLoaded": [],
-    "CwdChanged": [],
-    "FileChanged": [],
-    "Elicitation": [],
-    "ElicitationResult": []
+    "StopFailure": [
+      {
+        "matcher": "rate_limit|authentication_failed|billing_error|max_output_tokens",
+        "hooks": [
+          {
+{{- if eq .Platform "windows"}}
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-stop-failure.sh\"",
+{{- else}}
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-stop-failure.sh\"",
+{{- end}}
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "matcher": "manual|auto",
+        "hooks": [
+          {
+{{- if eq .Platform "windows"}}
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-post-compact.sh\"",
+{{- else}}
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-post-compact.sh\"",
+{{- end}}
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "InstructionsLoaded": [
+      {
+        "hooks": [
+          {
+{{- if eq .Platform "windows"}}
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-instructions-loaded.sh\"",
+{{- else}}
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-instructions-loaded.sh\"",
+{{- end}}
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "CwdChanged": [
+      {
+        "hooks": [
+          {
+{{- if eq .Platform "windows"}}
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-cwd-changed.sh\"",
+{{- else}}
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-cwd-changed.sh\"",
+{{- end}}
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "FileChanged": [
+      {
+        "hooks": [
+          {
+{{- if eq .Platform "windows"}}
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-file-changed.sh\"",
+{{- else}}
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-file-changed.sh\"",
+{{- end}}
+            "timeout": 5,
+            "type": "command"
+          }
+        ],
+        "matcher": ".env|.envrc|.gitignore"
+      }
+    ],
+    "Elicitation": [
+      {
+        "hooks": [
+          {
+{{- if eq .Platform "windows"}}
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-elicitation.sh\"",
+{{- else}}
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-elicitation.sh\"",
+{{- end}}
+            "timeout": 10,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "ElicitationResult": [
+      {
+        "hooks": [
+          {
+{{- if eq .Platform "windows"}}
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-elicitation-result.sh\"",
+{{- else}}
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/ae/handle-elicitation-result.sh\"",
+{{- end}}
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      }
+    ]
   },
   "statusLine": {
     "type": "command",
-    "command": ".ae/status_line.sh"
+    "command": ".ae/status_line.sh",
+    "refreshInterval": 10
   },
   "outputStyle": "AE",
+  "showThinkingSummaries": false,
   "cleanupPeriodDays": 30,
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "CLAUDE_CODE_FILE_READ_MAX_OUTPUT_TOKENS": "64000",
     "ENABLE_TOOL_SEARCH": "1",
     "AE_CONFIG_SOURCE": "sections",
+    "CLAUDE_CODE_NO_FLICKER": "1",
     "CLAUDE_CODE_SUBPROCESS_ENV_SCRUB": "1",
     "PATH": "{{jsonEscape .SmartPATH}}"
   },
@@ -293,7 +430,7 @@
       "NotebookEdit",
       "Read",
       "Skill",
-      "Task",
+      "Agent",
       "TaskCreate",
       "TaskGet",
       "TaskList",
@@ -481,6 +618,7 @@
   "enableAllProjectMcpServers": true,
   "respectGitignore": true,
   "teammateMode": "auto",
+  "effortLevel": "medium",
   "includeGitInstructions": true,
   "plansDirectory": ".ae/plans"
 }

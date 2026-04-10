@@ -66,6 +66,51 @@ const (
 	// EventWorktreeRemove is triggered when a worktree is removed after an isolated agent terminates.
 	// Available since Claude Code v2.1.49+.
 	EventWorktreeRemove EventType = "WorktreeRemove"
+
+	// EventPostCompact is triggered after context compaction completes.
+	// Available since Claude Code v2.1.76+.
+	EventPostCompact EventType = "PostCompact"
+
+	// EventInstructionsLoaded is triggered when CLAUDE.md or .claude/rules/*.md files are loaded.
+	// Available since Claude Code v2.1.69+.
+	EventInstructionsLoaded EventType = "InstructionsLoaded"
+
+	// EventStopFailure is triggered when a turn ends due to an API error (rate limit, auth failure).
+	// Available since Claude Code v2.1.78+.
+	EventStopFailure EventType = "StopFailure"
+
+	// EventSetup is triggered via --init, --init-only, or --maintenance CLI flags.
+	// Available since Claude Code v2.1.10+.
+	EventSetup EventType = "Setup"
+
+	// EventConfigChange is triggered when configuration files change during a session.
+	// Available since Claude Code v2.1.49+.
+	EventConfigChange EventType = "ConfigChange"
+
+	// EventTaskCreated is triggered when a task is created via TaskCreate.
+	// Available since Claude Code v2.1.84+.
+	EventTaskCreated EventType = "TaskCreated"
+
+	// EventCwdChanged is triggered when the working directory changes during a session.
+	// Available since Claude Code v2.1.83+.
+	EventCwdChanged EventType = "CwdChanged"
+
+	// EventFileChanged is triggered when a file is changed externally during a session.
+	// Available since Claude Code v2.1.83+.
+	EventFileChanged EventType = "FileChanged"
+
+	// EventElicitation is triggered when an MCP server requests user input.
+	// Available since Claude Code v2.1.76+.
+	EventElicitation EventType = "Elicitation"
+
+	// EventElicitationResult is triggered after user responds to MCP elicitation.
+	// Available since Claude Code v2.1.76+.
+	EventElicitationResult EventType = "ElicitationResult"
+
+	// EventPermissionDenied is triggered after auto mode classifier denies a tool call.
+	// Return {retry: true} in hook output to allow the model to retry the operation.
+	// Available since Claude Code v2.1.89+.
+	EventPermissionDenied EventType = "PermissionDenied"
 )
 
 // ValidEventTypes returns all valid event types.
@@ -87,6 +132,17 @@ func ValidEventTypes() []EventType {
 		EventTaskCompleted,
 		EventWorktreeCreate,
 		EventWorktreeRemove,
+		EventPostCompact,
+		EventInstructionsLoaded,
+		EventStopFailure,
+		EventSetup,
+		EventConfigChange,
+		EventTaskCreated,
+		EventCwdChanged,
+		EventFileChanged,
+		EventElicitation,
+		EventElicitationResult,
+		EventPermissionDenied,
 	}
 }
 
@@ -100,6 +156,7 @@ const (
 	DecisionAllow = "allow"
 	DecisionDeny  = "deny"
 	DecisionAsk   = "ask"
+	DecisionDefer = "defer" // Pause headless session; resume with --resume (v2.1.89+)
 )
 
 // Top-level decision constants for Stop, PostToolUse, etc. (Claude Code protocol).
@@ -136,8 +193,9 @@ type HookInput struct {
 	StopHookActive bool `json:"stop_hook_active,omitempty"` // True when already continuing due to stop hook
 
 	// SubagentStart/SubagentStop fields
-	AgentID             string `json:"agent_id,omitempty"`
-	AgentTranscriptPath string `json:"agent_transcript_path,omitempty"`
+	AgentID              string `json:"agent_id,omitempty"`
+	AgentTranscriptPath  string `json:"agent_transcript_path,omitempty"`
+	LastAssistantMessage string `json:"last_assistant_message,omitempty"` // SubagentStop/Stop: final response text
 
 	// PreCompact fields
 	Trigger            string `json:"trigger,omitempty"`             // manual, auto
@@ -146,6 +204,10 @@ type HookInput struct {
 	// PostToolUseFailure fields
 	Error       string `json:"error,omitempty"`
 	IsInterrupt bool   `json:"is_interrupt,omitempty"`
+
+	// StopFailure fields (v2.1.78+)
+	ErrorType    string `json:"error_type,omitempty"`    // rate_limit, authentication_failed, billing_error, etc.
+	ErrorMessage string `json:"error_message,omitempty"` // Detailed error message
 
 	// UserPromptSubmit fields
 	Prompt string `json:"prompt,omitempty"`
@@ -170,16 +232,51 @@ type HookInput struct {
 	WorktreeBranch string `json:"worktree_branch,omitempty"` // Branch name for the worktree
 	AgentName      string `json:"agent_name,omitempty"`      // Name of the agent using the worktree
 
+	// ConfigChange fields (v2.1.49+)
+	ConfigFilePath      string `json:"config_file_path,omitempty"`      // Path to the changed configuration file
+	ConfigurationSource string `json:"configuration_source,omitempty"` // user_settings, project_settings, local_settings, policy_settings, skills
+
+	// TaskCreated fields (v2.1.84+)
+	// Reuses TaskID, TaskSubject, TaskDescription from TeammateIdle/TaskCompleted
+
+	// FileChanged fields (v2.1.83+)
+	FilePath   string `json:"file_path,omitempty"`   // Path to the changed file
+	ChangeType string `json:"change_type,omitempty"` // modified, created, deleted
+
+	// CwdChanged fields (v2.1.83+)
+	OldCwd string `json:"old_cwd,omitempty"` // Previous working directory
+	NewCwd string `json:"new_cwd,omitempty"` // New working directory
+
+	// Elicitation fields (v2.1.76+)
+	ElicitationServerName string          `json:"elicitation_server_name,omitempty"` // MCP server requesting input
+	MCPToolName           string          `json:"mcp_tool_name,omitempty"`           // MCP tool that triggered elicitation
+	ElicitationRequest    json.RawMessage `json:"elicitation_request,omitempty"`     // Form fields for elicitation
+
+	// InstructionsLoaded fields (v2.1.69+)
+	InstructionFilePath  string `json:"instruction_file_path,omitempty"`  // Absolute path to loaded file
+	MemoryType           string `json:"memory_type,omitempty"`            // User, Project, Local, Managed
+	LoadReason           string `json:"load_reason,omitempty"`            // session_start, nested_traversal, path_glob_match, include, compact
+	Globs                string `json:"globs,omitempty"`                  // Glob patterns that triggered load
+	TriggerFilePath      string `json:"trigger_file_path,omitempty"`      // File that triggered the load
+	ParentFilePath       string `json:"parent_file_path,omitempty"`       // Parent file that included this
+
+	// PermissionRequest fields
+	PermissionSuggestions json.RawMessage `json:"permission_suggestions,omitempty"` // Suggested permission rules
+
 	// Internal data (not serialized to JSON)
 	Data json.RawMessage `json:"-"`
 }
 
-// HookSpecificOutput represents the hookSpecificOutput field for PreToolUse/PostToolUse.
+// HookSpecificOutput represents the hookSpecificOutput field for PreToolUse/PostToolUse/UserPromptSubmit.
+// hookEventName is REQUIRED by Claude Code protocol for every hookSpecificOutput.
 type HookSpecificOutput struct {
-	HookEventName            string `json:"hookEventName,omitempty"`
-	PermissionDecision       string `json:"permissionDecision,omitempty"`
-	PermissionDecisionReason string `json:"permissionDecisionReason,omitempty"`
-	AdditionalContext        string `json:"additionalContext,omitempty"`
+	HookEventName            string          `json:"hookEventName,omitempty"`
+	PermissionDecision       string          `json:"permissionDecision,omitempty"`
+	PermissionDecisionReason string          `json:"permissionDecisionReason,omitempty"`
+	AdditionalContext        string          `json:"additionalContext,omitempty"`
+	SessionTitle             string          `json:"sessionTitle,omitempty"`             // UserPromptSubmit: sets session title in Claude Code UI
+	UpdatedInput             json.RawMessage `json:"updatedInput,omitempty"`             // PreToolUse: modifies tool input before execution
+	UpdatedMCPToolOutput     string          `json:"updatedMCPToolOutput,omitempty"`     // PostToolUse: replaces MCP tool output
 }
 
 // HookOutput represents the JSON payload written to stdout for Claude Code.
@@ -201,6 +298,9 @@ type HookOutput struct {
 
 	// UpdatedInput is used by UserPromptSubmit to modify the user's prompt.
 	UpdatedInput string `json:"updatedInput,omitempty"`
+
+	// Retry signals that the model should retry the denied operation (PermissionDenied, v2.1.89+).
+	Retry bool `json:"retry,omitempty"`
 
 	// ExitCode allows handlers to signal a specific process exit code.
 	// Not serialized to JSON. Used for exit code 2 protocol (TeammateIdle, TaskCompleted).
@@ -332,6 +432,24 @@ func NewUserPromptBlockOutput(reason string) *HookOutput {
 		Decision: DecisionBlock,
 		Reason:   reason,
 	}
+}
+
+// NewDeferOutput creates a HookOutput with permissionDecision "defer" for PreToolUse.
+// In headless sessions (-p mode), this pauses execution until resumed with --resume (v2.1.89+).
+func NewDeferOutput(reason string) *HookOutput {
+	return &HookOutput{
+		HookSpecificOutput: &HookSpecificOutput{
+			HookEventName:            "PreToolUse",
+			PermissionDecision:       DecisionDefer,
+			PermissionDecisionReason: reason,
+		},
+	}
+}
+
+// NewPermissionDeniedRetryOutput creates a HookOutput for PermissionDenied that signals retry.
+// Return this from a PermissionDenied hook handler to allow the model to retry the denied operation.
+func NewPermissionDeniedRetryOutput() *HookOutput {
+	return &HookOutput{Retry: true}
 }
 
 // NewTeammateKeepWorkingOutput creates a HookOutput that signals exit code 2 for TeammateIdle.

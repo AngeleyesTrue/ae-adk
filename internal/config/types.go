@@ -2,6 +2,7 @@ package config
 
 import (
 	"slices"
+	"time"
 
 	"github.com/AngeleyesTrue/ae-adk/pkg/models"
 )
@@ -23,6 +24,9 @@ type Config struct {
 	Workflow      WorkflowConfig             `yaml:"workflow"`
 	State         StateConfig                `yaml:"state"`
 	Statusline    models.StatuslineConfig    `yaml:"statusline"`
+	Gate          GateConfig                 `yaml:"gate"`
+	Sunset        SunsetConfig               `yaml:"sunset"`
+	Research      ResearchConfig             `yaml:"research"`
 }
 
 // GitStrategyConfig represents the git strategy configuration section.
@@ -75,6 +79,15 @@ type LoopConfig struct {
 	MaxIterations int  `yaml:"max_iterations"`
 	AutoConverge  bool `yaml:"auto_converge"`
 	HumanReview   bool `yaml:"human_review"`
+
+	// LintAsInstruction enables injecting LSP diagnostics as systemMessage
+	// so the AI receives errors as its next prompt (REQ-LAI-003).
+	// Default: true.
+	LintAsInstruction bool `yaml:"lint_as_instruction"`
+
+	// WarnAsInstruction includes warnings in the systemMessage when there are
+	// no errors and this flag is true (REQ-LAI-006). Default: false.
+	WarnAsInstruction bool `yaml:"warn_as_instruction"`
 }
 
 // WorkflowConfig represents the workflow configuration section.
@@ -122,11 +135,126 @@ type SyncGate struct {
 	RequireCleanLSP bool `yaml:"require_clean_lsp"`
 }
 
+// GateConfig represents configuration for the deterministic quality gate
+// that runs before git commit (SPEC-GATE-001).
+type GateConfig struct {
+	// Enabled controls whether the quality gate runs.
+	Enabled bool `yaml:"enabled"`
+	// SkipTests skips the go test step when true.
+	SkipTests bool `yaml:"skip_tests"`
+	// Timeouts holds per-step timeout values in seconds.
+	Timeouts GateTimeouts `yaml:"timeouts"`
+}
+
+// GateTimeouts holds per-step timeout configuration in seconds.
+type GateTimeouts struct {
+	Vet  int `yaml:"vet"`
+	Lint int `yaml:"lint"`
+	Test int `yaml:"test"`
+}
+
+// VetTimeoutDuration converts the Vet timeout to time.Duration.
+// Returns 30s when the value is zero or negative.
+func (g *GateConfig) VetTimeoutDuration() time.Duration {
+	if g.Timeouts.Vet <= 0 {
+		return 30 * time.Second
+	}
+	return time.Duration(g.Timeouts.Vet) * time.Second
+}
+
+// LintTimeoutDuration converts the Lint timeout to time.Duration.
+// Returns 60s when the value is zero or negative.
+func (g *GateConfig) LintTimeoutDuration() time.Duration {
+	if g.Timeouts.Lint <= 0 {
+		return 60 * time.Second
+	}
+	return time.Duration(g.Timeouts.Lint) * time.Second
+}
+
+// TestTimeoutDuration converts the Test timeout to time.Duration.
+// Returns 120s when the value is zero or negative.
+func (g *GateConfig) TestTimeoutDuration() time.Duration {
+	if g.Timeouts.Test <= 0 {
+		return 120 * time.Second
+	}
+	return time.Duration(g.Timeouts.Test) * time.Second
+}
+
+// SunsetConfig defines the Build-to-Delete framework configuration.
+// Quality gates that consistently pass can be relaxed over time.
+type SunsetConfig struct {
+	// Enabled controls whether sunset tracking is active.
+	Enabled    bool              `yaml:"enabled"`
+	Conditions []SunsetCondition `yaml:"conditions"`
+}
+
+// SunsetCondition defines when a quality gate can be relaxed.
+type SunsetCondition struct {
+	Gate        string `yaml:"gate"`
+	Metric      string `yaml:"metric"`
+	Threshold   int    `yaml:"threshold"`
+	Action      string `yaml:"action"`
+	Description string `yaml:"description"`
+}
+
+// ResearchConfig represents the Self-Research System configuration section.
+type ResearchConfig struct {
+	Enabled   bool                    `yaml:"enabled"`
+	Passive   ResearchPassiveConfig   `yaml:"passive"`
+	Active    ResearchActiveConfig    `yaml:"active"`
+	Safety    ResearchSafetyConfig    `yaml:"safety"`
+	Dashboard ResearchDashboardConfig `yaml:"dashboard"`
+}
+
+// ResearchPassiveConfig represents passive observation settings.
+type ResearchPassiveConfig struct {
+	Enabled                 bool                      `yaml:"enabled"`
+	CorrectionWindowSeconds int                       `yaml:"correction_window_seconds"`
+	PatternThresholds       ResearchPatternThresholds `yaml:"pattern_thresholds"`
+}
+
+// ResearchPatternThresholds defines observation count thresholds for pattern classification.
+type ResearchPatternThresholds struct {
+	Heuristic      int `yaml:"heuristic"`
+	Rule           int `yaml:"rule"`
+	HighConfidence int `yaml:"high_confidence"`
+}
+
+// ResearchActiveConfig represents active experiment settings.
+type ResearchActiveConfig struct {
+	RunsPerExperiment int     `yaml:"runs_per_experiment"`
+	MaxExperiments    int     `yaml:"max_experiments"`
+	PassThreshold     float64 `yaml:"pass_threshold"`
+	TargetScore       float64 `yaml:"target_score"`
+	BudgetCapTokens   int     `yaml:"budget_cap_tokens"`
+}
+
+// ResearchSafetyConfig represents safety layer settings.
+type ResearchSafetyConfig struct {
+	WorktreeIsolation         bool                    `yaml:"worktree_isolation"`
+	CanaryRegressionThreshold float64                 `yaml:"canary_regression_threshold"`
+	RateLimits                ResearchRateLimitConfig `yaml:"rate_limits"`
+}
+
+// ResearchRateLimitConfig represents rate limiting settings.
+type ResearchRateLimitConfig struct {
+	MaxExperimentsPerSession int `yaml:"max_experiments_per_session"`
+	MaxAcceptedPerSession    int `yaml:"max_accepted_per_session"`
+	MaxAutoResearchPerWeek   int `yaml:"max_auto_research_per_week"`
+}
+
+// ResearchDashboardConfig represents dashboard display settings.
+type ResearchDashboardConfig struct {
+	DefaultMode    string `yaml:"default_mode"`
+	HTMLOpenBrowser bool   `yaml:"html_open_browser"`
+}
+
 // sectionNames lists all valid configuration section names.
 var sectionNames = []string{
 	"user", "language", "quality", "project",
 	"git_strategy", "git_convention", "system", "llm",
-	"pricing", "loop", "workflow", "state", "statusline",
+	"pricing", "loop", "workflow", "state", "statusline", "gate", "sunset",
+	"research",
 }
 
 // IsValidSectionName checks if the given name is a valid section name.
@@ -176,4 +304,9 @@ type stateFileWrapper struct {
 // statuslineFileWrapper handles the statusline.yaml section file.
 type statuslineFileWrapper struct {
 	Statusline models.StatuslineConfig `yaml:"statusline"`
+}
+
+// researchFileWrapper handles the research.yaml section file.
+type researchFileWrapper struct {
+	Research ResearchConfig `yaml:"research"`
 }

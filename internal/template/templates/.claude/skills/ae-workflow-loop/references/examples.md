@@ -759,7 +759,7 @@ jobs:
 
       - name: Install AE-ADK
         run: |
-          go install github.com/modu-ai/ae-adk/cmd/ae@latest
+          go install github.com/AngeleyesTrue/ae-adk/cmd/ae@latest
           ae init
 
       - name: Run Ralph Loop
@@ -799,7 +799,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          go install github.com/modu-ai/ae-adk/cmd/ae@latest
+          go install github.com/AngeleyesTrue/ae-adk/cmd/ae@latest
           ae init
 
       - name: Run ${{ matrix.check }} Check
@@ -869,7 +869,7 @@ FROM python:3.13-slim
 WORKDIR /app
 
 # Install AE-ADK
-RUN go install github.com/modu-ai/ae-adk/cmd/ae@latest
+RUN go install github.com/AngeleyesTrue/ae-adk/cmd/ae@latest
 
 # Copy project
 COPY . .
