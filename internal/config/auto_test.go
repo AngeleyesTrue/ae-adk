@@ -122,6 +122,71 @@ func TestAutoConfigValidation(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "wait_minutes exceeds max returns error",
+			modify: func(c *AutoConfig) {
+				c.ContextIsolated.Copilot.WaitMinutes = MaxCopilotWaitMinutes + 1
+			},
+			wantErr: true,
+		},
+		{
+			name: "wait_minutes at max is valid",
+			modify: func(c *AutoConfig) {
+				c.ContextIsolated.Copilot.WaitMinutes = MaxCopilotWaitMinutes
+			},
+			wantErr: false,
+		},
+		{
+			name: "check_iteration exceeds sync_review_iterations returns error",
+			modify: func(c *AutoConfig) {
+				c.ContextIsolated.SyncReviewIterations = 3
+				c.ContextIsolated.Copilot.CheckIteration = 4
+			},
+			wantErr: true,
+		},
+		{
+			name: "check_iteration equals sync_review_iterations is valid",
+			modify: func(c *AutoConfig) {
+				c.ContextIsolated.SyncReviewIterations = 3
+				c.ContextIsolated.Copilot.CheckIteration = 3
+			},
+			wantErr: false,
+		},
+		{
+			name: "invalid merge strategy returns error",
+			modify: func(c *AutoConfig) {
+				c.ContextIsolated.FinalMerge.Strategy = "fast-forward"
+			},
+			wantErr: true,
+		},
+		{
+			name: "merge strategy squash is valid",
+			modify: func(c *AutoConfig) {
+				c.ContextIsolated.FinalMerge.Strategy = "squash"
+			},
+			wantErr: false,
+		},
+		{
+			name: "merge strategy merge is valid",
+			modify: func(c *AutoConfig) {
+				c.ContextIsolated.FinalMerge.Strategy = "merge"
+			},
+			wantErr: false,
+		},
+		{
+			name: "merge strategy rebase is valid",
+			modify: func(c *AutoConfig) {
+				c.ContextIsolated.FinalMerge.Strategy = "rebase"
+			},
+			wantErr: false,
+		},
+		{
+			name: "empty merge strategy is valid",
+			modify: func(c *AutoConfig) {
+				c.ContextIsolated.FinalMerge.Strategy = ""
+			},
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {

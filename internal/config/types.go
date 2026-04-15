@@ -290,6 +290,16 @@ type FinalMergeConfig struct {
 // MaxSyncReviewIterations is the upper bound for sync_review_iterations.
 const MaxSyncReviewIterations = 10
 
+// MaxCopilotWaitMinutes is the upper bound for copilot.wait_minutes.
+const MaxCopilotWaitMinutes = 60
+
+// validMergeStrategies lists the supported merge strategies.
+var validMergeStrategies = map[string]bool{
+	"squash": true,
+	"merge":  true,
+	"rebase": true,
+}
+
 // Validate checks that AutoConfig values are within acceptable ranges.
 func (a *AutoConfig) Validate() error {
 	ci := a.ContextIsolated
@@ -302,11 +312,20 @@ func (a *AutoConfig) Validate() error {
 	if ci.Copilot.WaitMinutes < 0 {
 		return fmt.Errorf("auto: copilot.wait_minutes must be non-negative, got %d", ci.Copilot.WaitMinutes)
 	}
+	if ci.Copilot.WaitMinutes > MaxCopilotWaitMinutes {
+		return fmt.Errorf("auto: copilot.wait_minutes must be <= %d, got %d", MaxCopilotWaitMinutes, ci.Copilot.WaitMinutes)
+	}
 	if ci.Copilot.CheckIteration < 0 {
 		return fmt.Errorf("auto: copilot.check_iteration must be non-negative, got %d", ci.Copilot.CheckIteration)
 	}
+	if ci.Copilot.CheckIteration > ci.SyncReviewIterations {
+		return fmt.Errorf("auto: copilot.check_iteration (%d) must be <= sync_review_iterations (%d)", ci.Copilot.CheckIteration, ci.SyncReviewIterations)
+	}
 	if ci.Teammate.Count <= 0 {
 		return fmt.Errorf("auto: teammate.count must be positive, got %d", ci.Teammate.Count)
+	}
+	if ci.FinalMerge.Strategy != "" && !validMergeStrategies[ci.FinalMerge.Strategy] {
+		return fmt.Errorf("auto: final_merge.strategy must be one of: squash, merge, rebase; got %q", ci.FinalMerge.Strategy)
 	}
 	return nil
 }

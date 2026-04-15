@@ -644,6 +644,58 @@ func TestValidateAutoConfigValidPassesCentralValidation(t *testing.T) {
 	}
 }
 
+func TestValidateDynamicTokensInAutoFields(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name   string
+		modify func(*Config)
+	}{
+		{
+			name: "bot_login with dynamic token",
+			modify: func(c *Config) {
+				c.Auto.ContextIsolated.Copilot.BotLogin = "${BOT_LOGIN}"
+			},
+		},
+		{
+			name: "teammate mode with dynamic token",
+			modify: func(c *Config) {
+				c.Auto.ContextIsolated.Teammate.Mode = "{{MODE}}"
+			},
+		},
+		{
+			name: "teammate model with dynamic token",
+			modify: func(c *Config) {
+				c.Auto.ContextIsolated.Teammate.Model = "$MODEL_NAME"
+			},
+		},
+		{
+			name: "merge strategy with dynamic token",
+			modify: func(c *Config) {
+				c.Auto.ContextIsolated.FinalMerge.Strategy = "${STRATEGY}"
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			cfg := NewDefaultConfig()
+			tt.modify(cfg)
+			loaded := map[string]bool{}
+
+			err := Validate(cfg, loaded)
+			if err == nil {
+				t.Fatal("expected error for dynamic token in auto config field")
+			}
+			if !errors.Is(err, ErrDynamicToken) {
+				t.Errorf("expected ErrDynamicToken, got: %v", err)
+			}
+		})
+	}
+}
+
 // containsSubstring is a test helper that checks if s contains substr.
 func containsSubstring(s, substr string) bool {
 	return len(s) >= len(substr) && (s == substr || len(s) > 0 && containsHelper(s, substr))

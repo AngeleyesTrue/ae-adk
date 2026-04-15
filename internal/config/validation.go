@@ -233,6 +233,12 @@ func validateDynamicTokens(cfg *Config) []ValidationError {
 	errs = append(errs, checkStringField("llm.quality_model", cfg.LLM.QualityModel)...)
 	errs = append(errs, checkStringField("llm.speed_model", cfg.LLM.SpeedModel)...)
 
+	// Auto section
+	errs = append(errs, checkStringField("auto.copilot.bot_login", cfg.Auto.ContextIsolated.Copilot.BotLogin)...)
+	errs = append(errs, checkStringField("auto.teammate.mode", cfg.Auto.ContextIsolated.Teammate.Mode)...)
+	errs = append(errs, checkStringField("auto.teammate.model", cfg.Auto.ContextIsolated.Teammate.Model)...)
+	errs = append(errs, checkStringField("auto.final_merge.strategy", cfg.Auto.ContextIsolated.FinalMerge.Strategy)...)
+
 	return errs
 }
 
