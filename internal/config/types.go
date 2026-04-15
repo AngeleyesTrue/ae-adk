@@ -287,14 +287,23 @@ type FinalMergeConfig struct {
 	RequireCIPass bool   `yaml:"require_ci_pass"`
 }
 
+// MaxSyncReviewIterations is the upper bound for sync_review_iterations.
+const MaxSyncReviewIterations = 10
+
 // Validate checks that AutoConfig values are within acceptable ranges.
 func (a *AutoConfig) Validate() error {
 	ci := a.ContextIsolated
 	if ci.SyncReviewIterations <= 0 {
 		return fmt.Errorf("auto: sync_review_iterations must be positive, got %d", ci.SyncReviewIterations)
 	}
+	if ci.SyncReviewIterations > MaxSyncReviewIterations {
+		return fmt.Errorf("auto: sync_review_iterations must be <= %d, got %d", MaxSyncReviewIterations, ci.SyncReviewIterations)
+	}
 	if ci.Copilot.WaitMinutes < 0 {
 		return fmt.Errorf("auto: copilot.wait_minutes must be non-negative, got %d", ci.Copilot.WaitMinutes)
+	}
+	if ci.Copilot.CheckIteration < 0 {
+		return fmt.Errorf("auto: copilot.check_iteration must be non-negative, got %d", ci.Copilot.CheckIteration)
 	}
 	if ci.Teammate.Count <= 0 {
 		return fmt.Errorf("auto: teammate.count must be positive, got %d", ci.Teammate.Count)

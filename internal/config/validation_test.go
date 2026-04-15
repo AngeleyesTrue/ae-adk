@@ -600,6 +600,50 @@ func TestDevelopmentModeStrings(t *testing.T) {
 	}
 }
 
+func TestValidateAutoConfigInCentralValidation(t *testing.T) {
+	t.Parallel()
+
+	cfg := NewDefaultConfig()
+	cfg.Auto.ContextIsolated.SyncReviewIterations = 0 // invalid
+	loaded := map[string]bool{}
+
+	err := Validate(cfg, loaded)
+	if err == nil {
+		t.Fatal("expected error for invalid auto config")
+	}
+	if !errors.Is(err, ErrInvalidConfig) {
+		t.Errorf("expected ErrInvalidConfig, got: %v", err)
+	}
+
+	var ve *ValidationErrors
+	if !errors.As(err, &ve) {
+		t.Fatalf("expected *ValidationErrors, got %T", err)
+	}
+
+	found := false
+	for _, e := range ve.Errors {
+		if e.Field == "auto" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("expected validation error for field 'auto'")
+	}
+}
+
+func TestValidateAutoConfigValidPassesCentralValidation(t *testing.T) {
+	t.Parallel()
+
+	cfg := NewDefaultConfig()
+	loaded := map[string]bool{}
+
+	err := Validate(cfg, loaded)
+	if err != nil {
+		t.Errorf("default config should pass central validation, got: %v", err)
+	}
+}
+
 // containsSubstring is a test helper that checks if s contains substr.
 func containsSubstring(s, substr string) bool {
 	return len(s) >= len(substr) && (s == substr || len(s) > 0 && containsHelper(s, substr))

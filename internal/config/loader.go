@@ -205,6 +205,10 @@ func (l *Loader) loadAutoSection(dir string, cfg *Config) {
 		return
 	}
 	if loaded {
+		if err := wrapper.Auto.Validate(); err != nil {
+			slog.Warn("auto config validation failed, using defaults", "error", err)
+			return
+		}
 		cfg.Auto = wrapper.Auto
 		l.loadedSections["auto"] = true
 	}

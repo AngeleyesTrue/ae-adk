@@ -5,7 +5,6 @@ description: >
   using independent Agent Teams per phase. Each team has exactly one teammate that
   inherits project skills (/ae run, /ae sync, /ae review). Context is released
   between phases via TeamDelete to prevent hallucination and context exhaustion.
-allowed-tools: Read, Write, Edit, Grep, Glob, Bash, Agent, AskUserQuestion, TaskCreate, TaskUpdate, TaskList, TaskGet
 user-invocable: false
 metadata:
   version: "1.0.0"

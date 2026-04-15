@@ -94,6 +94,34 @@ func TestAutoConfigValidation(t *testing.T) {
 			},
 			wantErr: true,
 		},
+		{
+			name: "check_iteration negative returns error",
+			modify: func(c *AutoConfig) {
+				c.ContextIsolated.Copilot.CheckIteration = -1
+			},
+			wantErr: true,
+		},
+		{
+			name: "check_iteration zero is valid",
+			modify: func(c *AutoConfig) {
+				c.ContextIsolated.Copilot.CheckIteration = 0
+			},
+			wantErr: false,
+		},
+		{
+			name: "iterations exceeds max returns error",
+			modify: func(c *AutoConfig) {
+				c.ContextIsolated.SyncReviewIterations = MaxSyncReviewIterations + 1
+			},
+			wantErr: true,
+		},
+		{
+			name: "iterations at max is valid",
+			modify: func(c *AutoConfig) {
+				c.ContextIsolated.SyncReviewIterations = MaxSyncReviewIterations
+			},
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -245,6 +273,83 @@ func TestNewDefaultConfigContainsAuto(t *testing.T) {
 	if cfg.Auto.ContextIsolated.SyncReviewIterations != DefaultSyncReviewIterations {
 		t.Errorf("Auto.ContextIsolated.SyncReviewIterations: got %d, want %d",
 			cfg.Auto.ContextIsolated.SyncReviewIterations, DefaultSyncReviewIterations)
+	}
+}
+
+func TestAutoConfigInvalidYAMLFallsBackToDefaults(t *testing.T) {
+	t.Parallel()
+
+	tempDir := t.TempDir()
+	sectionsDir := filepath.Join(tempDir, ".ae", "config", "sections")
+	if err := os.MkdirAll(sectionsDir, 0o755); err != nil {
+		t.Fatalf("failed to create sections dir: %v", err)
+	}
+
+	// Write auto.yaml with invalid values (iterations = 0)
+	invalidYAML := []byte(`auto:
+  context_isolated:
+    sync_review_iterations: 0
+`)
+	if err := os.WriteFile(filepath.Join(sectionsDir, "auto.yaml"), invalidYAML, 0o644); err != nil {
+		t.Fatalf("failed to write auto.yaml: %v", err)
+	}
+
+	loader := NewLoader()
+	cfg, err := loader.Load(filepath.Join(tempDir, ".ae"))
+	if err != nil {
+		t.Fatalf("Load() error: %v", err)
+	}
+
+	// Invalid config should fall back to defaults
+	if cfg.Auto.ContextIsolated.SyncReviewIterations != DefaultSyncReviewIterations {
+		t.Errorf("expected default SyncReviewIterations %d, got %d",
+			DefaultSyncReviewIterations, cfg.Auto.ContextIsolated.SyncReviewIterations)
+	}
+
+	// Section should NOT be marked as loaded
+	if loader.LoadedSections()["auto"] {
+		t.Error("auto section should not be marked as loaded when validation fails")
+	}
+}
+
+func TestAutoConfigPartialYAML(t *testing.T) {
+	t.Parallel()
+
+	tempDir := t.TempDir()
+	sectionsDir := filepath.Join(tempDir, ".ae", "config", "sections")
+	if err := os.MkdirAll(sectionsDir, 0o755); err != nil {
+		t.Fatalf("failed to create sections dir: %v", err)
+	}
+
+	// Write partial auto.yaml - only override iterations
+	partialYAML := []byte(`auto:
+  context_isolated:
+    sync_review_iterations: 5
+`)
+	if err := os.WriteFile(filepath.Join(sectionsDir, "auto.yaml"), partialYAML, 0o644); err != nil {
+		t.Fatalf("failed to write auto.yaml: %v", err)
+	}
+
+	loader := NewLoader()
+	cfg, err := loader.Load(filepath.Join(tempDir, ".ae"))
+	if err != nil {
+		t.Fatalf("Load() error: %v", err)
+	}
+
+	// Overridden field should have new value
+	if cfg.Auto.ContextIsolated.SyncReviewIterations != 5 {
+		t.Errorf("SyncReviewIterations: got %d, want 5",
+			cfg.Auto.ContextIsolated.SyncReviewIterations)
+	}
+
+	// Non-specified fields should have default values (from wrapper initialization)
+	if cfg.Auto.ContextIsolated.Copilot.WaitMinutes != DefaultCopilotWaitMinutes {
+		t.Errorf("Copilot.WaitMinutes: got %d, want default %d",
+			cfg.Auto.ContextIsolated.Copilot.WaitMinutes, DefaultCopilotWaitMinutes)
+	}
+	if cfg.Auto.ContextIsolated.Teammate.Count != DefaultTeammateCount {
+		t.Errorf("Teammate.Count: got %d, want default %d",
+			cfg.Auto.ContextIsolated.Teammate.Count, DefaultTeammateCount)
 	}
 }
 

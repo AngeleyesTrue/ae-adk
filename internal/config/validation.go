@@ -37,6 +37,9 @@ func Validate(cfg *Config, loadedSections map[string]bool) error {
 	// Check git convention config
 	errs = append(errs, validateGitConventionConfig(&cfg.GitConvention)...)
 
+	// Check auto config ranges
+	errs = append(errs, validateAutoConfig(&cfg.Auto)...)
+
 	// Check for unexpanded dynamic tokens
 	errs = append(errs, validateDynamicTokens(cfg)...)
 
@@ -174,6 +177,20 @@ func validateGitConventionConfig(gc *models.GitConventionConfig) []ValidationErr
 	}
 
 	return errs
+}
+
+// validateAutoConfig checks auto pipeline configuration value ranges.
+func validateAutoConfig(a *AutoConfig) []ValidationError {
+	if err := a.Validate(); err != nil {
+		return []ValidationError{
+			{
+				Field:   "auto",
+				Message: err.Error(),
+				Wrapped: ErrInvalidConfig,
+			},
+		}
+	}
+	return nil
 }
 
 // validateDynamicTokens checks all string fields for unexpanded dynamic tokens.
