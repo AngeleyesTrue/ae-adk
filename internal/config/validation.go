@@ -37,6 +37,9 @@ func Validate(cfg *Config, loadedSections map[string]bool) error {
 	// Check git convention config
 	errs = append(errs, validateGitConventionConfig(&cfg.GitConvention)...)
 
+	// Check auto config ranges
+	errs = append(errs, validateAutoConfig(&cfg.Auto)...)
+
 	// Check for unexpanded dynamic tokens
 	errs = append(errs, validateDynamicTokens(cfg)...)
 
@@ -176,6 +179,20 @@ func validateGitConventionConfig(gc *models.GitConventionConfig) []ValidationErr
 	return errs
 }
 
+// validateAutoConfig checks auto pipeline configuration value ranges.
+func validateAutoConfig(a *AutoConfig) []ValidationError {
+	if err := a.Validate(); err != nil {
+		return []ValidationError{
+			{
+				Field:   "auto",
+				Message: err.Error(),
+				Wrapped: ErrInvalidConfig,
+			},
+		}
+	}
+	return nil
+}
+
 // validateDynamicTokens checks all string fields for unexpanded dynamic tokens.
 func validateDynamicTokens(cfg *Config) []ValidationError {
 	var errs []ValidationError
@@ -215,6 +232,12 @@ func validateDynamicTokens(cfg *Config) []ValidationError {
 	errs = append(errs, checkStringField("llm.default_model", cfg.LLM.DefaultModel)...)
 	errs = append(errs, checkStringField("llm.quality_model", cfg.LLM.QualityModel)...)
 	errs = append(errs, checkStringField("llm.speed_model", cfg.LLM.SpeedModel)...)
+
+	// Auto section
+	errs = append(errs, checkStringField("auto.copilot.bot_login", cfg.Auto.ContextIsolated.Copilot.BotLogin)...)
+	errs = append(errs, checkStringField("auto.teammate.mode", cfg.Auto.ContextIsolated.Teammate.Mode)...)
+	errs = append(errs, checkStringField("auto.teammate.model", cfg.Auto.ContextIsolated.Teammate.Model)...)
+	errs = append(errs, checkStringField("auto.final_merge.strategy", cfg.Auto.ContextIsolated.FinalMerge.Strategy)...)
 
 	return errs
 }

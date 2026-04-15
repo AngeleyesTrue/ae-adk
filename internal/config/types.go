@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"slices"
 	"time"
 
@@ -27,6 +28,7 @@ type Config struct {
 	Gate          GateConfig                 `yaml:"gate"`
 	Sunset        SunsetConfig               `yaml:"sunset"`
 	Research      ResearchConfig             `yaml:"research"`
+	Auto          AutoConfig                 `yaml:"auto"`
 }
 
 // GitStrategyConfig represents the git strategy configuration section.
@@ -249,12 +251,91 @@ type ResearchDashboardConfig struct {
 	HTMLOpenBrowser bool   `yaml:"html_open_browser"`
 }
 
+// AutoConfig represents the auto pipeline configuration section.
+type AutoConfig struct {
+	ContextIsolated ContextIsolatedConfig `yaml:"context_isolated"`
+}
+
+// ContextIsolatedConfig represents the context-isolated pipeline settings.
+type ContextIsolatedConfig struct {
+	Enabled              bool             `yaml:"enabled"`
+	SyncReviewIterations int              `yaml:"sync_review_iterations"`
+	Copilot              CopilotConfig    `yaml:"copilot"`
+	Teammate             TeammateConfig   `yaml:"teammate"`
+	FinalMerge           FinalMergeConfig `yaml:"final_merge"`
+}
+
+// CopilotConfig represents Copilot review integration settings.
+type CopilotConfig struct {
+	Enabled        bool   `yaml:"enabled"`
+	CheckIteration int    `yaml:"check_iteration"`
+	WaitMinutes    int    `yaml:"wait_minutes"`
+	BotLogin       string `yaml:"bot_login"`
+}
+
+// TeammateConfig represents teammate spawn settings.
+type TeammateConfig struct {
+	Count int    `yaml:"count"`
+	Mode  string `yaml:"mode"`
+	Model string `yaml:"model"`
+}
+
+// FinalMergeConfig represents the final merge settings.
+type FinalMergeConfig struct {
+	Strategy      string `yaml:"strategy"`
+	DeleteBranch  bool   `yaml:"delete_branch"`
+	RequireCIPass bool   `yaml:"require_ci_pass"`
+}
+
+// MaxSyncReviewIterations is the upper bound for sync_review_iterations.
+const MaxSyncReviewIterations = 10
+
+// MaxCopilotWaitMinutes is the upper bound for copilot.wait_minutes.
+const MaxCopilotWaitMinutes = 60
+
+// validMergeStrategies lists the supported merge strategies.
+var validMergeStrategies = map[string]bool{
+	"squash": true,
+	"merge":  true,
+	"rebase": true,
+}
+
+// Validate checks that AutoConfig values are within acceptable ranges.
+func (a *AutoConfig) Validate() error {
+	ci := a.ContextIsolated
+	if ci.SyncReviewIterations <= 0 {
+		return fmt.Errorf("auto: sync_review_iterations must be positive, got %d", ci.SyncReviewIterations)
+	}
+	if ci.SyncReviewIterations > MaxSyncReviewIterations {
+		return fmt.Errorf("auto: sync_review_iterations must be <= %d, got %d", MaxSyncReviewIterations, ci.SyncReviewIterations)
+	}
+	if ci.Copilot.WaitMinutes < 0 {
+		return fmt.Errorf("auto: copilot.wait_minutes must be non-negative, got %d", ci.Copilot.WaitMinutes)
+	}
+	if ci.Copilot.WaitMinutes > MaxCopilotWaitMinutes {
+		return fmt.Errorf("auto: copilot.wait_minutes must be <= %d, got %d", MaxCopilotWaitMinutes, ci.Copilot.WaitMinutes)
+	}
+	if ci.Copilot.CheckIteration < 0 {
+		return fmt.Errorf("auto: copilot.check_iteration must be non-negative, got %d", ci.Copilot.CheckIteration)
+	}
+	if ci.Copilot.CheckIteration > ci.SyncReviewIterations {
+		return fmt.Errorf("auto: copilot.check_iteration (%d) must be <= sync_review_iterations (%d)", ci.Copilot.CheckIteration, ci.SyncReviewIterations)
+	}
+	if ci.Teammate.Count <= 0 {
+		return fmt.Errorf("auto: teammate.count must be positive, got %d", ci.Teammate.Count)
+	}
+	if ci.FinalMerge.Strategy != "" && !validMergeStrategies[ci.FinalMerge.Strategy] {
+		return fmt.Errorf("auto: final_merge.strategy must be one of: squash, merge, rebase; got %q", ci.FinalMerge.Strategy)
+	}
+	return nil
+}
+
 // sectionNames lists all valid configuration section names.
 var sectionNames = []string{
 	"user", "language", "quality", "project",
 	"git_strategy", "git_convention", "system", "llm",
 	"pricing", "loop", "workflow", "state", "statusline", "gate", "sunset",
-	"research",
+	"research", "auto",
 }
 
 // IsValidSectionName checks if the given name is a valid section name.
@@ -309,4 +390,9 @@ type statuslineFileWrapper struct {
 // researchFileWrapper handles the research.yaml section file.
 type researchFileWrapper struct {
 	Research ResearchConfig `yaml:"research"`
+}
+
+// autoFileWrapper handles the auto.yaml section file.
+type autoFileWrapper struct {
+	Auto AutoConfig `yaml:"auto"`
 }

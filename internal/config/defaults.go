@@ -51,6 +51,14 @@ const (
 	DefaultGitConventionMaxLength           = 100
 
 	DefaultStateDir = ".ae/state"
+
+	DefaultSyncReviewIterations  = 3
+	DefaultCopilotWaitMinutes    = 10
+	DefaultCopilotCheckIteration = 1
+	DefaultCopilotBotLogin       = "copilot-pull-request-reviewer[bot]"
+	DefaultTeammateCount         = 1
+	DefaultTeammateMode          = "auto"
+	DefaultFinalMergeStrategy    = "squash"
 )
 
 // NewDefaultConfig returns a Config with all fields set to compiled defaults.
@@ -71,6 +79,7 @@ func NewDefaultConfig() *Config {
 		Gate:          NewDefaultGateConfig(),
 		Sunset:        NewDefaultSunsetConfig(),
 		Research:      NewDefaultResearchConfig(),
+		Auto:          NewDefaultAutoConfig(),
 	}
 }
 
@@ -285,6 +294,31 @@ func NewDefaultGitConventionConfig() models.GitConventionConfig {
 			ShowExamples:    true,
 			ShowSuggestions: true,
 			Verbose:         false,
+		},
+	}
+}
+
+// NewDefaultAutoConfig returns an AutoConfig with default values.
+func NewDefaultAutoConfig() AutoConfig {
+	return AutoConfig{
+		ContextIsolated: ContextIsolatedConfig{
+			Enabled:              true,
+			SyncReviewIterations: DefaultSyncReviewIterations,
+			Copilot: CopilotConfig{
+				Enabled:        true,
+				CheckIteration: DefaultCopilotCheckIteration,
+				WaitMinutes:    DefaultCopilotWaitMinutes,
+				BotLogin:       DefaultCopilotBotLogin,
+			},
+			Teammate: TeammateConfig{
+				Count: DefaultTeammateCount,
+				Mode:  DefaultTeammateMode,
+			},
+			FinalMerge: FinalMergeConfig{
+				Strategy:      DefaultFinalMergeStrategy,
+				DeleteBranch:  true,
+				RequireCIPass: true,
+			},
 		},
 	}
 }
