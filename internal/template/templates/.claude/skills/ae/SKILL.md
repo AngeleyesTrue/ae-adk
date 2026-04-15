@@ -6,7 +6,7 @@ description: >
   loop, mx, project, feedback, review, clean, codemaps, coverage, e2e)
   to specialized agents.
   Use for any development task from planning to deployment.
-allowed-tools: Task, AskUserQuestion, TaskCreate, TaskUpdate, TaskList, TaskGet, Bash, Read, Write, Edit, Glob, Grep
+allowed-tools: Agent, AskUserQuestion, TaskCreate, TaskUpdate, TaskList, TaskGet, Bash, Read, Write, Edit, Glob, Grep
 argument-hint: "[subcommand] [args] | \"natural language task\""
 ---
 
