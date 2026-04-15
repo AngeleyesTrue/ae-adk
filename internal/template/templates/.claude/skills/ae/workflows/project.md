@@ -60,7 +60,7 @@ If no source code found:
 
 Routing:
 
-- New Project selected: Proceed to Phase 0.5
+- New Project selected: Proceed to Phase 0.3
 - Existing Project selected: Proceed to Phase 1
 
 ---
@@ -245,7 +245,7 @@ If "Cancel": Exit with guidance.
 
 Pass to manager-docs:
 
-- Analysis Results from Phase 1 (or user input from Phase 0.5)
+- Analysis Results from Phase 1 (or user input from Phase 0.3)
 - User Confirmation from Phase 2
 - Output Directory: .ae/project/
 - Language: conversation_language from config
@@ -276,7 +276,7 @@ Output Files (in `.ae/project/codemaps/` directory):
 - data-flow.md: Data flow paths, request lifecycle, state management patterns
 
 Skip Conditions:
-- New projects with no existing code (Phase 0.5 path): Skip codemaps generation, create placeholder `.ae/project/codemaps/overview.md` with project goals only
+- New projects with no existing code (Phase 0.3 path): Skip codemaps generation, create placeholder `.ae/project/codemaps/overview.md` with project goals only
 - User explicitly requests skip via AskUserQuestion in Phase 2
 
 For detailed codemaps generation process, delegate to codemaps workflow (workflows/codemaps.md).
