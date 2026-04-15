@@ -71,6 +71,7 @@ When no flag is provided, the system evaluates task complexity and automatically
 - **e2e** (aliases: e2e-test): Create and run E2E tests
 - **context** (aliases: ctx, memory): Extract and display git-based context memory
 - **auto** (aliases: pipeline): Context-isolated auto pipeline (Run -> Sync-Review Loop -> Final Merge)
+- **auto-sync**: Pipeline-safe sync for auto mode (no merge, no Phase 4). Used internally by auto pipeline. For interactive sync, use `sync`. For detailed orchestration: Read ${CLAUDE_SKILL_DIR}/workflows/auto-sync.md
 
 
 ### Priority 2: SPEC-ID Detection
@@ -212,6 +213,13 @@ Agents: Agent Teams (1 teammate per phase, context released between phases)
 Flags: --iterations N, --skip-run, --no-copilot
 For detailed orchestration: Read ${CLAUDE_SKILL_DIR}/workflows/auto.md
 
+### auto-sync - Pipeline-Safe Sync
+
+Purpose: Pipeline-safe synchronization without merge capability. Used internally by auto pipeline.
+Agents: manager-docs (primary), manager-quality, manager-git
+Modes: auto, force, status, project. Flags: --skip-mx (no --merge support)
+For detailed orchestration: Read ${CLAUDE_SKILL_DIR}/workflows/auto-sync.md
+
 ---
 
 ## Execution Directive
@@ -265,5 +273,5 @@ Use AskUserQuestion to present the user with logical next actions based on the c
 
 ---
 
-Version: 2.6.0
-Last Updated: 2026-02-25
+Version: 2.7.0
+Last Updated: 2026-04-16

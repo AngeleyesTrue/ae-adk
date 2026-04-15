@@ -127,3 +127,579 @@ func TestAutoTemplateWorkflowSkeleton(t *testing.T) {
 		t.Error("auto.md should reference 'auto'")
 	}
 }
+
+// ============================================================================
+// SPEC-PIPELINE-002: Structural Workflow Separation Tests
+// ============================================================================
+
+// --- Structural Separation Tests (core invariants) ---
+
+// TestRunWorkflowNoPhase4 verifies run.md does NOT contain "### Phase 4"
+// header. This is the core structural invariant — if Phase 4 exists,
+// cascade is possible. (AC-01)
+func TestRunWorkflowNoPhase4(t *testing.T) {
+	t.Parallel()
+
+	fsys, err := EmbeddedTemplates()
+	if err != nil {
+		t.Fatalf("EmbeddedTemplates() error: %v", err)
+	}
+
+	data, err := fs.ReadFile(fsys, ".claude/skills/ae/workflows/run.md")
+	if err != nil {
+		t.Fatalf("read run.md: %v", err)
+	}
+
+	content := string(data)
+
+	if strings.Contains(content, "### Phase 4") {
+		t.Error("run.md must NOT contain '### Phase 4' — this creates a cascade trigger in auto pipeline")
+	}
+
+	if strings.Contains(content, "Sync Documentation") {
+		t.Error("run.md must NOT contain 'Sync Documentation' AskUserQuestion option — cascade trigger removed")
+	}
+}
+
+// TestRunWorkflowPhase3Preserved verifies run.md still contains "### Phase 3"
+// (git operations) to ensure we didn't accidentally remove too much. (AC-01)
+func TestRunWorkflowPhase3Preserved(t *testing.T) {
+	t.Parallel()
+
+	fsys, err := EmbeddedTemplates()
+	if err != nil {
+		t.Fatalf("EmbeddedTemplates() error: %v", err)
+	}
+
+	data, err := fs.ReadFile(fsys, ".claude/skills/ae/workflows/run.md")
+	if err != nil {
+		t.Fatalf("read run.md: %v", err)
+	}
+
+	content := string(data)
+
+	if !strings.Contains(content, "### Phase 3") {
+		t.Error("run.md must still contain '### Phase 3' (git operations)")
+	}
+}
+
+// TestRunWorkflowCompletionCriteriaNoPhase4 verifies run.md Completion Criteria
+// section does NOT reference "Phase 4". Catches partial cleanup where the section
+// header is removed but the completion criteria reference remains. (AC-01)
+func TestRunWorkflowCompletionCriteriaNoPhase4(t *testing.T) {
+	t.Parallel()
+
+	fsys, err := EmbeddedTemplates()
+	if err != nil {
+		t.Fatalf("EmbeddedTemplates() error: %v", err)
+	}
+
+	data, err := fs.ReadFile(fsys, ".claude/skills/ae/workflows/run.md")
+	if err != nil {
+		t.Fatalf("read run.md: %v", err)
+	}
+
+	content := string(data)
+
+	// Extract Completion Criteria section (up to the next --- separator,
+	// not including version footer which may mention "Phase 4" in changelog)
+	ccIdx := strings.Index(content, "## Completion Criteria")
+	if ccIdx == -1 {
+		t.Fatal("run.md must contain '## Completion Criteria' section")
+	}
+	ccSection := content[ccIdx:]
+	if sepIdx := strings.Index(ccSection, "\n---"); sepIdx != -1 {
+		ccSection = ccSection[:sepIdx]
+	}
+
+	if strings.Contains(ccSection, "Phase 4") {
+		t.Error("run.md Completion Criteria must NOT reference 'Phase 4'")
+	}
+}
+
+// TestAutoSyncWorkflowExists verifies auto-sync.md exists in embedded templates
+// and has valid frontmatter (name: ae-workflow-auto-sync). (AC-02)
+func TestAutoSyncWorkflowExists(t *testing.T) {
+	t.Parallel()
+
+	fsys, err := EmbeddedTemplates()
+	if err != nil {
+		t.Fatalf("EmbeddedTemplates() error: %v", err)
+	}
+
+	data, err := fs.ReadFile(fsys, ".claude/skills/ae/workflows/auto-sync.md")
+	if err != nil {
+		t.Fatalf("auto-sync.md must exist in embedded templates: %v", err)
+	}
+
+	content := string(data)
+
+	if !strings.Contains(content, "name: ae-workflow-auto-sync") {
+		t.Error("auto-sync.md must have 'name: ae-workflow-auto-sync' in frontmatter")
+	}
+}
+
+// TestAutoSyncNoMergeCapability verifies auto-sync.md does NOT contain
+// `gh pr merge` command. This is the second core structural invariant. (AC-02)
+func TestAutoSyncNoMergeCapability(t *testing.T) {
+	t.Parallel()
+
+	fsys, err := EmbeddedTemplates()
+	if err != nil {
+		t.Fatalf("EmbeddedTemplates() error: %v", err)
+	}
+
+	data, err := fs.ReadFile(fsys, ".claude/skills/ae/workflows/auto-sync.md")
+	if err != nil {
+		t.Fatalf("read auto-sync.md: %v", err)
+	}
+
+	content := string(data)
+
+	// Check for gh pr merge as an executable command (not in explanatory text).
+	// Explanatory text in [HARD] constraint is acceptable.
+	// Split into lines and check each — command usage patterns start with
+	// action verbs or are indented code.
+	lines := strings.Split(content, "\n")
+	for i, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		// Skip the [HARD] constraint explanation line and provenance line
+		if strings.Contains(line, "[HARD]") || strings.HasPrefix(trimmed, "Source:") {
+			continue
+		}
+		if strings.Contains(line, "gh pr merge") {
+			t.Errorf("auto-sync.md line %d must NOT contain 'gh pr merge' as a command: %s", i+1, trimmed)
+		}
+	}
+}
+
+// TestAutoSyncNoPhase4 verifies auto-sync.md does NOT contain
+// "### Phase 4" header. (AC-02)
+func TestAutoSyncNoPhase4(t *testing.T) {
+	t.Parallel()
+
+	fsys, err := EmbeddedTemplates()
+	if err != nil {
+		t.Fatalf("EmbeddedTemplates() error: %v", err)
+	}
+
+	data, err := fs.ReadFile(fsys, ".claude/skills/ae/workflows/auto-sync.md")
+	if err != nil {
+		t.Fatalf("read auto-sync.md: %v", err)
+	}
+
+	content := string(data)
+
+	if strings.Contains(content, "### Phase 4") {
+		t.Error("auto-sync.md must NOT contain '### Phase 4'")
+	}
+
+	if strings.Contains(content, "Phase 4:") {
+		t.Error("auto-sync.md must NOT contain 'Phase 4:' header")
+	}
+}
+
+// TestAutoSyncNoMergeFlag verifies auto-sync.md Supported Flags section does NOT
+// list `--merge` as a supported flag. Section-scoped check to avoid false negatives
+// from explanatory text elsewhere in the file. (AC-02)
+func TestAutoSyncNoMergeFlag(t *testing.T) {
+	t.Parallel()
+
+	fsys, err := EmbeddedTemplates()
+	if err != nil {
+		t.Fatalf("EmbeddedTemplates() error: %v", err)
+	}
+
+	data, err := fs.ReadFile(fsys, ".claude/skills/ae/workflows/auto-sync.md")
+	if err != nil {
+		t.Fatalf("read auto-sync.md: %v", err)
+	}
+
+	content := string(data)
+
+	// Extract the Supported Flags section (from "## Supported Flags" to next "##" header)
+	flagsStart := strings.Index(content, "## Supported Flags")
+	if flagsStart == -1 {
+		t.Fatal("auto-sync.md must contain '## Supported Flags' section")
+	}
+
+	afterFlags := content[flagsStart+len("## Supported Flags"):]
+	nextSection := strings.Index(afterFlags, "\n## ")
+	var flagsSection string
+	if nextSection != -1 {
+		flagsSection = afterFlags[:nextSection]
+	} else {
+		flagsSection = afterFlags
+	}
+
+	if strings.Contains(flagsSection, "--merge") {
+		t.Error("auto-sync.md Supported Flags section must NOT list '--merge' as a supported flag")
+	}
+}
+
+// TestAutoSyncNoAutoMergeOption verifies auto-sync.md does NOT contain
+// "Auto-Merge PR" option text. (AC-02)
+func TestAutoSyncNoAutoMergeOption(t *testing.T) {
+	t.Parallel()
+
+	fsys, err := EmbeddedTemplates()
+	if err != nil {
+		t.Fatalf("EmbeddedTemplates() error: %v", err)
+	}
+
+	data, err := fs.ReadFile(fsys, ".claude/skills/ae/workflows/auto-sync.md")
+	if err != nil {
+		t.Fatalf("read auto-sync.md: %v", err)
+	}
+
+	content := string(data)
+
+	if strings.Contains(content, "Auto-Merge PR") {
+		t.Error("auto-sync.md must NOT contain 'Auto-Merge PR' option text")
+	}
+}
+
+// --- Auto Pipeline Prompt Tests ---
+
+// TestAutoPromptUsesAutoSync verifies auto.md Phase 2 Sync prompt contains
+// `/ae auto-sync` (not `/ae sync`). (AC-03)
+func TestAutoPromptUsesAutoSync(t *testing.T) {
+	t.Parallel()
+
+	fsys, err := EmbeddedTemplates()
+	if err != nil {
+		t.Fatalf("EmbeddedTemplates() error: %v", err)
+	}
+
+	data, err := fs.ReadFile(fsys, ".claude/skills/ae/workflows/auto.md")
+	if err != nil {
+		t.Fatalf("read auto.md: %v", err)
+	}
+
+	content := string(data)
+
+	if !strings.Contains(content, "/ae auto-sync") {
+		t.Error("auto.md must contain '/ae auto-sync' in Phase 2 Sync prompt")
+	}
+}
+
+// TestAutoFinalMergeUserGate verifies auto.md Phase 3 contains AskUserQuestion
+// BEFORE gh pr merge (strings.Index ordering within Phase 3 section). Also
+// verifies gh pr merge appears inside a conditional block gated by user
+// approval. Scoped to Phase 3 to avoid false positives from diagram text. (AC-04)
+func TestAutoFinalMergeUserGate(t *testing.T) {
+	t.Parallel()
+
+	fsys, err := EmbeddedTemplates()
+	if err != nil {
+		t.Fatalf("EmbeddedTemplates() error: %v", err)
+	}
+
+	data, err := fs.ReadFile(fsys, ".claude/skills/ae/workflows/auto.md")
+	if err != nil {
+		t.Fatalf("read auto.md: %v", err)
+	}
+
+	content := string(data)
+
+	// Extract Phase 3 section to avoid false positives from diagram text.
+	// Use "## Error Recovery" as end marker because Phase 3's code fence
+	// contains "## " headers (e.g., "## Query PR") that would break
+	// generic section extraction.
+	phase3Idx := strings.Index(content, "## Phase 3: Final Merge")
+	if phase3Idx == -1 {
+		t.Fatal("auto.md must contain '## Phase 3: Final Merge'")
+	}
+
+	phase3Content := content[phase3Idx:]
+
+	errorRecoveryIdx := strings.Index(phase3Content, "## Error Recovery")
+	if errorRecoveryIdx != -1 {
+		phase3Content = phase3Content[:errorRecoveryIdx]
+	}
+
+	askIdx := strings.Index(phase3Content, "AskUserQuestion")
+	mergeIdx := strings.Index(phase3Content, "gh pr merge")
+
+	if askIdx == -1 {
+		t.Fatal("auto.md Phase 3 must contain 'AskUserQuestion'")
+	}
+	if mergeIdx == -1 {
+		t.Fatal("auto.md Phase 3 must contain 'gh pr merge'")
+	}
+	if askIdx >= mergeIdx {
+		t.Error("auto.md Phase 3: AskUserQuestion must appear BEFORE gh pr merge (index ordering)")
+	}
+
+	// Verify merge is inside a conditional block
+	conditionalIdx := strings.Index(phase3Content, `IF "Merge PR"`)
+	if conditionalIdx == -1 {
+		t.Fatal("auto.md Phase 3 must contain 'IF \"Merge PR\"' conditional")
+	}
+	if conditionalIdx >= mergeIdx {
+		t.Error("auto.md Phase 3: 'IF \"Merge PR\"' conditional must appear BEFORE gh pr merge")
+	}
+	if conditionalIdx <= askIdx {
+		t.Error("auto.md Phase 3: 'IF \"Merge PR\"' conditional must appear AFTER AskUserQuestion")
+	}
+}
+
+// TestAutoFinalMergeOptionsText verifies auto.md Phase 3 AskUserQuestion
+// contains the three required option keywords: "Merge PR", "Skip merge",
+// and "Abort". (AC-04)
+func TestAutoFinalMergeOptionsText(t *testing.T) {
+	t.Parallel()
+
+	fsys, err := EmbeddedTemplates()
+	if err != nil {
+		t.Fatalf("EmbeddedTemplates() error: %v", err)
+	}
+
+	data, err := fs.ReadFile(fsys, ".claude/skills/ae/workflows/auto.md")
+	if err != nil {
+		t.Fatalf("read auto.md: %v", err)
+	}
+
+	content := string(data)
+
+	requiredOptions := []string{"Merge PR", "Skip merge", "Abort"}
+	for _, opt := range requiredOptions {
+		if !strings.Contains(content, opt) {
+			t.Errorf("auto.md Phase 3 AskUserQuestion must contain option keyword %q", opt)
+		}
+	}
+}
+
+// TestAutoSyncHardRoutingConstraint verifies auto.md Phase 2 Sync teammate
+// spawn prompt contains [HARD] and /ae auto-sync in the same prompt block. (AC-03)
+func TestAutoSyncHardRoutingConstraint(t *testing.T) {
+	t.Parallel()
+
+	fsys, err := EmbeddedTemplates()
+	if err != nil {
+		t.Fatalf("EmbeddedTemplates() error: %v", err)
+	}
+
+	data, err := fs.ReadFile(fsys, ".claude/skills/ae/workflows/auto.md")
+	if err != nil {
+		t.Fatalf("read auto.md: %v", err)
+	}
+
+	content := string(data)
+
+	// Find the Phase 2 Sync section (around the spawn teammate prompt)
+	syncPhaseIdx := strings.Index(content, "## Phase 2: Sync-Review Loop")
+	if syncPhaseIdx == -1 {
+		t.Fatal("auto.md must contain '## Phase 2: Sync-Review Loop'")
+	}
+
+	phase3Idx := strings.Index(content, "## Phase 3:")
+	if phase3Idx == -1 {
+		t.Fatal("auto.md must contain '## Phase 3:'")
+	}
+
+	phase2Content := content[syncPhaseIdx:phase3Idx]
+
+	if !strings.Contains(phase2Content, "[HARD]") {
+		t.Error("auto.md Phase 2 must contain [HARD] routing constraint")
+	}
+
+	if !strings.Contains(phase2Content, "/ae auto-sync") {
+		t.Error("auto.md Phase 2 must contain '/ae auto-sync' in sync prompt")
+	}
+}
+
+// --- Backward Compatibility Tests ---
+
+// TestSyncWorkflowUnchanged_Phase4Preserved verifies sync.md still contains
+// "### Phase 4" and "Auto-Merge PR" option text — confirming interactive sync
+// is not degraded. (AC-05)
+func TestSyncWorkflowUnchanged_Phase4Preserved(t *testing.T) {
+	t.Parallel()
+
+	fsys, err := EmbeddedTemplates()
+	if err != nil {
+		t.Fatalf("EmbeddedTemplates() error: %v", err)
+	}
+
+	data, err := fs.ReadFile(fsys, ".claude/skills/ae/workflows/sync.md")
+	if err != nil {
+		t.Fatalf("read sync.md: %v", err)
+	}
+
+	content := string(data)
+
+	if !strings.Contains(content, "### Phase 4") {
+		t.Error("sync.md must still contain '### Phase 4' (interactive sync not degraded)")
+	}
+
+	if !strings.Contains(content, "Auto-Merge PR") {
+		t.Error("sync.md must still contain 'Auto-Merge PR' option text")
+	}
+}
+
+// TestSyncWorkflowUnchanged_MergePreserved verifies sync.md still contains
+// "Step 3.4" and "gh pr merge" — confirming interactive merge capability
+// intact. (AC-05)
+func TestSyncWorkflowUnchanged_MergePreserved(t *testing.T) {
+	t.Parallel()
+
+	fsys, err := EmbeddedTemplates()
+	if err != nil {
+		t.Fatalf("EmbeddedTemplates() error: %v", err)
+	}
+
+	data, err := fs.ReadFile(fsys, ".claude/skills/ae/workflows/sync.md")
+	if err != nil {
+		t.Fatalf("read sync.md: %v", err)
+	}
+
+	content := string(data)
+
+	if !strings.Contains(content, "Step 3.4") {
+		t.Error("sync.md must still contain 'Step 3.4' (auto-merge section)")
+	}
+
+	if !strings.Contains(content, "gh pr merge") {
+		t.Error("sync.md must still contain 'gh pr merge' (merge capability)")
+	}
+}
+
+// --- Registration Tests ---
+
+// TestAutoSyncSkillRegistration verifies SKILL.md contains "auto-sync"
+// subcommand. (AC-06)
+func TestAutoSyncSkillRegistration(t *testing.T) {
+	t.Parallel()
+
+	fsys, err := EmbeddedTemplates()
+	if err != nil {
+		t.Fatalf("EmbeddedTemplates() error: %v", err)
+	}
+
+	data, err := fs.ReadFile(fsys, ".claude/skills/ae/SKILL.md")
+	if err != nil {
+		t.Fatalf("read SKILL.md: %v", err)
+	}
+
+	content := string(data)
+
+	if !strings.Contains(content, "auto-sync") {
+		t.Error("SKILL.md must contain 'auto-sync' subcommand")
+	}
+}
+
+// TestAutoSyncCLAUDERegistration verifies CLAUDE.md Subcommands line
+// contains "auto-sync". (AC-06)
+func TestAutoSyncCLAUDERegistration(t *testing.T) {
+	t.Parallel()
+
+	fsys, err := EmbeddedTemplates()
+	if err != nil {
+		t.Fatalf("EmbeddedTemplates() error: %v", err)
+	}
+
+	data, err := fs.ReadFile(fsys, "CLAUDE.md")
+	if err != nil {
+		t.Fatalf("read CLAUDE.md: %v", err)
+	}
+
+	content := string(data)
+
+	if !strings.Contains(content, "auto-sync") {
+		t.Error("CLAUDE.md must contain 'auto-sync' in Subcommands line")
+	}
+}
+
+// --- Diagram Consistency Test ---
+
+// TestAutoPipelineDiagramUsesAutoSync verifies auto.md Pipeline Sequence diagram
+// references `/ae auto-sync` (not `/ae sync {spec_id}` without auto- prefix). (AC-08)
+func TestAutoPipelineDiagramUsesAutoSync(t *testing.T) {
+	t.Parallel()
+
+	fsys, err := EmbeddedTemplates()
+	if err != nil {
+		t.Fatalf("EmbeddedTemplates() error: %v", err)
+	}
+
+	data, err := fs.ReadFile(fsys, ".claude/skills/ae/workflows/auto.md")
+	if err != nil {
+		t.Fatalf("read auto.md: %v", err)
+	}
+
+	content := string(data)
+
+	// Find the Pipeline Sequence diagram section
+	diagramStart := strings.Index(content, "## Pipeline Sequence")
+	if diagramStart == -1 {
+		t.Fatal("auto.md must contain '## Pipeline Sequence'")
+	}
+
+	// Find end of diagram section (next ## section)
+	afterDiagram := content[diagramStart+len("## Pipeline Sequence"):]
+	nextSection := strings.Index(afterDiagram, "\n## ")
+	var diagramSection string
+	if nextSection != -1 {
+		diagramSection = afterDiagram[:nextSection]
+	} else {
+		diagramSection = afterDiagram
+	}
+
+	if !strings.Contains(diagramSection, "/ae auto-sync") {
+		t.Error("auto.md Pipeline Sequence diagram must reference '/ae auto-sync'")
+	}
+}
+
+// --- Structural Parity Test ---
+
+// TestAutoSyncStructuralParityWithSync verifies auto-sync.md and sync.md share
+// the same phase structure (Phase 0, Phase 1, Phase 2, Phase 3 headers present
+// in both). Verifies auto-sync.md does NOT contain Phase 4 while sync.md does.
+// This detects maintenance drift when sync.md adds or renames phases. (AC-09)
+func TestAutoSyncStructuralParityWithSync(t *testing.T) {
+	t.Parallel()
+
+	fsys, err := EmbeddedTemplates()
+	if err != nil {
+		t.Fatalf("EmbeddedTemplates() error: %v", err)
+	}
+
+	syncData, err := fs.ReadFile(fsys, ".claude/skills/ae/workflows/sync.md")
+	if err != nil {
+		t.Fatalf("read sync.md: %v", err)
+	}
+
+	autoSyncData, err := fs.ReadFile(fsys, ".claude/skills/ae/workflows/auto-sync.md")
+	if err != nil {
+		t.Fatalf("read auto-sync.md: %v", err)
+	}
+
+	syncContent := string(syncData)
+	autoSyncContent := string(autoSyncData)
+
+	// Both must share Phase 0, Phase 1, Phase 2, Phase 3
+	sharedPhases := []string{
+		"### Phase 0:",
+		"### Phase 1:",
+		"### Phase 2:",
+		"### Phase 3:",
+	}
+
+	for _, phase := range sharedPhases {
+		if !strings.Contains(syncContent, phase) {
+			t.Errorf("sync.md must contain %q", phase)
+		}
+		if !strings.Contains(autoSyncContent, phase) {
+			t.Errorf("auto-sync.md must contain %q for structural parity with sync.md", phase)
+		}
+	}
+
+	// sync.md must have Phase 4, auto-sync.md must NOT
+	if !strings.Contains(syncContent, "### Phase 4") {
+		t.Error("sync.md must contain '### Phase 4' (structural separation)")
+	}
+	if strings.Contains(autoSyncContent, "### Phase 4") {
+		t.Error("auto-sync.md must NOT contain '### Phase 4' (structural separation)")
+	}
+}

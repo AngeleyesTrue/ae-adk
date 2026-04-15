@@ -89,6 +89,7 @@ Load from `.ae/config/sections/auto.yaml`:
   |   +- TeamCreate("run-team")
   |   +- Spawn 1 teammate (general-purpose, mode: auto)
   |   +- Teammate executes: /ae run {spec_id}
+  |   +- (run.md has no Phase 4 — no cascade possible)
   |   +- Branch: feature/{spec_id}
   |   +- Await completion
   |   +- TeamDelete("run-team")
@@ -97,7 +98,7 @@ Load from `.ae/config/sections/auto.yaml`:
   |   |
   |   +- Iteration 1:
   |   |   +- Sync (Team: sync-team-1)
-  |   |   |   +- TeamCreate -> teammate: /ae sync {spec_id} -> TeamDelete
+  |   |   |   +- TeamCreate -> teammate: /ae auto-sync {spec_id} -> TeamDelete
   |   |   +- Orchestrator: gh pr list --head feature/{spec_id} -> PR number
   |   |   +- Copilot Wait (if enabled AND iteration == check_iteration)
   |   |   |   +- Bash: sleep {wait_minutes * 60}
@@ -107,14 +108,16 @@ Load from `.ae/config/sections/auto.yaml`:
   |   |       +- TeamCreate -> teammate: /ae review {spec_id} + PR#{number} + Copilot comments -> TeamDelete
   |   |
   |   +- Iteration 2..N:
-  |       +- Sync (Team: sync-team-{i}) -> TeamDelete
+  |       +- Sync (Team: sync-team-{i}, /ae auto-sync) -> TeamDelete
   |       +- Orchestrator: PR number query
   |       +- Review (Team: review-team-{i}) + PR#{number} -> TeamDelete
   |
   +- Phase 3: Final Merge
       +- gh pr list --head feature/{spec_id} --state open
       +- gh pr checks {pr_number}
-      +- If all pass: gh pr merge {pr_number} --squash --delete-branch
+      +- If checks pending: gh pr checks {pr_number} --watch --fail-fast (10min timeout)
+      +- If all pass: AskUserQuestion -> Merge/Skip/Abort
+      +- If "Merge PR": gh pr merge {pr_number} --squash --delete-branch
       +- If fail: Report to user with options
 ```
 
@@ -181,10 +184,11 @@ FOR i = 1 TO iterations:
     - subagent_type: "general-purpose"
     - mode: "auto"
     - prompt: |
-        Execute /ae sync {spec_id}.
+        Execute /ae auto-sync {spec_id}.
         Synchronize documentation with code changes.
         Create or update the pull request from feature/{spec_id} to main.
         Commit and push any documentation changes.
+        [HARD]: You MUST invoke '/ae auto-sync {spec_id}', NOT '/ae sync'. Invoking '/ae sync' causes unintended merge operations and is prohibited in the auto pipeline.
 
   Await teammate completion.
   TeamDelete("sync-team-{i}")
@@ -261,10 +265,25 @@ IF no open PR:
 ## Check CI
 Bash: gh pr checks {pr_number}
 
+IF checks still pending:
+  Bash: gh pr checks {pr_number} --watch --fail-fast (timeout: 10 minutes)
+  Re-evaluate after wait.
+
 IF all checks pass:
-  Bash: gh pr merge {pr_number} --squash --delete-branch
-  Report: Merge Complete
-    "PR #{pr_number} merged successfully via squash. Branch deleted."
+  AskUserQuestion:
+    Question: "All CI checks passed on PR #{pr_number}. Ready to merge?"
+    Options:
+      - "Merge PR (Recommended): Squash merge and delete branch"
+      - "Skip merge: Keep PR open for manual review"
+      - "Abort pipeline: Stop without merging"
+
+  IF "Merge PR": gh pr merge {pr_number} --squash --delete-branch
+    Report: Merge Complete
+      "PR #{pr_number} merged successfully via squash. Branch deleted."
+  IF "Skip merge": Report PR left open
+    "PR #{pr_number} left open for manual review."
+  IF "Abort pipeline": Report pipeline aborted
+    "Pipeline aborted. PR #{pr_number} remains open."
 
 IF checks fail:
   Report: Merge Blocked
@@ -363,5 +382,5 @@ mitigates this by including structured handoff data in each phase's prompt:
 
 ---
 
-Version: 1.0.0
-Source: SPEC-PIPELINE-001
+Version: 1.1.0
+Source: SPEC-PIPELINE-001, updated: SPEC-PIPELINE-002 (auto-sync routing, [HARD] constraint, conditional merge gate)
