@@ -65,6 +65,9 @@ func (l *Loader) Load(configDir string) (*Config, error) {
 	// Load research section
 	l.loadResearchSection(sectionsDir, cfg)
 
+	// Load auto section
+	l.loadAutoSection(sectionsDir, cfg)
+
 	return cfg, nil
 }
 
@@ -190,6 +193,20 @@ func (l *Loader) loadResearchSection(dir string, cfg *Config) {
 	if loaded {
 		cfg.Research = wrapper.Research
 		l.loadedSections["research"] = true
+	}
+}
+
+// loadAutoSection loads the auto pipeline configuration section from auto.yaml.
+func (l *Loader) loadAutoSection(dir string, cfg *Config) {
+	wrapper := &autoFileWrapper{Auto: cfg.Auto}
+	loaded, err := loadYAMLFile(dir, "auto.yaml", wrapper)
+	if err != nil {
+		slog.Warn("failed to load auto config, using defaults", "error", err)
+		return
+	}
+	if loaded {
+		cfg.Auto = wrapper.Auto
+		l.loadedSections["auto"] = true
 	}
 }
 

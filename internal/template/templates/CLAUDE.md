@@ -74,7 +74,7 @@ Integrate and report results:
 
 Definition: Single entry point for all AE development workflows.
 
-Subcommands: plan, run, sync, project, fix, loop, mx, feedback, review, clean, codemaps, coverage, e2e
+Subcommands: plan, run, sync, auto, project, fix, loop, mx, feedback, review, clean, codemaps, coverage, e2e
 Default (natural language): Routes to autonomous workflow (plan -> run -> sync pipeline)
 
 Allowed Tools: Full access (Agent, AskUserQuestion, TaskCreate, TaskUpdate, TaskList, TaskGet, Bash, Read, Write, Edit, Glob, Grep)

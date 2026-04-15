@@ -70,6 +70,7 @@ When no flag is provided, the system evaluates task complexity and automatically
 - **coverage** (aliases: cov): Analyze test coverage and generate missing tests
 - **e2e** (aliases: e2e-test): Create and run E2E tests
 - **context** (aliases: ctx, memory): Extract and display git-based context memory
+- **auto** (aliases: pipeline): Context-isolated auto pipeline (Run -> Sync-Review Loop -> Final Merge)
 
 
 ### Priority 2: SPEC-ID Detection
@@ -203,6 +204,13 @@ For detailed orchestration: Read ${CLAUDE_SKILL_DIR}/workflows/context.md
 Purpose: Collect user feedback and create GitHub issues.
 Agents: manager-quality
 For detailed orchestration: Read ${CLAUDE_SKILL_DIR}/workflows/feedback.md
+
+### auto - Context-Isolated Auto Pipeline
+
+Purpose: Execute Run -> Sync-Review Loop -> Final Merge using context-isolated Agent Teams.
+Agents: Agent Teams (1 teammate per phase, context released between phases)
+Flags: --iterations N, --skip-run, --no-copilot
+For detailed orchestration: Read ${CLAUDE_SKILL_DIR}/workflows/auto.md
 
 ---
 

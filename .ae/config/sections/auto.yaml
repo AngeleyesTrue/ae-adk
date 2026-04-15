@@ -1,0 +1,17 @@
+auto:
+  context_isolated:
+    enabled: true
+    sync_review_iterations: 3
+    copilot:
+      enabled: true
+      check_iteration: 1
+      wait_minutes: 10
+      bot_login: "copilot-pull-request-reviewer[bot]"
+    teammate:
+      count: 1
+      mode: "auto"
+      model: null
+    final_merge:
+      strategy: "squash"
+      delete_branch: true
+      require_ci_pass: true

@@ -131,8 +131,8 @@ func TestValidSectionNames(t *testing.T) {
 	names := ValidSectionNames()
 
 	// Verify count
-	if len(names) != 16 {
-		t.Fatalf("expected 16 section names, got %d", len(names))
+	if len(names) != 17 {
+		t.Fatalf("expected 17 section names, got %d", len(names))
 	}
 
 	// Verify all expected names are present
@@ -141,6 +141,7 @@ func TestValidSectionNames(t *testing.T) {
 		"git_strategy": true, "git_convention": true, "system": true, "llm": true,
 		"pricing": true, "loop": true, "workflow": true, "state": true,
 		"statusline": true, "gate": true, "sunset": true, "research": true,
+		"auto": true,
 	}
 	for _, name := range names {
 		if !expected[name] {

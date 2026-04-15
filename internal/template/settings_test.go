@@ -171,17 +171,72 @@ func TestSettingsTemplateAttribution(t *testing.T) {
 		t.Fatalf("Unmarshal error: %v", err)
 	}
 
-	attr, ok := settings["attribution"].(map[string]any)
-	if !ok {
-		t.Fatal("missing attribution section")
+	// Attribution section must NOT exist (SPEC-PIPELINE-001 REQ-013)
+	if _, ok := settings["attribution"]; ok {
+		t.Error("attribution section should not exist in rendered settings")
 	}
-	commit, _ := attr["commit"].(string)
-	if !strings.Contains(commit, "AE") {
-		t.Errorf("attribution.commit should contain AE, got %q", commit)
+
+	// mo.ai.kr string must NOT appear anywhere in the rendered output
+	if strings.Contains(output, "mo.ai.kr") {
+		t.Error("rendered settings should not contain 'mo.ai.kr'")
 	}
-	pr, _ := attr["pr"].(string)
-	if !strings.Contains(pr, "AE") {
-		t.Errorf("attribution.pr should contain AE, got %q", pr)
+}
+
+func TestSettingsTemplateEmojiUnification(t *testing.T) {
+	t.Parallel()
+
+	fsys, err := EmbeddedTemplates()
+	if err != nil {
+		t.Fatalf("EmbeddedTemplates() error: %v", err)
+	}
+
+	tests := []struct {
+		name          string
+		file          string
+		mustNotExist  []string
+		mustExist     []string
+	}{
+		{
+			name:         "ae.md eye icon replaces robot",
+			file:         ".claude/output-styles/ae/ae.md",
+			mustNotExist: []string{"🤖 AE ★"},
+			mustExist:    []string{"👁️ AE ★", "🤖 DELEGATED"},
+		},
+		{
+			name:         "r2d2.md eye icon replaces moai",
+			file:         ".claude/output-styles/ae/r2d2.md",
+			mustNotExist: []string{"🗿 AE-ADK"},
+			mustExist:    []string{"👁️ AE-ADK", "🤖 R2-D2"},
+		},
+		{
+			name:         "yoda.md eye icon replaces moai",
+			file:         ".claude/output-styles/ae/yoda.md",
+			mustNotExist: []string{"🗿 AE-ADK"},
+			mustExist:    []string{"👁️ AE-ADK", "🧙 Yoda"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			data, err := fs.ReadFile(fsys, tt.file)
+			if err != nil {
+				t.Fatalf("read %s: %v", tt.file, err)
+			}
+			content := string(data)
+
+			for _, pattern := range tt.mustNotExist {
+				if strings.Contains(content, pattern) {
+					t.Errorf("%s should NOT contain %q", tt.file, pattern)
+				}
+			}
+			for _, pattern := range tt.mustExist {
+				if !strings.Contains(content, pattern) {
+					t.Errorf("%s should contain %q", tt.file, pattern)
+				}
+			}
+		})
 	}
 }
 

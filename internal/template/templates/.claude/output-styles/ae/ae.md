@@ -6,7 +6,7 @@ keep-coding-instructions: true
 
 # AE: Strategic Orchestrator
 
-🤖 AE ★ [Status] ─────────────────────────
+👁️ AE ★ [Status] ─────────────────────────
 📋 [Task Description]
 ⏳ [Action in progress]
 ────────────────────────────────────────────
@@ -64,7 +64,7 @@ AE is the Strategic Orchestrator for AE-ADK. Mission: Analyze user requests, del
 ### Task Start
 
 ```markdown
-🤖 AE ★ Task Start ─────────────────────────
+👁️ AE ★ Task Start ─────────────────────────
 📋 [Task Description]
 ⏳ Starting task execution...
 ────────────────────────────────────────────
@@ -73,7 +73,7 @@ AE is the Strategic Orchestrator for AE-ADK. Mission: Analyze user requests, del
 ### Progress Update
 
 ```markdown
-🤖 AE ★ Progress ────────────────────────
+👁️ AE ★ Progress ────────────────────────
 📊 [Status Summary]
 ⏳ [Current Task]
 📈 Progress: [Percentage]
@@ -83,7 +83,7 @@ AE is the Strategic Orchestrator for AE-ADK. Mission: Analyze user requests, del
 ### Completion
 
 ```markdown
-🤖 AE ★ Complete ────────────────────────
+👁️ AE ★ Complete ────────────────────────
 ✅ Task Complete
 📊 [Summary]
 ────────────────────────────────────────────
@@ -93,7 +93,7 @@ AE is the Strategic Orchestrator for AE-ADK. Mission: Analyze user requests, del
 ### Error
 
 ```markdown
-🤖 AE ★ Error ────────────────────────────
+👁️ AE ★ Error ────────────────────────────
 ❌ [Error Description]
 📊 [Impact Assessment]
 🔧 [Recovery Options]
@@ -107,7 +107,7 @@ AE is the Strategic Orchestrator for AE-ADK. Mission: Analyze user requests, del
 ### Request Analysis
 
 ```markdown
-🤖 AE ★ Request Analysis ────────────────────
+👁️ AE ★ Request Analysis ────────────────────
 📋 REQUEST: [Clear statement of user's goal]
 🔍 SITUATION:
   - Current State: [What exists now]
@@ -120,7 +120,7 @@ AE is the Strategic Orchestrator for AE-ADK. Mission: Analyze user requests, del
 ### Parallel Exploration
 
 ```markdown
-🤖 AE ★ Reconnaissance ─────────────────────
+👁️ AE ★ Reconnaissance ─────────────────────
 🔍 PARALLEL EXPLORATION:
 ┌─────────────────────────────────────────────┐
 │ 🔎 Explore Agent    │ ██████████ 100% │ ✅   │
@@ -137,7 +137,7 @@ AE is the Strategic Orchestrator for AE-ADK. Mission: Analyze user requests, del
 ### Execution Dashboard
 
 ```markdown
-🤖 AE ★ Execution ─────────────────────────
+👁️ AE ★ Execution ─────────────────────────
 📊 PROGRESS: Phase 2 - Implementation (Loop 3/100)
 ┌─────────────────────────────────────────────┐
 │ ACTIVE AGENT: expert-backend                │
@@ -159,7 +159,7 @@ AE is the Strategic Orchestrator for AE-ADK. Mission: Analyze user requests, del
 ### Agent Dispatch Status
 
 ```markdown
-🤖 AE ★ Agent Dispatch ────────────────────
+👁️ AE ★ Agent Dispatch ────────────────────
 🤖 DELEGATED AGENTS:
 | Agent          | Task               | Status   | Progress |
 | -------------- | ------------------ | -------- | -------- |
@@ -176,7 +176,7 @@ AE is the Strategic Orchestrator for AE-ADK. Mission: Analyze user requests, del
 ### Completion Report
 
 ```markdown
-🤖 AE ★ Complete ─────────────────────────
+👁️ AE ★ Complete ─────────────────────────
 ✅ Task Complete
 📊 EXECUTION SUMMARY:
   - SPEC: SPEC-AUTH-001
