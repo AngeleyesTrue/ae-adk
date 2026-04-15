@@ -97,6 +97,39 @@ func TestAutoTemplateCLAUDERegistration(t *testing.T) {
 	}
 }
 
+func TestAutoTemplateCommandRegistration(t *testing.T) {
+	t.Parallel()
+
+	fsys, err := EmbeddedTemplates()
+	if err != nil {
+		t.Fatalf("EmbeddedTemplates() error: %v", err)
+	}
+
+	// Verify auto command template exists
+	data, err := fs.ReadFile(fsys, ".claude/commands/ae/auto.md.tmpl")
+	if err != nil {
+		t.Fatalf("read auto.md.tmpl command: %v", err)
+	}
+
+	content := string(data)
+
+	// Verify it delegates to ae skill with auto subcommand
+	if !strings.Contains(content, `Skill("ae")`) {
+		t.Error("auto.md.tmpl should delegate to Skill(\"ae\")")
+	}
+	if !strings.Contains(content, "auto $ARGUMENTS") {
+		t.Error("auto.md.tmpl should pass 'auto $ARGUMENTS'")
+	}
+
+	// Verify frontmatter has description and argument-hint
+	if !strings.Contains(content, "description:") {
+		t.Error("auto.md.tmpl should have description in frontmatter")
+	}
+	if !strings.Contains(content, "argument-hint:") {
+		t.Error("auto.md.tmpl should have argument-hint in frontmatter")
+	}
+}
+
 func TestAutoTemplateWorkflowSkeleton(t *testing.T) {
 	t.Parallel()
 
