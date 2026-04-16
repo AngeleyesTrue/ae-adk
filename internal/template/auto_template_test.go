@@ -551,8 +551,8 @@ func TestAutoPhase2NoUnsafeSyncCommand(t *testing.T) {
 
 	phase2Content := content[syncPhaseIdx:phase3Idx]
 
-	// Check for bare "/ae sync " (with trailing space to match command usage,
-	// not "/ae auto-sync" which is the safe variant)
+	// Check for bare "/ae sync" (without "auto-" prefix).
+	// Catches all forms: "/ae sync ", "/ae sync{", "/ae sync\n", etc.
 	lines := strings.Split(phase2Content, "\n")
 	for i, line := range lines {
 		// Skip lines that contain the safe "/ae auto-sync"
@@ -563,7 +563,7 @@ func TestAutoPhase2NoUnsafeSyncCommand(t *testing.T) {
 		if strings.Contains(line, "[HARD]") {
 			continue
 		}
-		if strings.Contains(line, "/ae sync ") || strings.Contains(line, "/ae sync{") {
+		if strings.Contains(line, "/ae sync") {
 			t.Errorf("auto.md Phase 2 line %d must NOT contain bare '/ae sync' command (use '/ae auto-sync'): %s",
 				i+1, strings.TrimSpace(line))
 		}
@@ -850,7 +850,17 @@ func TestAutoSyncGracefulExitRetryCommand(t *testing.T) {
 		t.Error("auto-sync.md Graceful Exit must reference '/ae auto-sync' as retry command")
 	}
 
-	if strings.Contains(exitSection, "/ae sync") && !strings.Contains(exitSection, "/ae auto-sync") {
-		t.Error("auto-sync.md Graceful Exit must NOT reference '/ae sync' without 'auto-' prefix")
+	// Check each line for bare "/ae sync" (without "auto-" prefix).
+	// Previous logic had a false-negative: it passed when both "/ae sync" and
+	// "/ae auto-sync" coexisted. Line-by-line check prevents this.
+	exitLines := strings.Split(exitSection, "\n")
+	for i, line := range exitLines {
+		if strings.Contains(line, "/ae auto-sync") {
+			continue
+		}
+		if strings.Contains(line, "/ae sync") {
+			t.Errorf("auto-sync.md Graceful Exit line %d must NOT use bare '/ae sync': %s",
+				i+1, strings.TrimSpace(line))
+		}
 	}
 }

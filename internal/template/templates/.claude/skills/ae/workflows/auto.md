@@ -3,14 +3,14 @@ name: ae-workflow-auto
 description: >
   Context-Isolated Auto Pipeline. Executes Run -> Sync-Review Loop -> Final Merge
   using independent Agent Teams per phase. Each team has exactly one teammate that
-  inherits project skills (/ae run, /ae sync, /ae review). Context is released
+  inherits project skills (/ae run, /ae auto-sync, /ae review). Context is released
   between phases via TeamDelete to prevent hallucination and context exhaustion.
 user-invocable: false
 metadata:
   version: "1.0.0"
   category: "workflow"
   status: "active"
-  updated: "2026-04-15"
+  updated: "2026-04-16"
   tags: "auto, pipeline, autonomous, context-isolated"
 
 # AE Extension: Progressive Disclosure
@@ -37,7 +37,7 @@ completion, TeamDelete releases the context entirely (Context Zero Principle).
 ## Architectural Justification
 
 Agent Teams are used instead of simple Agent() calls because Agent Teams teammates
-inherit project skills and can execute skill commands like `/ae run`, `/ae sync`,
+inherit project skills and can execute skill commands like `/ae run`, `/ae auto-sync`,
 `/ae review`. Simple Agent() sub-agents operate in isolated contexts without access
 to project skill definitions. This is the key architectural reason for using Agent Teams.
 
@@ -292,7 +292,7 @@ IF checks fail:
     Question: "CI checks are failing on PR #{pr_number}. How would you like to proceed?"
     Options:
       - "Wait and retry (Recommended): Wait for CI to complete and retry merge"
-      - "Force merge: Merge despite failing checks"
+      - "Force merge: Merge despite failing checks (use with caution — bypasses CI safety)"
       - "Manual intervention: Stop pipeline for manual review"
       - "Abort: Cancel the merge"
 
