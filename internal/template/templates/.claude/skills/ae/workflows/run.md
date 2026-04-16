@@ -37,7 +37,7 @@ For methodology details (DDD ANALYZE-PRESERVE-IMPROVE and TDD RED-GREEN-REFACTOR
 
 - Implements Step 3 of AE's 4-step workflow (Task Execution)
 - Receives SPEC documents created by /ae plan
-- Hands off to /ae sync for documentation and PR
+- Documentation sync is handled separately: interactive users invoke /ae sync, auto pipeline uses /ae auto-sync
 
 ## Input
 
@@ -441,19 +441,6 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 
 Output: branch_name, commits array (sha and message), files_staged count, status, issue_number (from SPEC metadata).
 
-### Phase 4: Completion and Guidance
-
-Tool: AskUserQuestion (at orchestrator level)
-
-Display implementation summary:
-- Files created count, tests passing count, coverage percentage, commits count
-
-Options:
-- Sync Documentation (recommended): Execute /ae sync to synchronize docs and create PR
-- Implement Another Feature: Return to /ae plan for additional SPEC
-- Review Results: Examine implementation and test coverage locally
-- Finish: Session complete
-
 ---
 
 ## Execution Mode Gate Integration
@@ -527,9 +514,10 @@ All of the following must be verified:
 - Phase 2.5: manager-quality completed TRUST 5 validation with PASS or WARNING status
 - Quality gate blocked Phase 3 if status was CRITICAL
 - Phase 3: manager-git created commits (branch or direct) only if quality permitted
-- Phase 4: User presented with next step options
+
+Note: For interactive documentation sync and PR creation, invoke `/ae sync SPEC-{ID}` as the next step. In auto pipeline mode, the orchestrator (auto.md) controls sync routing via `/ae auto-sync` — do not invoke sync directly.
 
 ---
 
-Version: 2.10.0
-Updated: 2026-03-11. Added GitHub Issue linking: Phase 3 reads SPEC issue_number for Fixes #N in commits/PRs. Previous: Harness Engineering improvements (v2.9.0).
+Version: 2.11.0
+Updated: 2026-04-16. Removed Phase 4 (Completion and Guidance) to prevent auto-pipeline cascade — sync is now initiated by the auto pipeline or user directly via /ae sync. Previous: GitHub Issue linking (v2.10.0).
