@@ -257,14 +257,21 @@ func TestAutoSyncNoMergeCapability(t *testing.T) {
 	content := string(data)
 
 	// Check for gh pr merge on each line, skipping only known safe contexts:
-	// - Lines containing [HARD] (the pipeline safety constraint explanation)
+	// - The specific [HARD] pipeline safety constraint explanation line
 	// - Lines starting with "Source:" (provenance metadata)
 	// Any other occurrence is treated as an executable command reference.
+	// NOTE: We match the specific [HARD] safety explanation rather than all
+	// [HARD] lines to prevent false negatives if a future [HARD] rule
+	// accidentally includes a gh pr merge command.
 	lines := strings.Split(content, "\n")
 	for i, line := range lines {
 		trimmed := strings.TrimSpace(line)
-		// Skip the [HARD] constraint explanation line and provenance line
-		if strings.Contains(line, "[HARD]") || strings.HasPrefix(trimmed, "Source:") {
+		// Skip the specific pipeline safety constraint explanation line
+		if strings.Contains(line, "[HARD] This workflow has NO merge capability") {
+			continue
+		}
+		// Skip provenance metadata line
+		if strings.HasPrefix(trimmed, "Source:") {
 			continue
 		}
 		if strings.Contains(line, "gh pr merge") {

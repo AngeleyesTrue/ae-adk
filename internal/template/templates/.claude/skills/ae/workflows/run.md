@@ -37,7 +37,7 @@ For methodology details (DDD ANALYZE-PRESERVE-IMPROVE and TDD RED-GREEN-REFACTOR
 
 - Implements Step 3 of AE's 4-step workflow (Task Execution)
 - Receives SPEC documents created by /ae plan
-- Hands off to /ae sync for documentation and PR
+- Documentation sync is handled separately: interactive users invoke /ae sync, auto pipeline uses /ae auto-sync
 
 ## Input
 

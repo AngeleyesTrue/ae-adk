@@ -292,9 +292,16 @@ IF checks fail:
     Question: "CI checks are failing on PR #{pr_number}. How would you like to proceed?"
     Options:
       - "Wait and retry (Recommended): Wait for CI to complete and retry merge"
-      - "Force merge: Merge despite failing checks (use with caution — bypasses CI safety)"
+      - "Force merge: Merge despite failing checks (WARNING: bypasses CI safety, use only if failures are known-safe)"
       - "Manual intervention: Stop pipeline for manual review"
       - "Abort: Cancel the merge"
+
+  IF "Wait and retry": gh pr checks {pr_number} --watch --fail-fast (10min timeout), then re-evaluate
+  IF "Force merge": gh pr merge {pr_number} --squash --delete-branch --admin
+    Report: Force Merge Complete
+      "WARNING: PR #{pr_number} force-merged despite failing CI checks. Review CI failures manually."
+  IF "Manual intervention": Report pipeline paused for manual review
+  IF "Abort": Report merge cancelled
 
 IF merge conflict detected:
   Report: Merge Conflict

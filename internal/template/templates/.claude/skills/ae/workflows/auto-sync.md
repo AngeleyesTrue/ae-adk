@@ -939,4 +939,4 @@ All of the following must be verified:
 
 Version: 1.0.0
 Updated: 2026-04-16
-Source: Derived from sync.md v3.5.0. Pipeline-safe variant without merge capability — removed --merge flag, Step 3.4 (Auto-Merge), and Phase 4 (Completion and Next Steps). Merge operations are controlled by auto.md Phase 3.
+Source: Derived from sync.md v3.3.0. Pipeline-safe variant without merge capability — removed --merge flag, Step 3.4 (Auto-Merge), and Phase 4 (Completion and Next Steps). Merge operations are controlled by auto.md Phase 3.
