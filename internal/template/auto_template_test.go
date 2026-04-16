@@ -256,10 +256,10 @@ func TestAutoSyncNoMergeCapability(t *testing.T) {
 
 	content := string(data)
 
-	// Check for gh pr merge as an executable command (not in explanatory text).
-	// Explanatory text in [HARD] constraint is acceptable.
-	// Split into lines and check each — command usage patterns start with
-	// action verbs or are indented code.
+	// Check for gh pr merge on each line, skipping only known safe contexts:
+	// - Lines containing [HARD] (the pipeline safety constraint explanation)
+	// - Lines starting with "Source:" (provenance metadata)
+	// Any other occurrence is treated as an executable command reference.
 	lines := strings.Split(content, "\n")
 	for i, line := range lines {
 		trimmed := strings.TrimSpace(line)
@@ -446,7 +446,8 @@ func TestAutoFinalMergeUserGate(t *testing.T) {
 
 // TestAutoFinalMergeOptionsText verifies auto.md Phase 3 AskUserQuestion
 // contains the three required option keywords: "Merge PR", "Skip merge",
-// and "Abort". (AC-04)
+// and "Abort". Scoped to Phase 3 section to avoid false positives from
+// diagram or error recovery text elsewhere. (AC-04)
 func TestAutoFinalMergeOptionsText(t *testing.T) {
 	t.Parallel()
 
@@ -462,9 +463,19 @@ func TestAutoFinalMergeOptionsText(t *testing.T) {
 
 	content := string(data)
 
+	// Scope to Phase 3 section only
+	phase3Idx := strings.Index(content, "## Phase 3: Final Merge")
+	if phase3Idx == -1 {
+		t.Fatal("auto.md must contain '## Phase 3: Final Merge'")
+	}
+	phase3Content := content[phase3Idx:]
+	if errIdx := strings.Index(phase3Content, "## Error Recovery"); errIdx != -1 {
+		phase3Content = phase3Content[:errIdx]
+	}
+
 	requiredOptions := []string{"Merge PR", "Skip merge", "Abort"}
 	for _, opt := range requiredOptions {
-		if !strings.Contains(content, opt) {
+		if !strings.Contains(phase3Content, opt) {
 			t.Errorf("auto.md Phase 3 AskUserQuestion must contain option keyword %q", opt)
 		}
 	}
@@ -506,6 +517,97 @@ func TestAutoSyncHardRoutingConstraint(t *testing.T) {
 
 	if !strings.Contains(phase2Content, "/ae auto-sync") {
 		t.Error("auto.md Phase 2 must contain '/ae auto-sync' in sync prompt")
+	}
+}
+
+// TestAutoPhase2NoUnsafeSyncCommand verifies auto.md Phase 2 spawn prompt
+// does NOT contain the bare "/ae sync " command (without "auto-" prefix).
+// If both "/ae sync" and "/ae auto-sync" coexist, the cascade risk partially
+// returns since the teammate may invoke the unsafe variant.
+func TestAutoPhase2NoUnsafeSyncCommand(t *testing.T) {
+	t.Parallel()
+
+	fsys, err := EmbeddedTemplates()
+	if err != nil {
+		t.Fatalf("EmbeddedTemplates() error: %v", err)
+	}
+
+	data, err := fs.ReadFile(fsys, ".claude/skills/ae/workflows/auto.md")
+	if err != nil {
+		t.Fatalf("read auto.md: %v", err)
+	}
+
+	content := string(data)
+
+	syncPhaseIdx := strings.Index(content, "## Phase 2: Sync-Review Loop")
+	if syncPhaseIdx == -1 {
+		t.Fatal("auto.md must contain '## Phase 2: Sync-Review Loop'")
+	}
+
+	phase3Idx := strings.Index(content, "## Phase 3:")
+	if phase3Idx == -1 {
+		t.Fatal("auto.md must contain '## Phase 3:'")
+	}
+
+	phase2Content := content[syncPhaseIdx:phase3Idx]
+
+	// Check for bare "/ae sync " (with trailing space to match command usage,
+	// not "/ae auto-sync" which is the safe variant)
+	lines := strings.Split(phase2Content, "\n")
+	for i, line := range lines {
+		// Skip lines that contain the safe "/ae auto-sync"
+		if strings.Contains(line, "/ae auto-sync") {
+			continue
+		}
+		// Skip lines that are part of the [HARD] constraint explanation
+		if strings.Contains(line, "[HARD]") {
+			continue
+		}
+		if strings.Contains(line, "/ae sync ") || strings.Contains(line, "/ae sync{") {
+			t.Errorf("auto.md Phase 2 line %d must NOT contain bare '/ae sync' command (use '/ae auto-sync'): %s",
+				i+1, strings.TrimSpace(line))
+		}
+	}
+}
+
+// TestAutoPhase3CIWaitPresent verifies auto.md Phase 3 contains CI pending
+// handling with --watch --fail-fast. (REQ-06 / AC-07)
+func TestAutoPhase3CIWaitPresent(t *testing.T) {
+	t.Parallel()
+
+	fsys, err := EmbeddedTemplates()
+	if err != nil {
+		t.Fatalf("EmbeddedTemplates() error: %v", err)
+	}
+
+	data, err := fs.ReadFile(fsys, ".claude/skills/ae/workflows/auto.md")
+	if err != nil {
+		t.Fatalf("read auto.md: %v", err)
+	}
+
+	content := string(data)
+
+	// Scope to Phase 3 section
+	phase3Idx := strings.Index(content, "## Phase 3: Final Merge")
+	if phase3Idx == -1 {
+		t.Fatal("auto.md must contain '## Phase 3: Final Merge'")
+	}
+
+	phase3Content := content[phase3Idx:]
+	if errIdx := strings.Index(phase3Content, "## Error Recovery"); errIdx != -1 {
+		phase3Content = phase3Content[:errIdx]
+	}
+
+	if !strings.Contains(phase3Content, "--watch") {
+		t.Error("auto.md Phase 3 must contain '--watch' for CI pending handling (REQ-06)")
+	}
+
+	if !strings.Contains(phase3Content, "--fail-fast") {
+		t.Error("auto.md Phase 3 must contain '--fail-fast' for CI pending handling (REQ-06)")
+	}
+
+	if !strings.Contains(phase3Content, "checks still pending") {
+		t.Error("auto.md Phase 3 must contain CI pending detection logic")
 	}
 }
 
@@ -590,7 +692,8 @@ func TestAutoSyncSkillRegistration(t *testing.T) {
 }
 
 // TestAutoSyncCLAUDERegistration verifies CLAUDE.md Subcommands line
-// contains "auto-sync". (AC-06)
+// contains "auto-sync". Scoped to the Subcommands line to prevent false
+// positives from incidental mentions elsewhere. (AC-06)
 func TestAutoSyncCLAUDERegistration(t *testing.T) {
 	t.Parallel()
 
@@ -606,8 +709,17 @@ func TestAutoSyncCLAUDERegistration(t *testing.T) {
 
 	content := string(data)
 
-	if !strings.Contains(content, "auto-sync") {
-		t.Error("CLAUDE.md must contain 'auto-sync' in Subcommands line")
+	// Find the Subcommands line specifically
+	lines := strings.Split(content, "\n")
+	found := false
+	for _, line := range lines {
+		if strings.HasPrefix(line, "Subcommands:") && strings.Contains(line, "auto-sync") {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("CLAUDE.md must contain 'auto-sync' in its Subcommands: line")
 	}
 }
 
@@ -701,5 +813,44 @@ func TestAutoSyncStructuralParityWithSync(t *testing.T) {
 	}
 	if strings.Contains(autoSyncContent, "### Phase 4") {
 		t.Error("auto-sync.md must NOT contain '### Phase 4' (structural separation)")
+	}
+}
+
+// TestAutoSyncGracefulExitRetryCommand verifies auto-sync.md Graceful Exit
+// section references "/ae auto-sync" (not "/ae sync") as the retry command.
+// Prevents regression where users are directed to the interactive sync workflow
+// which has merge capability. (AC-02 supplementary)
+func TestAutoSyncGracefulExitRetryCommand(t *testing.T) {
+	t.Parallel()
+
+	fsys, err := EmbeddedTemplates()
+	if err != nil {
+		t.Fatalf("EmbeddedTemplates() error: %v", err)
+	}
+
+	data, err := fs.ReadFile(fsys, ".claude/skills/ae/workflows/auto-sync.md")
+	if err != nil {
+		t.Fatalf("read auto-sync.md: %v", err)
+	}
+
+	content := string(data)
+
+	// Extract Graceful Exit section
+	exitIdx := strings.Index(content, "## Graceful Exit")
+	if exitIdx == -1 {
+		t.Fatal("auto-sync.md must contain '## Graceful Exit' section")
+	}
+
+	exitSection := content[exitIdx:]
+	if nextIdx := strings.Index(exitSection, "\n---"); nextIdx != -1 {
+		exitSection = exitSection[:nextIdx]
+	}
+
+	if !strings.Contains(exitSection, "/ae auto-sync") {
+		t.Error("auto-sync.md Graceful Exit must reference '/ae auto-sync' as retry command")
+	}
+
+	if strings.Contains(exitSection, "/ae sync") && !strings.Contains(exitSection, "/ae auto-sync") {
+		t.Error("auto-sync.md Graceful Exit must NOT reference '/ae sync' without 'auto-' prefix")
 	}
 }

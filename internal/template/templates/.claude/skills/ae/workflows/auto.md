@@ -176,7 +176,7 @@ FOR i = 1 TO iterations:
 
   Report: Sync Phase Start
     "Sync-Review Loop: iteration {i}/{iterations}"
-    "Team: sync-team-{i}, Task: /ae sync {spec_id}"
+    "Team: sync-team-{i}, Task: /ae auto-sync {spec_id}"
 
   TeamCreate("sync-team-{i}")
 

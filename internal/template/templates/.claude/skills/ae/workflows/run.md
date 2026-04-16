@@ -515,7 +515,7 @@ All of the following must be verified:
 - Quality gate blocked Phase 3 if status was CRITICAL
 - Phase 3: manager-git created commits (branch or direct) only if quality permitted
 
-Note: For documentation sync and PR creation, invoke `/ae sync SPEC-{ID}` as the next step.
+Note: For interactive documentation sync and PR creation, invoke `/ae sync SPEC-{ID}` as the next step. In auto pipeline mode, the orchestrator (auto.md) controls sync routing via `/ae auto-sync` — do not invoke sync directly.
 
 ---
 

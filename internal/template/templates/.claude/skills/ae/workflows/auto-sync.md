@@ -120,7 +120,7 @@ Before execution, load these essential files:
 - .ae/project/codemaps/ directory listing (architecture maps for conditional update)
 - README.md (current project documentation)
 
-Pre-execution commands: git status, git diff, git branch, git log, find .ae/specs.
+Pre-execution commands: git status, git diff, git branch, git log, find .ae/specs
 
 ---
 
@@ -919,7 +919,7 @@ When user aborts at any decision point:
 
 - No changes made to documents, Git history, or branch state
 - Project remains in current state
-- Display retry command: /ae sync [mode]
+- Display retry command: /ae auto-sync [mode]
 - Exit with code 0
 
 ---
