@@ -1,0 +1,6 @@
+---
+description: {{if eq .ConversationLanguage "ko"}}컨텍스트 격리 자동 파이프라인 (Run → Sync-Review Loop → Final Merge){{else if eq .ConversationLanguage "ja"}}コンテキスト分離自動パイプライン (Run → Sync-Review Loop → Final Merge){{else if eq .ConversationLanguage "zh"}}上下文隔离自动流水线 (Run → Sync-Review Loop → Final Merge){{else}}Context-isolated auto pipeline (Run → Sync-Review Loop → Final Merge){{end}}
+argument-hint: "SPEC-XXX [--iterations N] [--skip-run] [--no-copilot]"
+---
+
+Use Skill("ae") with arguments: auto $ARGUMENTS

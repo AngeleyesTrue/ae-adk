@@ -1,0 +1,6 @@
+---
+description: {{if eq .ConversationLanguage "ko"}}파이프라인 안전 동기화 (merge 없음, auto 파이프라인 내부용){{else if eq .ConversationLanguage "ja"}}パイプライン安全同期 (マージなし、autoパイプライン内部用){{else if eq .ConversationLanguage "zh"}}流水线安全同步 (无合并，auto流水线内部使用){{else}}Pipeline-safe sync without merge capability (internal to auto pipeline){{end}}
+argument-hint: "SPEC-XXX [--skip-mx]"
+---
+
+Use Skill("ae") with arguments: auto-sync $ARGUMENTS
