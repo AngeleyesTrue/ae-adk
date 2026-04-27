@@ -27,6 +27,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 하드코딩 상수 12건 집중화: `internal/foundation/{constants,envvars}.go`
   - `GateConfig.AstGrepGate` 필드 추가 (Self-Learning Quality Guard)
   - ESLint 품질 게이트 Python-only 오차단 수정
+- **SPEC-UPDATE-004 후속 보강 (PR #29 비판적 다관점 리뷰 후속, `f5fcc9c`)**:
+  - REQ-17 dead code 해소: `injectCLAUDEEnvFile` 호출 배선 추가 — v1.3.0에서 함수 정의만 존재하고 SessionStart 훅에서 호출되지 않던 결함을 정정
+  - REQ-22 PermissionMode 전용 필드 분리: `preferences.go` + `profile_setup.go`에서 TeammateDisplay 오용 제거 (데이터 모델 정정)
+  - REQ-16 PermissionRequest: `input.ToolInput` 명시로 주석/구현 불일치 해소 + 회귀 테스트 3건 추가(대소문자 우회/중첩 객체)
+  - REQ-20 LSP compliance 테스트 강건성: `yaml.Unmarshal` 기반 전환 — 들여쓰기 의존 약점 제거
+  - REQ-08/A-09.5: `normalizeEffortValue` 정규화 함수 + 비표준 effort 경고 신규 — `TestNormalizeEffortValue` 16 sub-test 추가
+  - REQ-15: `doctor.go` MCP 중복 출력 `sort.Strings` 결정성 확보
+  - 테스트 결정성: `session_start_inject_test.go` modTime → SHA256 비교 (Windows NTFS 정밀도 의존 해소)
 - 후속 SPEC 4건 제안서: `docs/future-specs/` (SPEC-UPDATE-005, SPEC-UPDATE-006, SPEC-LSP-CORE-002, SPEC-SECURITY-BYPASS-001)
 - `ae win` / `ae mac` 플랫폼 전환 및 진단 명령어 (SPEC-PLATFORM-001)
   - settings.json PATH 자동 재구성 (BuildSmartPATH 활용)
