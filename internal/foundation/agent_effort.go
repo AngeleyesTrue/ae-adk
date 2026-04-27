@@ -2,6 +2,7 @@ package foundation
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
@@ -9,6 +10,26 @@ import (
 	"github.com/AngeleyesTrue/ae-adk/internal/manifest"
 	"gopkg.in/yaml.v3"
 )
+
+// normalizeEffortValue normalizes a user-provided effort string per A-09.5:
+//   - trims surrounding whitespace
+//   - strips surrounding double or single quotes
+//   - lowercases
+//
+// Returns the canonical lowercase value if it matches one of the standard
+// 5 levels (low/medium/high/xhigh/max), or "" for any non-standard input.
+// "max" is included as a forward-compatible alias even when not yet in the
+// active EffortLevel set.
+func normalizeEffortValue(s string) string {
+	s = strings.TrimSpace(s)
+	s = strings.Trim(s, `"'`)
+	s = strings.ToLower(s)
+	switch s {
+	case "low", "medium", "high", "xhigh", "max":
+		return s
+	}
+	return ""
+}
 
 // agentEffortMap은 추론 집약 에이전트와 해당 effort 레벨을 매핑한다.
 // v1.2.0: plan-auditor 제외 (templates에 파일 미존재, REQ-24 BLOCKER 해소)
@@ -137,7 +158,17 @@ func injectEffortIntoFrontmatter(content string, level EffortLevel) (updated str
 	}
 
 	if fm.Effort != "" {
-		// 사용자 커스텀 값 보존 (A-01)
+		// 사용자 커스텀 값 보존 (A-01) + A-09.5 정규화 검사
+		// 표준 5개 값(low/medium/high/xhigh/max) 또는 정규화 가능(따옴표/대문자)이면
+		// 사용자 명시 의도로 간주하여 그대로 보존한다. 비표준 입력은 경고만 발생시키고
+		// 기존 값을 유지한다 — 정책값 강제 덮어쓰기는 사용자 의도를 침해할 수 있어 보수적
+		// 처리.
+		if normalizeEffortValue(fm.Effort) == "" {
+			slog.Warn("non-standard effort value detected in agent frontmatter; preserved as-is",
+				"effort", fm.Effort,
+				"policy_default", level.String(),
+			)
+		}
 		return content, false, nil
 	}
 

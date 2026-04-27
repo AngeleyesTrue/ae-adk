@@ -35,6 +35,20 @@ func (h *sessionStartHandler) Handle(ctx context.Context, input *HookInput) (*Ho
 		"project_dir", input.ProjectDir,
 	)
 
+	// REQ-17: Windows 전용 — 프로젝트 루트에 .env가 있으면
+	// .claude/settings.local.json의 env 맵에 CLAUDE_ENV_FILE을 주입한다.
+	// non-Windows 빌드에서는 build tag로 분리된 no-op 스텁이 호출된다.
+	// 비차단 정책: 주입 실패는 로깅만 하고 세션 시작을 계속 진행한다.
+	if input.ProjectDir != "" {
+		if err := injectCLAUDEEnvFile(input.ProjectDir); err != nil {
+			slog.Warn("CLAUDE_ENV_FILE injection failed (non-fatal)",
+				"session_id", input.SessionID,
+				"project_dir", input.ProjectDir,
+				"error", err.Error(),
+			)
+		}
+	}
+
 	data := map[string]any{
 		"session_id": input.SessionID,
 		"status":     "initialized",

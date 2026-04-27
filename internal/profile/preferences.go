@@ -35,6 +35,11 @@ type ProfilePreferences struct {
 	StatuslineSegments map[string]bool `yaml:"statusline_segments,omitempty"` // segment toggles for custom preset
 	StatuslineTheme    string          `yaml:"statusline_theme,omitempty"`    // "default", "catppuccin-mocha", "catppuccin-latte"
 	TeammateDisplay    string          `yaml:"teammate_display,omitempty"`    // "auto", "in-process", "tmux"
+
+	// Permission mode (REQ-22)
+	// 위저드에서 선택한 권한 모드. TeammateDisplay와는 별개의 의미를 가지므로
+	// 전용 필드로 분리한다. 가능한 값: "default", "auto", "acceptEdits".
+	PermissionMode string `yaml:"permission_mode,omitempty"`
 }
 
 const (

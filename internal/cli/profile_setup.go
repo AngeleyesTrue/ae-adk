@@ -111,9 +111,13 @@ func runProfileSetup(cmd *cobra.Command, args []string) error {
 	bypass := existingPrefs.Bypass
 
 	// 권한 모드 (REQ-22: "auto" 옵션 추가)
-	permissionMode := existingPrefs.TeammateDisplay // TeammateDisplay를 모드 필드로 재활용하지 않음
-	_ = permissionMode                              // 별도 변수로 분리
-	permMode := "default"
+	// 기존 PermissionMode 값을 유지하고, 미설정 시에만 "default"로 시작한다.
+	// 이전에는 TeammateDisplay 필드를 재활용하지 않으면서 항상 "default"로
+	// 초기화하여 위저드 재실행 시 기존 설정이 손실되는 결함이 있었다.
+	permMode := existingPrefs.PermissionMode
+	if permMode == "" {
+		permMode = "default"
+	}
 
 	// Effort level (REQ-09: 5단계 선택)
 	effortLevel := existingPrefs.EffortLevel
@@ -288,7 +292,10 @@ func runProfileSetup(cmd *cobra.Command, args []string) error {
 		EffortLevel:      effortLevel,
 		StatuslineMode:   statuslineMode,
 		StatuslineTheme:  statuslineTheme,
-		TeammateDisplay:  permMode,
+		// TeammateDisplay는 위저드에서 묻지 않으므로 기존 값을 보존한다.
+		// 권한 모드는 별도 PermissionMode 필드로 분리 저장한다(REQ-22).
+		TeammateDisplay: existingPrefs.TeammateDisplay,
+		PermissionMode:  permMode,
 	}
 
 	if err := profile.WritePreferences(profileName, prefs); err != nil {

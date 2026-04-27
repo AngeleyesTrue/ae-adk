@@ -39,24 +39,40 @@ func readLSPTemplate(t *testing.T) []byte {
 }
 
 // TestLSPSchemaKeyCommand asserts that:
-//   - No entry uses the deprecated "binary:" key
-//   - At least 16 "command:" entries exist (one per supported language)
+//   - No entry uses the deprecated "binary:" key (raw text — schema validity)
+//   - At least 16 servers exist with non-empty "command:" field (parsed YAML)
+//
+// The "command:" field count is enforced via yaml.Unmarshal rather than raw
+// string counting so the test is independent of indentation/formatting and
+// remains stable when the template is reformatted.
 func TestLSPSchemaKeyCommand(t *testing.T) {
 	t.Parallel()
 
 	data := readLSPTemplate(t)
-	content := string(data)
 
-	// Assert no "binary:" key exists anywhere in the file.
-	if strings.Contains(content, "binary:") {
+	// Schema validity: no deprecated "binary:" key anywhere in raw template.
+	// Raw-text scan catches accidental reintroduction independent of YAML structure.
+	if strings.Contains(string(data), "binary:") {
 		t.Error("lsp.yaml.tmpl contains deprecated 'binary:' key; use 'command:' instead")
 	}
 
-	// Count "command:" occurrences — each language server has exactly one.
-	commandCount := strings.Count(content, "\n      command:")
+	// Structural validity: parse YAML and verify servers have non-empty Command.
+	var cfg lspConfig
+	if err := yaml.Unmarshal(data, &cfg); err != nil {
+		t.Fatalf("yaml.Unmarshal(lsp.yaml.tmpl): %v", err)
+	}
+
 	const wantMinLanguages = 16
+	commandCount := 0
+	for lang, entry := range cfg.LSP.Servers {
+		if entry.Command == "" {
+			t.Errorf("language %q has empty 'command' field", lang)
+			continue
+		}
+		commandCount++
+	}
 	if commandCount < wantMinLanguages {
-		t.Errorf("lsp.yaml.tmpl has %d 'command:' entries; want >= %d (one per supported language)",
+		t.Errorf("lsp.yaml.tmpl has %d servers with non-empty command; want >= %d (one per supported language)",
 			commandCount, wantMinLanguages)
 	}
 }

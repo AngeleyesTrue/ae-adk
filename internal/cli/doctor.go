@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -322,6 +323,10 @@ func checkMCPScopeDuplicatesWithPaths(projectMCPPath, globalMCPPath string) Diag
 		check.Message = "no duplicate MCP server keys found"
 		return check
 	}
+
+	// Map iteration is non-deterministic in Go. Sort to produce stable, reproducible
+	// output independent of map traversal order.
+	sort.Strings(duplicates)
 
 	check.Status = CheckWarn
 	check.Message = fmt.Sprintf("%d duplicate MCP server key(s): %s", len(duplicates), strings.Join(duplicates, ", "))

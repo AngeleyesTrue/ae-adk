@@ -56,10 +56,15 @@ func (h *permissionRequestHandler) Handle(ctx context.Context, input *HookInput)
 	}, nil
 }
 
-// hasMarkerSentinel returns true when input.HookSpecificOutput.UpdatedInput JSON
+// hasMarkerSentinel returns true when the PermissionRequest's tool input JSON
 // contains the "__updated_input_marker__" key at the top level (REQ-16).
+//
+// Implementation note: For PermissionRequest hook events Claude Code delivers the
+// updated input via HookInput.ToolInput (not via HookSpecificOutput.UpdatedInput).
+// Comparison is case-sensitive — only the exact constant key is treated as the
+// sentinel; case variants are intentionally ignored to mirror Claude Code's
+// canonical key handling.
 func (h *permissionRequestHandler) hasMarkerSentinel(input *HookInput) bool {
-	// updatedInput arrives via HookInput.ToolInput for PermissionRequest events.
 	raw := input.ToolInput
 	if len(raw) == 0 {
 		return false

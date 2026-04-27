@@ -1,11 +1,27 @@
 package hook
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
 )
+
+// sha256File returns the SHA256 hex digest of a file's content.
+// Used to verify file content equality in idempotency tests without depending
+// on filesystem-specific modtime precision (Windows NTFS 100ns vs Linux ext4 1ns)
+// or OS-cached metadata.
+func sha256File(t *testing.T, path string) string {
+	t.Helper()
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("read file for hash: %v", err)
+	}
+	sum := sha256.Sum256(data)
+	return hex.EncodeToString(sum[:])
+}
 
 // TestInjectCLAUDEEnvFile_Windows verifies REQ-17 behavior on Windows.
 // On non-Windows platforms, the function is a no-op and the test validates that.
@@ -82,22 +98,18 @@ func TestInjectCLAUDEEnvFile_Idempotent(t *testing.T) {
 		t.Fatalf("first call: %v", err)
 	}
 	settingsPath := filepath.Join(dir, ".claude", "settings.local.json")
-	stat1, err := os.Stat(settingsPath)
-	if err != nil {
-		t.Fatalf("settings.local.json stat after first call: %v", err)
-	}
-	modTime1 := stat1.ModTime()
+	hash1 := sha256File(t, settingsPath)
 
 	// Second call should be idempotent (same value → no write).
 	if err := injectCLAUDEEnvFile(dir); err != nil {
 		t.Fatalf("second call: %v", err)
 	}
-	stat2, err := os.Stat(settingsPath)
-	if err != nil {
-		t.Fatalf("settings.local.json stat after second call: %v", err)
-	}
-	if stat2.ModTime() != modTime1 {
-		t.Errorf("idempotent: settings.local.json was modified on second call")
+	hash2 := sha256File(t, settingsPath)
+
+	// Compare file content via SHA256 instead of modtime — content equality is the
+	// true idempotency invariant and is independent of filesystem timestamp precision.
+	if hash1 != hash2 {
+		t.Errorf("idempotency violated: settings.local.json content changed on second call\nfirst SHA256:  %s\nsecond SHA256: %s", hash1, hash2)
 	}
 }
 

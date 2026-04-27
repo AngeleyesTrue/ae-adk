@@ -3,6 +3,7 @@ package foundation
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/AngeleyesTrue/ae-adk/internal/manifest"
@@ -128,7 +129,7 @@ description: SPEC manager
 	}
 
 	// effort: xhigh가 포함되어야 함
-	if !contains(got, "effort: xhigh") {
+	if !strings.Contains(got, "effort: xhigh") {
 		t.Errorf("expected effort: xhigh in file content, got:\n%s", got)
 	}
 
@@ -178,18 +179,46 @@ description: SPEC manager
 	}
 }
 
-// contains는 문자열 s에 substr이 포함되어 있는지 확인한다.
-func contains(s, substr string) bool {
-	return len(s) >= len(substr) && (s == substr || len(s) > 0 && containsHelper(s, substr))
-}
+// TestNormalizeEffortValue verifies A-09.5 normalization rules:
+//   (a) lowercase normalization (XHIGH → xhigh)
+//   (b) quote stripping ("high" → high)
+//   (c) non-standard inputs return "" (signal for caller to warn-and-preserve)
+//
+// Standard set is exactly: low, medium, high, xhigh, max.
+func TestNormalizeEffortValue(t *testing.T) {
+	t.Parallel()
 
-func containsHelper(s, substr string) bool {
-	for i := 0; i <= len(s)-len(substr); i++ {
-		if s[i:i+len(substr)] == substr {
-			return true
-		}
+	tests := []struct {
+		name string
+		in   string
+		want string
+	}{
+		{"standard low passthrough", "low", "low"},
+		{"standard medium passthrough", "medium", "medium"},
+		{"standard high passthrough", "high", "high"},
+		{"standard xhigh passthrough", "xhigh", "xhigh"},
+		{"standard max passthrough", "max", "max"},
+		{"uppercase XHIGH normalized", "XHIGH", "xhigh"},
+		{"mixed case High normalized", "High", "high"},
+		{"double-quoted high normalized", `"high"`, "high"},
+		{"single-quoted medium normalized", "'medium'", "medium"},
+		{"surrounding whitespace trimmed", "  max  ", "max"},
+		{"quoted uppercase combined", `"XHIGH"`, "xhigh"},
+		{"non-standard returns empty", "custom", ""},
+		{"non-standard with quotes returns empty", `"unknown"`, ""},
+		{"empty input returns empty", "", ""},
+		{"whitespace-only returns empty", "   ", ""},
+		{"numeric returns empty", "5", ""},
 	}
-	return false
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			if got := normalizeEffortValue(tt.in); got != tt.want {
+				t.Errorf("normalizeEffortValue(%q) = %q, want %q", tt.in, got, tt.want)
+			}
+		})
+	}
 }
 
 // TestInjectEffortIntoFrontmatter_EdgeCases는 injectEffortIntoFrontmatter의
@@ -240,6 +269,22 @@ func TestInjectEffortIntoFrontmatter_EdgeCases(t *testing.T) {
 			wantChanged: false,
 		},
 		{
+			// A-09.5: non-standard effort values are preserved as-is (with a warning),
+			// never overwritten by the policy default. The user's explicit value wins.
+			name:        "NonStandardEffort_PreservedWithWarning",
+			input:       "---\nname: agent\neffort: custom-level\n---\n\n# Body",
+			level:       EffortHigh,
+			wantChanged: false,
+		},
+		{
+			// A-09.5 (a)+(b): quoted/uppercase variants are recognized as standard
+			// and preserved without a warning (normalizeEffortValue passes them).
+			name:        "QuotedUppercaseEffort_Preserved",
+			input:       "---\nname: agent\neffort: \"XHIGH\"\n---\n\n# Body",
+			level:       EffortHigh,
+			wantChanged: false,
+		},
+		{
 			name:        "NoEffort_Injected",
 			input:       "---\nname: agent\ndescription: A test agent\n---\n\n# Body",
 			level:       EffortHigh,
@@ -259,7 +304,7 @@ func TestInjectEffortIntoFrontmatter_EdgeCases(t *testing.T) {
 			if changed != tt.wantChanged {
 				t.Errorf("changed=%v, want %v\nupdated content:\n%s", changed, tt.wantChanged, updated)
 			}
-			if tt.wantContain != "" && !contains(updated, tt.wantContain) {
+			if tt.wantContain != "" && !strings.Contains(updated, tt.wantContain) {
 				t.Errorf("expected %q in output, got:\n%s", tt.wantContain, updated)
 			}
 			// changed=false 시 원본과 동일해야 함

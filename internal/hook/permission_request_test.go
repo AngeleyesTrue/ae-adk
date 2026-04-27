@@ -137,6 +137,36 @@ func TestPermissionRequestHandler_MarkerSentinel(t *testing.T) {
 			wantDecision: DecisionAsk,
 			wantSentinel: false,
 		},
+		{
+			// case-sensitivity guard: only the canonical lowercase key is the sentinel.
+			// Uppercase/mixed-case variants are NOT treated as sentinels — this matches
+			// Claude Code's case-sensitive key handling and prevents false positives from
+			// unrelated payload keys that happen to share a case-insensitive name.
+			name: "negative: uppercase variant key NOT treated as sentinel → ask",
+			toolInput: mustMarshal(map[string]any{
+				"__UPDATED_INPUT_MARKER__": true,
+			}),
+			wantDecision: DecisionAsk,
+			wantSentinel: false,
+		},
+		{
+			name: "negative: mixed-case variant key NOT treated as sentinel → ask",
+			toolInput: mustMarshal(map[string]any{
+				"__Updated_Input_Marker__": "1",
+			}),
+			wantDecision: DecisionAsk,
+			wantSentinel: false,
+		},
+		{
+			name: "negative: nested object containing sentinel key → ask (top-level only)",
+			toolInput: mustMarshal(map[string]any{
+				"outer": map[string]any{
+					"__updated_input_marker__": true,
+				},
+			}),
+			wantDecision: DecisionAsk,
+			wantSentinel: false,
+		},
 	}
 
 	for _, tt := range tests {
