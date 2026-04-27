@@ -142,3 +142,34 @@ Commands:
 
 - ae:3-sync for documentation deployment
 - ae:0-project for Nextra project initialization
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "MkDocs is fine, no need for Nextra" | Nextra integrates with Next.js, allowing live React components in docs. MkDocs cannot. |
+| "I don't need versioning, the docs match main branch" | Users land on docs for older releases. Version your docs to match published packages. |
+| "Search is optional, the sidebar is enough" | Sidebar navigation fails past 50 pages. Algolia DocSearch or built-in search is mandatory at scale. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Documentation site without working search
+- Docs not versioned despite published library having multiple major versions
+- MDX with React components but no error boundary
+- Internal links broken (relative paths wrong)
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Site builds with next build without warnings
+- [ ] Search index includes all docs pages
+- [ ] Versioning configured if the library has multiple supported releases
+- [ ] Internal and external links verified by a link checker
+
+<!-- ae:evolvable-end -->

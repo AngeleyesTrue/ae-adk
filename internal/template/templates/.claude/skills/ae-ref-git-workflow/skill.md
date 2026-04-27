@@ -158,3 +158,36 @@ Gotcha: Token blacklist requires Redis, not just in-memory cache
 
 Refs: SPEC-AUTH-001
 ```
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "Commit messages don't matter, I'll write 'fix' and move on" | Future debugging depends on commit messages. Use conventional commits with scope and rationale. |
+| "git reset --hard is fine, I'll fix it if I lose work" | Reset --hard is destructive. Use git reflog or stash; never reset uncommitted work without confirmation. |
+| "Branch naming is just personal preference" | Branch names drive automation (CI filters, deploy targets, issue linking). Standardize feature/SPEC-XXX style names. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Commit message without conventional prefix (feat/fix/refactor/docs/test/chore)
+- Force-push to a shared branch (main, develop, release/*)
+- Branch name not following the project convention (feature/SPEC-XXX, fix/issue-NNN)
+- PR merged without conventional commit squash or merge commit hygiene
+- Pre-commit hooks bypassed without explanation
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Conventional commit format used (type(scope): subject)
+- [ ] Branch named per convention and linked to a SPEC or issue
+- [ ] PR description references the SPEC or issue and summarizes intent
+- [ ] Pre-commit / pre-push hooks pass before push
+- [ ] Force-push only used on personal feature branches before review
+
+<!-- ae:evolvable-end -->

@@ -300,3 +300,34 @@ Style Guides:
 
 Version: 2.0.0
 Last Updated: 2025-12-30
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "Markdown is enough, I don't need a doc framework" | Sphinx, MkDocs, TypeDoc, Nextra provide search, versioning, and API extraction that raw Markdown cannot. |
+| "I'll write API docs by hand, the auto-generated ones look ugly" | Hand-written API docs drift the moment code changes. Use TypeDoc/JSDoc/Sphinx autodoc and customize the theme. |
+| "This README is enough documentation for the project" | Production projects need conceptual guides, API reference, examples, and a changelog. README alone is insufficient. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- API docs not generated from source comments (TypeDoc, Sphinx autodoc, JSDoc)
+- Documentation site lacks search, versioning, or table of contents
+- Code examples in docs that no longer compile against current code
+- No CI step verifying docs build cleanly
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Documentation site builds without errors (mkdocs build --strict, sphinx-build -W, or equivalent)
+- [ ] Code examples are extracted from tested source files, not pasted strings
+- [ ] API reference is generated from source, not hand-maintained
+- [ ] Internal links and external URLs validated by a link checker
+
+<!-- ae:evolvable-end -->

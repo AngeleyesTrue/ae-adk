@@ -70,3 +70,34 @@ settings:
 3. **Canary Regression**: Proposed changes tested against baselines
 4. **Rate Limiter**: Max experiments per session/week
 5. **Human Approval**: Required before merging to main
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "Research takes too long, I'll start coding" | Code-first on unfamiliar systems leads to dead ends. Research time pays back via fewer rewrites. |
+| "Binary eval experiments are academic" | Binary eval lets you measure improvement objectively. Without it, optimization is guesswork. |
+| "5-layer safety is paranoid for a research workflow" | Self-modifying research loops can drift dangerously. The safety layers prevent runaway changes. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Research conclusion based on a single experiment without replication
+- Self-modifying loop without rate limit or canary check
+- Eval criterion changed mid-experiment, invalidating comparisons
+- Research artifact not preserved, making findings irreproducible
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Each experiment replicated at least once
+- [ ] Self-modifying changes gated by canary evaluation
+- [ ] Eval criteria fixed before experiments begin
+- [ ] Research artifacts saved to .moai/research/ for future reference
+
+<!-- ae:evolvable-end -->

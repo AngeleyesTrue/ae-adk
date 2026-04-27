@@ -254,3 +254,34 @@ Commands:
 
 - /ae:3-sync: Documentation synchronization
 - /ae:9-feedback: Documentation improvements
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "I'll load all docs at session start, just in case" | Loading 50K tokens of docs preemptively wastes context. JIT loads only when triggered. |
+| "Caching is overkill, fetch every time" | Repeated fetches in one session waste tokens and time. Cache by URL + version. |
+| "Context7 is enough, I don't need other doc sources" | Context7 covers many libraries but not all. Combine with WebFetch for niche or internal docs. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Documentation loaded at session start without trigger
+- Same doc fetched multiple times within one session
+- Cache key not including version, leading to stale docs
+- Doc fetched and ignored because it didn't match the current task
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Doc fetch triggered by explicit need (intent, error, library mention)
+- [ ] Cache populated and reused within session
+- [ ] Cache key includes library name + version
+- [ ] Fetched docs summarized into context, not pasted verbatim
+
+<!-- ae:evolvable-end -->

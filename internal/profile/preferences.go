@@ -26,7 +26,8 @@ type ProfilePreferences struct {
 	Model       string `yaml:"model,omitempty"`        // e.g. "claude-opus-4-6"
 
 	// Launch settings
-	Bypass bool `yaml:"bypass,omitempty"` // --dangerously-skip-permissions
+	Bypass      bool   `yaml:"bypass,omitempty"`       // --dangerously-skip-permissions
+	EffortLevel string `yaml:"effort_level,omitempty"` // "low", "medium", "high", "xhigh", "max"
 
 	// Display settings
 	StatuslineMode     string          `yaml:"statusline_mode,omitempty"`     // "minimal", "default", "verbose"

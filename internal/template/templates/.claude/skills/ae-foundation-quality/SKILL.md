@@ -210,3 +210,36 @@ Integration Ready: CI/CD pipelines, GitHub Actions, REST APIs, real-time monitor
 Enterprise Features: Custom rules, ML prediction, real-time monitoring, benchmarking, comprehensive reporting
 
 Quality Standards: OWASP compliance, TRUST 5 framework, Context7 integration, automated improvement recommendations
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "The code looks fine, I don't need to run the linter" | Linters catch errors humans miss. Run them every time; trust tools over self-review. |
+| "85% coverage is arbitrary, my tests are thorough" | Coverage is a floor, not a ceiling. Below 85% means edge cases are likely untested. |
+| "Code review is enough, automated quality gates are redundant" | Reviewers miss things, especially under time pressure. Gates run every time, on every change. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Lint warnings ignored or suppressed without explanation
+- Test coverage below 85% for new code paths
+- Type errors silenced via @ts-ignore or # type: ignore without justification
+- Security warnings from gosec, bandit, or npm audit ignored
+- TRUST 5 dimensions self-asserted without tooling evidence
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Linter passes with zero warnings (golangci-lint, ruff, eslint, clippy)
+- [ ] Coverage report shows >= 85% for changed packages
+- [ ] Type checker passes (tsc --noEmit, mypy --strict, go vet)
+- [ ] Security scanner output reviewed and findings addressed or justified
+- [ ] TRUST 5 evidence attached to PR (test output, lint output, scan output)
+
+<!-- ae:evolvable-end -->

@@ -245,3 +245,34 @@ For JSON output suitable for CI/CD, execute sg scan with config and json flag, r
 ## Reference
 
 For additional information, consult the AST-Grep Official Documentation at ast-grep.github.io, the AST-Grep GitHub Repository at github.com/ast-grep/ast-grep, the Pattern Playground at ast-grep.github.io/playground.html, and the Rule Configuration Reference at ast-grep.github.io/reference/yaml.html.
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "Grep is enough for code search" | Grep matches text; ast-grep matches structure. Use ast-grep for refactors that depend on AST shape. |
+| "Codemods are scary, I'll do it by hand" | Hand refactors miss edge cases at scale. ast-grep applies the same transformation consistently across the codebase. |
+| "Security scanning is a separate tool" | ast-grep rules can encode security patterns (e.g., "dangerous SQL concat"). Integrate them into CI. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Mass refactor done with sed/Edit when the change depends on AST shape
+- Custom security rules not codified as ast-grep patterns
+- ast-grep rule without a test fixture demonstrating before/after
+- Pattern using regex when the same can be expressed structurally
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Refactor or codemod scope verified by ast-grep --json output before applying
+- [ ] Custom rules stored under .ast-grep/ with example fixtures
+- [ ] Security patterns (SQL concat, hardcoded secrets) codified as ast-grep rules in CI
+- [ ] Pattern correctness verified on at least 3 fixtures before bulk apply
+
+<!-- ae:evolvable-end -->

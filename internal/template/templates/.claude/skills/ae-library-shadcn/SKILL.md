@@ -180,3 +180,34 @@ Latest Versions as of November 2025:
 
 Last Updated: 2026-01-11
 Status: Production Ready
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "I'll just install all shadcn components upfront" | shadcn is copy-on-use by design. Install only the components you actually use to keep the codebase clean. |
+| "Tailwind v3 is fine, v4 is too new" | shadcn v4+ assumes Tailwind v4 and OKLCH theming. Mixing v3 and v4 conventions causes silent style breakage. |
+| "Dark mode is automatic with shadcn" | Dark mode requires the theme provider, CSS variables, and class strategy. Verify each component renders correctly in both modes. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Components installed but never used (dead code)
+- Manual edits to shadcn-generated files without documenting the divergence
+- Mixed Tailwind v3 and v4 syntax in the same project
+- OKLCH theme variables not defined for dark mode
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Only used components are installed in components/ui/
+- [ ] Theme provider configured with both light and dark CSS variables
+- [ ] Each used component verified in light and dark mode
+- [ ] Custom modifications to shadcn files documented with a comment header
+
+<!-- ae:evolvable-end -->

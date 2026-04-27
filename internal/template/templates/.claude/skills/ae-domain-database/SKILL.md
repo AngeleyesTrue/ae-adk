@@ -199,3 +199,36 @@ For detailed implementation patterns and database-specific optimizations, see th
 Status: Production Ready
 Last Updated: 2026-01-11
 Maintained by: AE-ADK Database Team
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "I'll add indexes after we see slow queries" | Adding indexes after the fact requires production migrations and downtime risk. Index foreign keys and frequent WHERE columns up front. |
+| "NoSQL because the schema might change" | Schema flexibility is rarely the actual constraint. Start with PostgreSQL unless access patterns truly require key-value or document semantics. |
+| "N+1 queries are fine if the dataset is small" | "Small" grows. Use eager loading, JOINs, or DataLoader patterns from day one. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Foreign key column without an index
+- Migration that drops or renames a column without a multi-step deprecation path
+- Query in a hot path that does SELECT * across joins instead of selecting required columns
+- Schema design that uses VARCHAR(255) defaults for everything without thought
+- No backup or point-in-time recovery strategy documented
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] EXPLAIN ANALYZE run on the slowest queries with results recorded
+- [ ] All foreign keys have corresponding indexes
+- [ ] Migration plan includes rollback steps and is tested on a staging snapshot
+- [ ] Connection pooling configured with sensible max_connections
+- [ ] Backup and recovery procedure documented and verified
+
+<!-- ae:evolvable-end -->

@@ -234,3 +234,36 @@ Status: Active
 Version: 2.0.0 (Consolidated Platform Coverage)
 Last Updated: 2026-02-09
 Platforms: Auth0, Clerk, Firebase Auth
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "Auth0 / Clerk / Firebase, all the same" | Each has a distinct sweet spot. Auth0 for enterprise SSO, Clerk for modern UX, Firebase for mobile-first. |
+| "I'll roll my own auth, libraries are bloated" | Hand-rolled auth has a long history of CVEs. Use a vetted provider or library; do not implement password hashing or JWT signing yourself. |
+| "MFA is friction, users will turn it off" | Default MFA-on for admins and sensitive accounts. Friction is preferable to account compromise. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Custom password hashing instead of bcrypt / argon2 from a library
+- JWT secret hardcoded or committed to version control
+- Session cookie without HttpOnly, Secure, and SameSite attributes
+- Auth provider chosen without comparison against alternatives
+- MFA not available for admin accounts
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Auth provider selected with documented justification (Auth0 / Clerk / Firebase / custom)
+- [ ] All secrets managed via environment variables or secret manager, not source
+- [ ] Session cookies use HttpOnly + Secure + SameSite=Lax (or Strict)
+- [ ] MFA available and required for sensitive roles
+- [ ] Logout invalidates session server-side, not just client-side
+
+<!-- ae:evolvable-end -->

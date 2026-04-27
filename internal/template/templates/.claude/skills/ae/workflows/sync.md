@@ -976,6 +976,43 @@ When user aborts at any decision point:
 
 ---
 
+## HUMAN GATE: Sync Plan Approval
+
+**WHEN** Phase 1 has produced a divergence analysis and proposed sync plan **THEN** AE MUST pause and request explicit user approval via AskUserQuestion before Phase 2 begins to write documentation, update SPEC status, or modify project documents.
+
+Why this gate exists:
+- Phase 2 mutates committed SPEC files, project documents, and the CHANGELOG. Without explicit approval, divergence between the implemented code and the SPEC could be silently rewritten in a direction the user did not intend.
+- The user must validate the divergence summary (which acceptance criteria were met, which exclusions changed, which lifecycle status is being updated) before any documentation mutation occurs.
+- The interactive sync workflow is the ONLY place this gate is authoritative. Auto pipelines (`auto.md`, `auto-sync.md`) MUST NOT carry an H2/H3 HUMAN GATE header — they rely on the structural cascade prevention defined in SPEC-PIPELINE-002 (Phase 4 removed, no merge capability, AskUserQuestion merge gate at the auto-sync entrypoint instead).
+
+Required AskUserQuestion shape (4 options, recommended marked):
+
+1. (권장) Approve sync plan as-is — proceed to Phase 2 documentation generation
+2. Adjust sync scope — return to Phase 1 with a narrower / wider list of files to update
+3. Skip documentation update for this run — execute Phase 3 git delivery only (rare; user must justify)
+4. Abort sync — keep working tree intact, no doc updates and no commits
+
+If the user picks option 2, re-run Phase 1 with adjusted scope; if option 4, terminate before invoking Phase 2 or Phase 3.
+
+## HUMAN GATE: PR / Push Confirmation
+
+**WHEN** Phase 3 is about to execute the `git_workflow` delivery action AND the action is irreversible (push to remote, PR creation that triggers CI minutes, auto-merge on a protected branch) **THEN** AE MUST request explicit user confirmation via AskUserQuestion before issuing the network call.
+
+Triggers that require this gate:
+- `git_workflow == github_flow` or `gitflow` and a PR is about to be created
+- `git_workflow == main_direct` and a push to the protected default branch is about to occur
+- `--auto-merge` flag combined with a PR that already exists
+- Local CI mirror (Step 3.1.5) reported any non-skipped failure (vet / test-race / lint / cross-compile)
+
+Required AskUserQuestion shape:
+
+1. (권장) Confirm and execute the configured delivery action (PR creation or push)
+2. Hold delivery — keep commits local, surface the diff for manual review before any network call
+3. Switch strategy — change git_workflow for this run (e.g., github_flow → manual review)
+4. Abort delivery — revert the staged commits and stop the sync workflow
+
+Reminder for orchestrators: a plain-prose mention of "HUMAN GATE" inside `auto.md` / `auto-sync.md` body content is permitted, but H2/H3 section headers matching the regex `(?im)^#{2,3}\s+.*human[\s\-_]?gate` MUST remain absent from those two files (SPEC-PIPELINE-002 cascade prevention contract).
+
 ## Completion Criteria
 
 All of the following must be verified:
@@ -984,6 +1021,8 @@ All of the following must be verified:
 - Phase 0.5: Quality verification completed (tests, linter, type checker, deep code review with auto-fix)
 - Phase 0.7: Coverage analysis completed (measurement, gap analysis, test generation, verification)
 - Phase 1: Prerequisites verified, project analyzed, divergence analysis completed, sync plan approved by user
+- HUMAN GATE: Sync Plan Approval cleared before Phase 2
+- HUMAN GATE: PR / Push Confirmation cleared (or not triggered) before any network delivery
 - Phase 2: Safety backup created and verified, documents synchronized, SPEC documents updated per lifecycle level, project documents updated (if applicable), quality verified, SPEC status updated
 - Phase 3: Changes committed, local CI mirror validated (Step 3.1.5: vet + test-race + lint + cross-compile — Windows skipped), delivered per git_workflow strategy (PR created for github_flow/gitflow, direct push for main_direct), auto-merge executed (if flagged and PR exists)
 - Phase 4: Completion report displayed with delivery result, appropriate next steps presented based on strategy and context

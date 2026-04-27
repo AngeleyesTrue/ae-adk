@@ -451,3 +451,36 @@ For migration scenarios and validation scripts, see [reference/migration-guide.m
 Version: 1.3.0 (SDD 2025 Standard Integration + SPEC Scope Classification)
 Last Updated: 2026-01-21
 Integration Status: Complete - Full Plan-Run-Sync workflow with SDD 2025 features and Migration Guide
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "EARS format is bureaucracy, I'll write requirements as prose" | EARS forces unambiguous requirements. Prose hides ambiguity that surfaces during implementation. |
+| "Acceptance criteria can be written after implementation" | Post-hoc criteria match the implementation, not the intent. Write them before code. |
+| "Plan-Run-Sync is rigid, I just need to ship" | Skipping Plan loses the rationale; skipping Sync loses the documentation. The phases exist for a reason. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Requirement written as prose without EARS structure ("the system shall..." without WHEN/IF/THEN)
+- Acceptance criteria written after implementation
+- SPEC missing scope, exclusions, or affected files sections
+- Plan phase skipped because "the requirement is obvious"
+- EARS "WHEN" or "IF" clauses without measurable conditions
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] All requirements use EARS format with measurable WHEN/IF/THEN
+- [ ] Acceptance criteria written before implementation begins
+- [ ] SPEC includes scope, exclusions, affected files, and risks
+- [ ] Plan-Run-Sync phases executed in order with /clear between Plan and Run
+- [ ] Requirements traceability: each requirement has at least one acceptance criterion
+
+<!-- ae:evolvable-end -->

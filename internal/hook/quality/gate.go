@@ -12,6 +12,9 @@ import (
 	"time"
 )
 
+// jsExtensions는 ESLint가 처리하는 JavaScript/TypeScript 파일 확장자 목록이다 (REQ-03).
+var jsExtensions = []string{".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs"}
+
 // GateConfig holds configuration for the QualityGate.
 type GateConfig struct {
 	// Enabled controls whether the quality gate runs at all.
@@ -242,13 +245,57 @@ func (g *QualityGate) detectToolchain() *langToolchain {
 }
 
 // executeStep runs a single gate step. Optional steps skip silently when the binary is missing.
+// For the ESLint step, the step is also skipped when no JavaScript/TypeScript source files
+// exist in ProjectDir (REQ-03): avoids false-positive failures on Python-only projects.
 func (g *QualityGate) executeStep(ctx context.Context, step gateStep, timeout time.Duration) (bool, string) {
 	if step.optional {
 		if _, err := exec.LookPath(step.binary); err != nil {
 			return true, ""
 		}
 	}
+	// ESLint Python-only fix: skip eslint when project has no JS/TS files (REQ-03).
+	if step.name == "eslint" {
+		if !g.hasJavaScriptFiles() {
+			return true, ""
+		}
+	}
 	return g.runStep(ctx, step.name, timeout, step.binary, step.args...)
+}
+
+// hasJavaScriptFiles reports whether ProjectDir contains at least one file with a
+// JavaScript or TypeScript extension (.js, .jsx, .ts, .tsx, .mjs, .cjs).
+// Returns false when ProjectDir is empty or cannot be read (REQ-03).
+func (g *QualityGate) hasJavaScriptFiles() bool {
+	dir := g.config.ProjectDir
+	if dir == "" {
+		dir, _ = os.Getwd()
+	}
+	if dir == "" {
+		return false
+	}
+	found := false
+	_ = filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {
+		if err != nil || found {
+			return nil
+		}
+		if d.IsDir() {
+			// Skip hidden directories and node_modules to keep the walk fast.
+			name := d.Name()
+			if name != "." && (name[0] == '.' || name == "node_modules") {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		ext := strings.ToLower(filepath.Ext(path))
+		for _, jsExt := range jsExtensions {
+			if ext == jsExt {
+				found = true
+				return filepath.SkipAll
+			}
+		}
+		return nil
+	})
+	return found
 }
 
 // runStep executes a single quality gate command with the given timeout.

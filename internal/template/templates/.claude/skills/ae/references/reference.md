@@ -246,5 +246,32 @@ Note: /ae:99-release is a separate local-only command, not part of the /ae skill
 
 ---
 
-Version: 2.5.0
-Last Updated: 2026-02-22
+## Language Neutrality
+
+ae-adk supports 16 programming languages on equal footing. No language is treated as PRIMARY or SECONDARY — toolchain selection is driven by detected project markers, not by hardcoded language preference.
+
+| Language | File Extensions | LSP Server | Test Framework | Lint Tool |
+|----------|----------------|------------|----------------|-----------|
+| go | `.go` | `gopls` | `go test` | `golangci-lint` |
+| python | `.py`, `.pyi` | `pyright` or `pylsp` | `pytest` | `ruff` |
+| typescript | `.ts`, `.tsx`, `.mts`, `.cts` | `typescript-language-server` | `jest` or `vitest` | `eslint` |
+| javascript | `.js`, `.jsx`, `.mjs`, `.cjs` | `typescript-language-server` | `jest` or `vitest` | `eslint` |
+| rust | `.rs` | `rust-analyzer` | `cargo test` | `cargo clippy` |
+| java | `.java` | `jdtls` | `junit` (Maven/Gradle) | `checkstyle` or `spotbugs` |
+| kotlin | `.kt`, `.kts` | `kotlin-language-server` | `junit` (Gradle) | `ktlint` or `detekt` |
+| swift | `.swift` | `sourcekit-lsp` | `swift test` | `swiftlint` |
+| ruby | `.rb`, `.rake`, `.gemspec` | `solargraph` or `ruby-lsp` | `rspec` or `minitest` | `rubocop` |
+| php | `.php`, `.phtml` | `intelephense` | `phpunit` | `phpstan` or `php-cs-fixer` |
+| cpp | `.cpp`, `.cc`, `.cxx`, `.hpp`, `.h` | `clangd` | `gtest` (CTest) | `clang-tidy` |
+| csharp | `.cs` | `omnisharp` | `dotnet test` (xUnit/NUnit) | `dotnet format` / `roslynator` |
+| scala | `.scala`, `.sc` | `metals` | `scalatest` (sbt) | `scalafmt` / `scalafix` |
+| elixir | `.ex`, `.exs` | `elixir-ls` | `mix test` (ExUnit) | `credo` |
+| r | `.r`, `.R` | `languageserver` | `testthat` | `lintr` |
+| dart | `.dart` | `dart language-server` (Dart SDK) | `dart test` / `flutter test` | `dart analyze` |
+
+Language detection priority: Inspect indicator files in the project root (`go.mod`, `pyproject.toml`, `package.json`, `Cargo.toml`, etc.). When multiple are present, prefer the one with the most associated source files. If detection fails, the orchestrator prompts the user to specify the language explicitly.
+
+---
+
+Version: 2.6.0
+Last Updated: 2026-04-27

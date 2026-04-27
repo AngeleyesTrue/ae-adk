@@ -34,12 +34,29 @@ type profileSetupText struct {
 	ModelOverrideTitle string
 	ModelOverrideDesc  string
 	ModelDefault       string
+	ModelOpus47        string // claude-opus-4-7 (REQ-09)
 	ModelOpus          string
 	ModelSonnet        string
 	ModelHaiku         string
 	ModelOpusPlan      string
 	BypassTitle        string
 	BypassDesc         string
+
+	// Section: Effort Level (REQ-09)
+	EffortLevelTitle string
+	EffortLevelDesc  string
+	EffortLow        string
+	EffortMedium     string
+	EffortHigh       string
+	EffortXHigh      string
+	EffortMax        string
+
+	// Section: Permission Mode (REQ-22)
+	PermissionModeTitle string
+	PermissionModeDesc  string
+	PermModeDefault     string
+	PermModeAuto        string
+	PermModeAcceptEdits string
 
 	// Section: Display
 	DisplayTitle string
@@ -57,12 +74,15 @@ type profileSetupText struct {
 	// Statusline theme selector
 	StatuslineThemeTitle string
 	StatuslineThemeDesc  string
-	ThemeAEDark        string
-	ThemeAELight       string
+	ThemeAEDark          string
+	ThemeAELight         string
 
 	// Messages
 	SetupCancelled string
 	SavedProfile   string
+
+	// StatuslineMigrationBanner는 statusline 형식 업데이트 시 표시하는 마이그레이션 배너이다 (REQ-22).
+	StatuslineMigrationBanner string
 }
 
 // profileSetupTexts maps language code to translated UI strings.
@@ -91,12 +111,25 @@ var profileSetupTexts = map[string]profileSetupText{
 		ModelOverrideTitle:   "Default model override",
 		ModelOverrideDesc:    "Override the model when launching with this profile.",
 		ModelDefault:         "Default (no override)",
+		ModelOpus47:          "claude-opus-4-7 (Adaptive Thinking, latest Opus)",
 		ModelOpus:            "claude-opus-4-6 (most capable)",
 		ModelSonnet:          "claude-sonnet-4-6 (balanced)",
 		ModelHaiku:           "claude-haiku-4-5 (fastest)",
 		ModelOpusPlan:        "opusplan (Opus planning, Sonnet coding)",
+		EffortLevelTitle:     "Reasoning effort level",
+		EffortLevelDesc:      "Sets CLAUDE_CODE_EFFORT_LEVEL for Opus 4.7 Adaptive Thinking.",
+		EffortLow:            "Low - Quick exploration, simple tasks",
+		EffortMedium:         "Medium - Most general tasks",
+		EffortHigh:           "High - Complex implementation (default)",
+		EffortXHigh:          "XHigh - Architecture decisions, security analysis",
+		EffortMax:            "Max - Maximum Adaptive Thinking allocation",
 		BypassTitle:          "Skip permission checks?",
 		BypassDesc:           "Adds --dangerously-skip-permissions. Only use in trusted environments.",
+		PermissionModeTitle:  "Permission mode",
+		PermissionModeDesc:   "Sets the default permission mode when launching Claude Code.",
+		PermModeDefault:      "Default - standard permission prompts",
+		PermModeAuto:         "Auto - auto classifier decides (v2.1.89+)",
+		PermModeAcceptEdits:  "AcceptEdits - accept file edits without prompts",
 		DisplayTitle:         "Display",
 		StatuslineModeTitle:  "Statusline display mode",
 		StatuslineModeDesc:   "Controls the layout style of the statusline.",
@@ -107,10 +140,11 @@ var profileSetupTexts = map[string]profileSetupText{
 		ModeMinimal:          "Minimal - Model and context only",
 		StatuslineThemeTitle: "Statusline Theme",
 		StatuslineThemeDesc:  "Select a color theme for the statusline.",
-		ThemeAEDark:        "AE Dark",
-		ThemeAELight:       "AE Light",
-		SetupCancelled:       "Setup cancelled.",
-		SavedProfile:         "\nSaved profile '%s':\n  Preferences → %s\n",
+		ThemeAEDark:          "AE Dark",
+		ThemeAELight:         "AE Light",
+		SetupCancelled:            "Setup cancelled.",
+		SavedProfile:              "\nSaved profile '%s':\n  Preferences → %s\n",
+		StatuslineMigrationBanner: "Statusline format has been updated. New format will be used after this session.",
 	},
 	"ko": {
 		ConfiguringProfile:   "프로필 '%s' 설정",
@@ -136,12 +170,25 @@ var profileSetupTexts = map[string]profileSetupText{
 		ModelOverrideTitle:   "기본 모델 오버라이드",
 		ModelOverrideDesc:    "이 프로필로 실행할 때 모델을 오버라이드합니다.",
 		ModelDefault:         "기본값 (오버라이드 없음)",
+		ModelOpus47:          "claude-opus-4-7 (Adaptive Thinking, 최신 Opus)",
 		ModelOpus:            "claude-opus-4-6 (최고 성능)",
 		ModelSonnet:          "claude-sonnet-4-6 (균형)",
 		ModelHaiku:           "claude-haiku-4-5 (최고 속도)",
 		ModelOpusPlan:        "opusplan (Opus 기획, Sonnet 코딩)",
+		EffortLevelTitle:     "추론 집약도",
+		EffortLevelDesc:      "Opus 4.7 Adaptive Thinking의 CLAUDE_CODE_EFFORT_LEVEL을 설정합니다.",
+		EffortLow:            "Low - 빠른 탐색, 단순 작업",
+		EffortMedium:         "Medium - 대부분의 일반 작업",
+		EffortHigh:           "High - 복잡한 구현 작업 (기본값)",
+		EffortXHigh:          "XHigh - 아키텍처 결정, 보안 분석",
+		EffortMax:            "Max - 최대 Adaptive Thinking 활성화",
 		BypassTitle:          "권한 검사 건너뛰기?",
 		BypassDesc:           "--dangerously-skip-permissions를 추가합니다. 신뢰할 수 있는 환경에서만 사용하세요.",
+		PermissionModeTitle:  "권한 모드",
+		PermissionModeDesc:   "Claude Code 실행 시 기본 권한 모드를 설정합니다.",
+		PermModeDefault:      "Default - 표준 권한 확인",
+		PermModeAuto:         "Auto - 자동 분류기 사용 (v2.1.89+)",
+		PermModeAcceptEdits:  "AcceptEdits - 파일 편집 자동 승인",
 		DisplayTitle:         "화면 표시",
 		StatuslineModeTitle:  "상태줄 표시 모드",
 		StatuslineModeDesc:   "상태줄의 레이아웃 스타일을 제어합니다.",
@@ -152,10 +199,11 @@ var profileSetupTexts = map[string]profileSetupText{
 		ModeMinimal:          "Minimal - 모델과 컨텍스트만 표시",
 		StatuslineThemeTitle: "Statusline 테마",
 		StatuslineThemeDesc:  "상태줄 색상 테마를 선택하세요.",
-		ThemeAEDark:        "AE Dark",
-		ThemeAELight:       "AE Light",
-		SetupCancelled:       "설정이 취소되었습니다.",
-		SavedProfile:         "\n프로필 '%s' 저장 완료:\n  환경설정 → %s\n",
+		ThemeAEDark:          "AE Dark",
+		ThemeAELight:         "AE Light",
+		SetupCancelled:            "설정이 취소되었습니다.",
+		SavedProfile:              "\n프로필 '%s' 저장 완료:\n  환경설정 → %s\n",
+		StatuslineMigrationBanner: "Statusline 형식이 업데이트되었습니다. 다음 세션부터 새 형식이 사용됩니다.",
 	},
 	"ja": {
 		ConfiguringProfile:   "プロファイル '%s' を設定",
@@ -181,12 +229,25 @@ var profileSetupTexts = map[string]profileSetupText{
 		ModelOverrideTitle:   "デフォルトモデルオーバーライド",
 		ModelOverrideDesc:    "このプロファイルで起動する際のモデルをオーバーライドします。",
 		ModelDefault:         "デフォルト (オーバーライドなし)",
+		ModelOpus47:          "claude-opus-4-7 (Adaptive Thinking、最新Opus)",
 		ModelOpus:            "claude-opus-4-6 (最高性能)",
 		ModelSonnet:          "claude-sonnet-4-6 (バランス)",
 		ModelHaiku:           "claude-haiku-4-5 (最速)",
 		ModelOpusPlan:        "opusplan (Opus設計、Sonnetコーディング)",
+		EffortLevelTitle:     "推論集約度",
+		EffortLevelDesc:      "Opus 4.7 Adaptive ThinkingのCLAUDE_CODE_EFFORT_LEVELを設定します。",
+		EffortLow:            "Low - 高速探索、単純タスク",
+		EffortMedium:         "Medium - 一般的なタスク",
+		EffortHigh:           "High - 複雑な実装タスク (デフォルト)",
+		EffortXHigh:          "XHigh - アーキテクチャ決定、セキュリティ分析",
+		EffortMax:            "Max - 最大Adaptive Thinking割り当て",
 		BypassTitle:          "権限チェックをスキップしますか？",
 		BypassDesc:           "--dangerously-skip-permissionsを追加します。信頼できる環境でのみ使用してください。",
+		PermissionModeTitle:  "権限モード",
+		PermissionModeDesc:   "Claude Code起動時のデフォルト権限モードを設定します。",
+		PermModeDefault:      "Default - 標準権限確認",
+		PermModeAuto:         "Auto - 自動分類器使用 (v2.1.89+)",
+		PermModeAcceptEdits:  "AcceptEdits - ファイル編集自動承認",
 		DisplayTitle:         "表示設定",
 		StatuslineModeTitle:  "ステータスライン表示モード",
 		StatuslineModeDesc:   "ステータスラインのレイアウトスタイルを制御します。",
@@ -197,10 +258,11 @@ var profileSetupTexts = map[string]profileSetupText{
 		ModeMinimal:          "Minimal - モデルとコンテキストのみ",
 		StatuslineThemeTitle: "ステータスラインテーマ",
 		StatuslineThemeDesc:  "ステータスラインのカラーテーマを選択してください。",
-		ThemeAEDark:        "AE Dark",
-		ThemeAELight:       "AE Light",
-		SetupCancelled:       "セットアップがキャンセルされました。",
-		SavedProfile:         "\nプロファイル '%s' を保存しました:\n  環境設定 → %s\n",
+		ThemeAEDark:          "AE Dark",
+		ThemeAELight:         "AE Light",
+		SetupCancelled:            "セットアップがキャンセルされました。",
+		SavedProfile:              "\nプロファイル '%s' を保存しました:\n  環境設定 → %s\n",
+		StatuslineMigrationBanner: "Statusline 形式が更新されました。次のセッションから新形式が使用されます。",
 	},
 	"zh": {
 		ConfiguringProfile:   "配置文件 '%s' 设置",
@@ -226,12 +288,25 @@ var profileSetupTexts = map[string]profileSetupText{
 		ModelOverrideTitle:   "默认模型覆盖",
 		ModelOverrideDesc:    "使用此配置文件启动时覆盖模型。",
 		ModelDefault:         "默认 (不覆盖)",
+		ModelOpus47:          "claude-opus-4-7 (Adaptive Thinking，最新Opus)",
 		ModelOpus:            "claude-opus-4-6 (最强性能)",
 		ModelSonnet:          "claude-sonnet-4-6 (均衡)",
 		ModelHaiku:           "claude-haiku-4-5 (最快)",
 		ModelOpusPlan:        "opusplan (Opus规划，Sonnet编码)",
+		EffortLevelTitle:     "推理集约度",
+		EffortLevelDesc:      "为Opus 4.7 Adaptive Thinking设置CLAUDE_CODE_EFFORT_LEVEL。",
+		EffortLow:            "Low - 快速探索，简单任务",
+		EffortMedium:         "Medium - 大多数常规任务",
+		EffortHigh:           "High - 复杂实现任务（默认）",
+		EffortXHigh:          "XHigh - 架构决策，安全分析",
+		EffortMax:            "Max - 最大Adaptive Thinking分配",
 		BypassTitle:          "跳过权限检查？",
 		BypassDesc:           "添加 --dangerously-skip-permissions。仅在可信环境中使用。",
+		PermissionModeTitle:  "权限模式",
+		PermissionModeDesc:   "设置启动Claude Code时的默认权限模式。",
+		PermModeDefault:      "Default - 标准权限提示",
+		PermModeAuto:         "Auto - 自动分类器决策 (v2.1.89+)",
+		PermModeAcceptEdits:  "AcceptEdits - 自动接受文件编辑",
 		DisplayTitle:         "显示设置",
 		StatuslineModeTitle:  "状态栏显示模式",
 		StatuslineModeDesc:   "控制状态栏的布局样式。",
@@ -242,10 +317,11 @@ var profileSetupTexts = map[string]profileSetupText{
 		ModeMinimal:          "Minimal - 仅显示模型和上下文",
 		StatuslineThemeTitle: "状态栏主题",
 		StatuslineThemeDesc:  "选择状态栏的颜色主题。",
-		ThemeAEDark:        "AE Dark",
-		ThemeAELight:       "AE Light",
-		SetupCancelled:       "设置已取消。",
-		SavedProfile:         "\n配置文件 '%s' 已保存:\n  偏好设置 → %s\n",
+		ThemeAEDark:          "AE Dark",
+		ThemeAELight:         "AE Light",
+		SetupCancelled:            "设置已取消。",
+		SavedProfile:              "\n配置文件 '%s' 已保存:\n  偏好设置 → %s\n",
+		StatuslineMigrationBanner: "Statusline 格式已更新。下一次会话将使用新格式。",
 	},
 }
 

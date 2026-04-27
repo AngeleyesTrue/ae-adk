@@ -414,3 +414,36 @@ For detailed patterns on each topic, see the modules directory.
 - ae-domain-frontend: React/Vue SVG component integration
 - ae-docs-generation: SVG diagram generation for documentation
 - ae-domain-uiux: Icon systems and design system integration
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "PNG is fine for icons" | PNG icons blur on retina and scale poorly. SVG renders crisp at any size and supports CSS theming. |
+| "SVGO defaults are aggressive, I'll skip optimization" | Unoptimized SVGs carry editor metadata and bloat bundles. SVGO with project config typically halves the size. |
+| "I'll just use Lucide / Heroicons / etc., no need to manage my own" | Third-party icons drift from your brand. Build a small icon system with consistent stroke and corner radius. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Icons shipped as PNG when SVG is feasible
+- SVG files committed without SVGO optimization
+- Inline SVG with editor metadata (Sketch, Figma, Inkscape comments)
+- SVG using <foreignObject> or <script> for non-graphic features
+- Different icons in the same set with inconsistent stroke width or corner radius
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] All inline icons are SVG, optimized via SVGO
+- [ ] SVGO config tuned to project (preserves viewBox, removes unused attributes)
+- [ ] Icon system has consistent stroke, corner radius, and grid
+- [ ] Sprite sheet or icon component pattern used to avoid duplicate inline SVG
+- [ ] SVG accessibility: <title>, role="img", aria-label where appropriate
+
+<!-- ae:evolvable-end -->

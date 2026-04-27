@@ -221,3 +221,34 @@ Module Deep Dives:
 External Resources: [reference.md](references/reference.md)
 
 Origin: Integrated from critical-thinking, brainstorm-diverge-converge, and ideation frameworks
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "I'll just brainstorm in my head, no need to diverge formally" | Internal brainstorming converges too fast. Explicit divergence (5+ ideas) before convergence yields better solutions. |
+| "Critical evaluation is just being negative" | Critical evaluation surfaces hidden assumptions. Without it, you ship the first plausible idea. |
+| "Deep questioning slows me down" | Slow upfront, fast downstream. Surface-level analysis costs more in rework. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Solution chosen after considering only one alternative
+- Brainstorming session that converged within the first 3 ideas
+- Assumptions in the solution unstated or unchallenged
+- Decision made without asking "what would have to be true for this to fail?"
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] At least 5 alternatives generated before convergence
+- [ ] Each alternative evaluated against explicit criteria
+- [ ] Hidden assumptions surfaced and validated or marked as risks
+- [ ] Failure modes considered ("how could this go wrong?")
+
+<!-- ae:evolvable-end -->

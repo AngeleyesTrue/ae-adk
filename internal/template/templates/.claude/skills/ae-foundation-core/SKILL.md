@@ -266,3 +266,37 @@ Module Deep Dives: modules/trust-5-framework.md, modules/spec-first-ddd.md, modu
 
 Full Examples: examples.md
 External Resources: reference.md
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "TRUST 5 is just a checklist, my code already passes" | TRUST 5 is verified by tooling, not assertion. Run the gates and produce evidence. |
+| "DDD is overkill for this small feature" | DDD applies progressively. Even small features benefit from explicit domain boundaries and characterization tests. |
+| "SPEC documents are bureaucracy, code is the truth" | Code answers "what" but not "why". SPEC captures intent and acceptance criteria that code cannot. |
+| "AE can implement directly, why delegate to subagents?" | AE is an orchestrator. Direct implementation by AE is prohibited; subagent delegation enforces specialization and quality. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Code change without a corresponding SPEC document or progress note
+- AE attempting implementation directly instead of delegating to expert-* or manager-* subagent
+- TRUST 5 gates skipped or asserted to pass without tooling output
+- Test coverage below 85% for new code, or characterization tests missing for legacy code touched
+- Commit messages without conventional prefix or issue reference
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Every code change references a SPEC ID or explicit user request
+- [ ] Implementation tasks delegated to appropriate subagent (manager-ddd, manager-tdd, expert-*)
+- [ ] TRUST 5 gates verified with tool output (test, lint, security scan, etc.)
+- [ ] Conventional commit format used (feat/fix/refactor/docs/test/chore)
+- [ ] Acceptance criteria from SPEC validated before marking task complete
+
+<!-- ae:evolvable-end -->

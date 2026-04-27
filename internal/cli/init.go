@@ -364,6 +364,11 @@ func runInit(cmd *cobra.Command, args []string) error {
 		_, _ = fmt.Fprintf(cmd.OutOrStdout(), "  Warning: Failed to sync profile to project config: %v\n", err)
 	}
 
+	// Apply effort policy to agent frontmatters (REQ-08)
+	if err := foundation.ApplyEffortPolicy(opts.ProjectRoot, mgr); err != nil {
+		_, _ = fmt.Fprintf(cmd.OutOrStdout(), "  Warning: Failed to apply effort policy: %v\n", err)
+	}
+
 	// Ensure global settings.json has required env variables
 	if err := ensureGlobalSettingsEnv(); err != nil {
 		_, _ = fmt.Fprintf(cmd.OutOrStdout(), "  Warning: Failed to update global settings env: %v\n", err)

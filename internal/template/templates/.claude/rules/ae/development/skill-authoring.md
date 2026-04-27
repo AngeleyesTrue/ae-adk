@@ -21,6 +21,8 @@ Optional standard fields:
 - compatibility: Target platform description, max 500 characters (default: Designed for Claude Code)
 - allowed-tools: Comma-separated string of tool names the skill can use (experimental)
 - user-invocable: Boolean to control slash command menu visibility (default: true, set to false to hide from / menu)
+- effort: Session effort level override. Five levels are supported: `low`, `medium`, `high`, `xhigh`, `max`. **`xhigh` and `max` require Claude Opus 4.7 or higher**; older models silently fall back to `high`.
+- model: Model override applied while the skill is active (e.g., `sonnet`, `opus`, `haiku`)
 
 ### metadata Map
 
@@ -68,6 +70,10 @@ license: Apache-2.0
 compatibility: Designed for Claude Code
 allowed-tools: Read, Grep, Glob, Bash, mcp__context7__resolve-library-id, mcp__context7__get-library-docs
 user-invocable: false
+# Effort level override (low|medium|high|xhigh|max). xhigh/max require Opus 4.7+.
+effort: high
+# Model override applied while the skill is active (sonnet|opus|haiku)
+model: sonnet
 metadata:
   version: "1.0.0"
   category: "domain"

@@ -332,3 +332,36 @@ Examples: [examples.md](examples.md)
 External Resources: [reference.md](reference.md)
 
 Origin: Inspired by Claude Code Philosopher Ignition framework
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "First principles is just a buzzword, I'll use my experience" | Experience embeds assumptions. First principles forces you to question the embedded constraints. |
+| "Root cause analysis takes too long for a simple bug" | Treating symptoms reintroduces the bug elsewhere. RCA pays back many times the upfront cost. |
+| "Stanford Design Thinking is for designers, not engineers" | Empathy + ideation + prototyping applies to architecture as much as UI. Engineers benefit from human-centered framing. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Architecture decision made without considering at least 3 alternatives
+- Bug fix that addresses the symptom but not the upstream cause
+- Technology selection driven by familiarity rather than first-principles fit
+- Decision log absent for choices that will affect future development
+- Cognitive bias unchecked (anchoring, recency, sunk cost)
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Decision rationale documented in ADR or research.md format
+- [ ] At least 3 alternatives considered with pros/cons each
+- [ ] Root cause traced to its origin, not just the immediate trigger
+- [ ] First-principles decomposition recorded for non-trivial choices
+- [ ] Decision reviewed for cognitive biases (anchoring, recency, sunk cost)
+
+<!-- ae:evolvable-end -->

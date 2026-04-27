@@ -203,3 +203,36 @@ Modules load on-demand (Level 3 Progressive Disclosure). Only relevant modules a
 - **Upstream**: moai-* skills are never modified (upstream immutable)
 - **License**: Apache 2.0, compatible with pbakaus/impeccable source
 - **Reference**: `${CLAUDE_SKILL_DIR}/reference.md` for source links and tools
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "Generic design tokens (blue-500, gray-100) are fine, users want familiar patterns" | Generic palettes signal AI Slop. Brand-specific tokens derived from visual-identity.md are mandatory. |
+| "This hero section uses a gradient because gradients look modern" | Gradient overuse is a top AI-design anti-pattern. Use only when the brand explicitly calls for it. |
+| "I can skip the context gathering step, the brief is clear enough" | Skipping context discovery is the #1 cause of generic output. Always run the gathering protocol first. |
+| "Lighthouse score 70 is acceptable for an MVP" | The skill mandates Lighthouse >= 80. Below threshold violates the design system contract. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Tailwind defaults (blue-500, gray-100) used without brand customization
+- Hero section with full-width gradient and no brand-specific imagery
+- Inter or system-ui font without justification against brand-voice.md
+- WCAG 2.1 AA contrast violations (e.g., gray-400 on white)
+- Same layout pattern (hero -> features grid -> CTA) regardless of brand context
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Design tokens are sourced from .moai/project/brand/visual-identity.md or equivalent brand file
+- [ ] Lighthouse score >= 80 verified on a built page, with screenshot evidence
+- [ ] Color contrast ratios meet WCAG 2.1 AA for all text/background combinations
+- [ ] Anti-pattern checklist run against the produced design before handoff
+
+<!-- ae:evolvable-end -->

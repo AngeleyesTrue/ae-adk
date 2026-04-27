@@ -147,3 +147,37 @@ Official documentation:
 
 Version: 2.0.0
 Last Updated: 2026-01-11
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "useEffect for everything, it's the React way" | useEffect for state derivations is an anti-pattern. Prefer derived state, useMemo, or event handlers. |
+| "Client components everywhere in Next.js 16, server components are confusing" | Server components are the default in App Router for a reason. Use "use client" only when you need interactivity. |
+| "Tailwind classes inline are fine, no need to extract components" | Repeated class strings indicate a missing component. Extract when the same pattern appears 3+ times. |
+| "State management library not needed, I'll just use Context" | Context re-renders all consumers on any change. For non-trivial app state, use Zustand, Jotai, or Redux Toolkit. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- useEffect that synchronizes state with props (use derived state instead)
+- "use client" applied to entire pages when only a small interactive section needs it
+- Inline event handlers that allocate new functions on every render in performance-critical lists
+- Direct DOM manipulation (document.querySelector) outside of useEffect
+- Missing key prop on list items, or using array index as key for reorderable lists
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Components categorized correctly as server vs client (App Router) or page vs component (Pages Router)
+- [ ] No useEffect that exists only to set state from props
+- [ ] Lighthouse Performance score >= 90 on built pages
+- [ ] Accessibility verified: keyboard navigation, ARIA roles, focus management
+- [ ] State management chosen based on app complexity, not preference
+
+<!-- ae:evolvable-end -->

@@ -10,7 +10,7 @@ llm:
 
   # Claude model mapping by tier
   claude_models:
-    high: "opus"      # Complex reasoning, architecture, security
+    high: "claude-opus-4-7"  # Complex reasoning, architecture, security
     medium: "sonnet"  # Balanced performance for most tasks
     low: "haiku"      # Fast exploration, simple tasks
 

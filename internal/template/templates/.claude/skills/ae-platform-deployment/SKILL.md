@@ -408,3 +408,36 @@ Status: Production Ready
 Version: 2.0.0
 Updated: 2026-02-09
 Platforms: Vercel, Railway, Convex
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "Vercel, Railway, Convex - I'll pick the one I know" | Each platform has architectural assumptions. Vercel: edge + static; Railway: containers; Convex: reactive backend. Pick by workload. |
+| "Edge functions are just lambdas" | Edge functions run with V8 isolates, not Node. Many npm packages do not work. Verify compatibility before commitment. |
+| "Continuous deployment from main is good enough" | Without staging or canary, every regression hits all users. Stage at minimum; canary for high-traffic services. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Platform chosen without comparison of alternatives or workload analysis
+- Edge functions using Node-specific APIs (fs, child_process)
+- No staging or canary stage in the deployment pipeline
+- Environment variables not separated by stage (preview / staging / production)
+- Rollback procedure not documented or tested
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Platform selection documented with workload justification
+- [ ] Edge function code verified against the runtime's API surface
+- [ ] Staging environment exists and matches production configuration
+- [ ] Environment variables managed per-stage in the platform's UI or via IaC
+- [ ] Rollback verified by performing one in staging
+
+<!-- ae:evolvable-end -->

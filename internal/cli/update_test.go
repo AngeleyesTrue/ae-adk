@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/AngeleyesTrue/ae-adk/internal/profile"
 	"github.com/AngeleyesTrue/ae-adk/internal/template"
 	"github.com/AngeleyesTrue/ae-adk/internal/update"
 	"github.com/AngeleyesTrue/ae-adk/pkg/version"
@@ -2722,4 +2723,85 @@ func TestRestoreAEConfig_CustomSectionPreserved(t *testing.T) {
 	if !strings.Contains(string(standardData), "new_field") {
 		t.Errorf("standard section should contain new template field, got:\n%s", string(standardData))
 	}
+}
+
+// TestEnsureGlobalSettingsEnv_EffortLevelInjection verifies that CLAUDE_CODE_EFFORT_LEVEL
+// is written to global settings.json env when profile.yaml specifies effort_level (REQ-05, AC-05).
+func TestEnsureGlobalSettingsEnv_EffortLevelInjection(t *testing.T) {
+	tempDir := t.TempDir()
+
+	// Redirect home so ensureGlobalSettingsEnv writes to tempDir/.claude/settings.json.
+	origHome := os.Getenv("HOME")
+	origUserProfile := os.Getenv("USERPROFILE")
+	defer func() {
+		_ = os.Setenv("HOME", origHome)
+		_ = os.Setenv("USERPROFILE", origUserProfile)
+	}()
+	_ = os.Setenv("HOME", tempDir)
+	_ = os.Setenv("USERPROFILE", tempDir)
+
+	// Redirect profile base dir so ReadPreferences reads from tempDir.
+	origOverride := profile.BaseDirOverride
+	defer func() { profile.BaseDirOverride = origOverride }()
+	profile.BaseDirOverride = filepath.Join(tempDir, "profiles")
+
+	claudeDir := filepath.Join(tempDir, ".claude")
+	if err := os.MkdirAll(claudeDir, 0755); err != nil {
+		t.Fatalf("mkdir .claude: %v", err)
+	}
+
+	settingsPath := filepath.Join(claudeDir, "settings.json")
+	initial := map[string]any{
+		"env": map[string]any{
+			"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+		},
+	}
+	data, _ := json.MarshalIndent(initial, "", "  ")
+	if err := os.WriteFile(settingsPath, data, 0644); err != nil {
+		t.Fatalf("write initial settings.json: %v", err)
+	}
+
+	t.Run("InjectsEffortLevel_WhenProfileHasOne", func(t *testing.T) {
+		// Write a profile preferences file with effort_level = xhigh.
+		prefs := profile.ProfilePreferences{EffortLevel: "xhigh"}
+		if err := profile.WritePreferences("default", prefs); err != nil {
+			t.Fatalf("write profile prefs: %v", err)
+		}
+
+		if err := ensureGlobalSettingsEnv(); err != nil {
+			t.Fatalf("ensureGlobalSettingsEnv: %v", err)
+		}
+
+		var settings map[string]any
+		raw, _ := os.ReadFile(settingsPath)
+		if err := json.Unmarshal(raw, &settings); err != nil {
+			t.Fatalf("parse settings.json: %v", err)
+		}
+		envMap := settings["env"].(map[string]any)
+		if envMap["CLAUDE_CODE_EFFORT_LEVEL"] != "xhigh" {
+			t.Errorf("expected CLAUDE_CODE_EFFORT_LEVEL=xhigh, got %v", envMap["CLAUDE_CODE_EFFORT_LEVEL"])
+		}
+	})
+
+	t.Run("RemovesEffortLevel_WhenProfileIsEmpty", func(t *testing.T) {
+		// Write a profile without effort_level.
+		prefs := profile.ProfilePreferences{UserName: "testuser"}
+		if err := profile.WritePreferences("default", prefs); err != nil {
+			t.Fatalf("write profile prefs: %v", err)
+		}
+
+		if err := ensureGlobalSettingsEnv(); err != nil {
+			t.Fatalf("ensureGlobalSettingsEnv: %v", err)
+		}
+
+		var settings map[string]any
+		raw, _ := os.ReadFile(settingsPath)
+		if err := json.Unmarshal(raw, &settings); err != nil {
+			t.Fatalf("parse settings.json: %v", err)
+		}
+		envMap := settings["env"].(map[string]any)
+		if _, exists := envMap["CLAUDE_CODE_EFFORT_LEVEL"]; exists {
+			t.Errorf("CLAUDE_CODE_EFFORT_LEVEL should not be present when profile has no effort_level")
+		}
+	})
 }
