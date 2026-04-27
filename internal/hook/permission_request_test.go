@@ -88,11 +88,16 @@ func TestPermissionRequestHandler_Handle(t *testing.T) {
 func TestPermissionRequestHandler_MarkerSentinel(t *testing.T) {
 	t.Parallel()
 
+	// Note on test design:
+	// PermissionDecision is the only externally observable signal of sentinel
+	// detection — the handler does not expose a separate "sentinel detected"
+	// flag. Asserting only wantDecision therefore fully covers the behavioral
+	// contract; an additional wantSentinel field would be redundant noise that
+	// could give a false sense of coverage.
 	tests := []struct {
-		name           string
-		toolInput      json.RawMessage
-		wantDecision   string
-		wantSentinel   bool // true → deny expected
+		name         string
+		toolInput    json.RawMessage
+		wantDecision string
 	}{
 		{
 			name: "positive: sentinel key present → deny",
@@ -101,7 +106,6 @@ func TestPermissionRequestHandler_MarkerSentinel(t *testing.T) {
 				"command":                  "ls",
 			}),
 			wantDecision: DecisionDeny,
-			wantSentinel: true,
 		},
 		{
 			name: "positive: sentinel key with string value → deny",
@@ -109,7 +113,6 @@ func TestPermissionRequestHandler_MarkerSentinel(t *testing.T) {
 				"__updated_input_marker__": "1",
 			}),
 			wantDecision: DecisionDeny,
-			wantSentinel: true,
 		},
 		{
 			name: "negative: normal tool input without sentinel → ask",
@@ -117,25 +120,21 @@ func TestPermissionRequestHandler_MarkerSentinel(t *testing.T) {
 				"command": "ls -la",
 			}),
 			wantDecision: DecisionAsk,
-			wantSentinel: false,
 		},
 		{
 			name:         "negative: nil tool input → ask",
 			toolInput:    nil,
 			wantDecision: DecisionAsk,
-			wantSentinel: false,
 		},
 		{
 			name:         "negative: empty tool input → ask",
 			toolInput:    json.RawMessage{},
 			wantDecision: DecisionAsk,
-			wantSentinel: false,
 		},
 		{
 			name:         "negative: non-object JSON → ask (safe fallback)",
 			toolInput:    json.RawMessage(`"just a string"`),
 			wantDecision: DecisionAsk,
-			wantSentinel: false,
 		},
 		{
 			// case-sensitivity guard: only the canonical lowercase key is the sentinel.
@@ -147,7 +146,6 @@ func TestPermissionRequestHandler_MarkerSentinel(t *testing.T) {
 				"__UPDATED_INPUT_MARKER__": true,
 			}),
 			wantDecision: DecisionAsk,
-			wantSentinel: false,
 		},
 		{
 			name: "negative: mixed-case variant key NOT treated as sentinel → ask",
@@ -155,7 +153,6 @@ func TestPermissionRequestHandler_MarkerSentinel(t *testing.T) {
 				"__Updated_Input_Marker__": "1",
 			}),
 			wantDecision: DecisionAsk,
-			wantSentinel: false,
 		},
 		{
 			name: "negative: nested object containing sentinel key → ask (top-level only)",
@@ -165,7 +162,6 @@ func TestPermissionRequestHandler_MarkerSentinel(t *testing.T) {
 				},
 			}),
 			wantDecision: DecisionAsk,
-			wantSentinel: false,
 		},
 	}
 

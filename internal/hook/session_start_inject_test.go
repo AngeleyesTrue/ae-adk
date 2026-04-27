@@ -3,8 +3,10 @@ package hook
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"os"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"testing"
 )
@@ -23,8 +25,9 @@ func sha256File(t *testing.T, path string) string {
 	return hex.EncodeToString(sum[:])
 }
 
-// TestInjectCLAUDEEnvFile_Windows verifies REQ-17 behavior on Windows.
-// On non-Windows platforms, the function is a no-op and the test validates that.
+// TestInjectCLAUDEEnvFile_NoEnvFile verifies REQ-17: when the project root has
+// no .env file, injectCLAUDEEnvFile is a no-op (no settings.local.json created).
+// This contract holds on Windows (early-return) and non-Windows (build-tag stub).
 func TestInjectCLAUDEEnvFile_NoEnvFile(t *testing.T) {
 	t.Parallel()
 
@@ -110,6 +113,100 @@ func TestInjectCLAUDEEnvFile_Idempotent(t *testing.T) {
 	// true idempotency invariant and is independent of filesystem timestamp precision.
 	if hash1 != hash2 {
 		t.Errorf("idempotency violated: settings.local.json content changed on second call\nfirst SHA256:  %s\nsecond SHA256: %s", hash1, hash2)
+	}
+}
+
+// TestInjectCLAUDEEnvFile_PreservesHeterogeneousEnvTypes verifies that
+// existing env entries with non-string values (numbers, objects, booleans)
+// are preserved verbatim when CLAUDE_ENV_FILE is injected.
+//
+// Regression guard for the previous map[string]string parse approach which
+// failed with "json: cannot unmarshal number into Go value of type string"
+// and silently aborted the entire injection — leaving CLAUDE_ENV_FILE unset.
+func TestInjectCLAUDEEnvFile_PreservesHeterogeneousEnvTypes(t *testing.T) {
+	t.Parallel()
+
+	if runtime.GOOS != "windows" {
+		t.Skip("Windows-specific injection: skipping on non-Windows (function is no-op)")
+	}
+
+	dir := t.TempDir()
+
+	// Pre-populate .claude/settings.local.json with mixed-type env entries
+	// that an external tool (or a future Claude Code release) might add.
+	settingsDir := filepath.Join(dir, ".claude")
+	if err := os.MkdirAll(settingsDir, 0o755); err != nil {
+		t.Fatalf("mkdir settings dir: %v", err)
+	}
+	settingsPath := filepath.Join(settingsDir, "settings.local.json")
+	pre := `{
+  "env": {
+    "STRING_VAR": "hello",
+    "NUMBER_VAR": 42,
+    "BOOL_VAR": true,
+    "OBJECT_VAR": {"nested": "value"}
+  },
+  "otherTopLevel": "preserved"
+}`
+	if err := os.WriteFile(settingsPath, []byte(pre), 0o600); err != nil {
+		t.Fatalf("write pre-existing settings: %v", err)
+	}
+
+	// Create .env so injection actually runs.
+	if err := os.WriteFile(filepath.Join(dir, ".env"), []byte("X=1"), 0o600); err != nil {
+		t.Fatalf("create .env: %v", err)
+	}
+
+	if err := injectCLAUDEEnvFile(dir); err != nil {
+		t.Fatalf("injectCLAUDEEnvFile must succeed when env contains heterogeneous types, got: %v", err)
+	}
+
+	raw, err := os.ReadFile(settingsPath)
+	if err != nil {
+		t.Fatalf("read settings: %v", err)
+	}
+
+	var got struct {
+		Env            map[string]json.RawMessage `json:"env"`
+		OtherTopLevel  string                     `json:"otherTopLevel"`
+	}
+	if err := json.Unmarshal(raw, &got); err != nil {
+		t.Fatalf("settings.local.json must remain valid JSON, got: %v\ncontent: %s", err, string(raw))
+	}
+
+	// CLAUDE_ENV_FILE must have been injected.
+	if _, ok := got.Env["CLAUDE_ENV_FILE"]; !ok {
+		t.Error("CLAUDE_ENV_FILE was not injected (heterogeneous env aborted injection — regression)")
+	}
+
+	// All pre-existing entries must be preserved with their original types.
+	// json.MarshalIndent re-formats RawMessage payloads with whitespace, so byte
+	// comparison fails for object values. Compare structurally by decoding each
+	// raw payload back to interface{} and using reflect.DeepEqual.
+	mustPreserve := func(key string, want any) {
+		t.Helper()
+		raw, ok := got.Env[key]
+		if !ok {
+			t.Errorf("env[%q] missing after injection (must preserve)", key)
+			return
+		}
+		var have any
+		if err := json.Unmarshal(raw, &have); err != nil {
+			t.Errorf("env[%q] roundtrip parse failed: %v (raw: %s)", key, err, string(raw))
+			return
+		}
+		if !reflect.DeepEqual(have, want) {
+			t.Errorf("env[%q] = %v (%T), want %v (%T) — type/value not preserved", key, have, have, want, want)
+		}
+	}
+	mustPreserve("STRING_VAR", "hello")
+	mustPreserve("NUMBER_VAR", float64(42)) // json numbers decode to float64
+	mustPreserve("BOOL_VAR", true)
+	mustPreserve("OBJECT_VAR", map[string]any{"nested": "value"})
+
+	// Top-level fields outside of "env" must also be preserved.
+	if got.OtherTopLevel != "preserved" {
+		t.Errorf("otherTopLevel = %q, want %q", got.OtherTopLevel, "preserved")
 	}
 }
 

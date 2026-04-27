@@ -278,6 +278,10 @@ func statusIcon(s CheckStatus) string {
 // checkMCPScopeDuplicates compares project .mcp.json and global ~/.claude/.mcp.json
 // for duplicate mcpServers keys and emits a warning per duplicate (REQ-15, v2.12.0).
 // Exit code remains 0 (non-blocking check).
+//
+// 첫 번째 인자(verbose bool)는 다른 doctor 체크 함수와 시그니처 일관성을 위해
+// 받지만 본 체크는 메시지/디테일이 단순하여 verbose 분기가 불필요하다. 향후 다국어
+// 디테일이 추가되면 이곳에서 분기 가능 (`_` 식별자 유지로 잘못된 사용을 방지).
 func checkMCPScopeDuplicates(_ bool) DiagnosticCheck {
 	check := DiagnosticCheck{Name: "MCP Scope Duplicates"}
 

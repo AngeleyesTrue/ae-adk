@@ -53,24 +53,35 @@ func injectCLAUDEEnvFile(projectRoot string) error {
 	}
 
 	// env 맵을 읽거나 새로 생성한다.
-	var envMap map[string]string
+	// json.RawMessage로 디코딩하여 다른 키의 비-문자열 값(숫자/객체 등)도
+	// 원형 그대로 보존한다. map[string]string으로 디코딩하면 외부 도구가 추가한
+	// 임의 타입 값에서 unmarshal 실패가 발생하여 전체 주입이 silent하게 중단된다.
+	envMap := make(map[string]json.RawMessage)
 	if envRaw, ok := settings["env"]; ok {
-		if err := json.Unmarshal(envRaw, &envMap); err != nil {
-			return fmt.Errorf("parse env section: %w", err)
+		// "null" 또는 비어있으면 빈 맵으로 초기화 (이미 위에서 초기화됨)
+		if len(envRaw) > 0 && string(envRaw) != "null" {
+			if err := json.Unmarshal(envRaw, &envMap); err != nil {
+				return fmt.Errorf("parse env section: %w", err)
+			}
 		}
 	}
-	if envMap == nil {
-		envMap = make(map[string]string)
+
+	// CLAUDE_ENV_FILE의 기대 직렬화 형태를 미리 계산하고 기존 값과 비교한다.
+	expectedRaw, err := json.Marshal(absEnvPath)
+	if err != nil {
+		return fmt.Errorf("marshal env value: %w", err)
+	}
+	if existing, ok := envMap["CLAUDE_ENV_FILE"]; ok {
+		// 이미 동일 값이 있으면 파일을 건드리지 않는다 (idempotent).
+		// json.RawMessage 비교는 직렬화 표현이 동일해야 idempotent로 간주.
+		if string(existing) == string(expectedRaw) {
+			return nil
+		}
 	}
 
-	// 이미 동일 값이 있으면 파일을 건드리지 않는다 (idempotent).
-	if envMap["CLAUDE_ENV_FILE"] == absEnvPath {
-		return nil
-	}
+	envMap["CLAUDE_ENV_FILE"] = json.RawMessage(expectedRaw)
 
-	envMap["CLAUDE_ENV_FILE"] = absEnvPath
-
-	// env 맵을 다시 직렬화한다.
+	// env 맵을 다시 직렬화한다 — 다른 키의 원본 값은 RawMessage 형태로 보존됨.
 	envBytes, err := json.Marshal(envMap)
 	if err != nil {
 		return fmt.Errorf("marshal env map: %w", err)
@@ -121,6 +132,10 @@ func injectCLAUDEEnvFile(projectRoot string) error {
 
 // claudeEnvFilePath는 현재 settings.local.json에서 CLAUDE_ENV_FILE 값을 반환한다.
 // 파일이 없거나 키가 없으면 빈 문자열을 반환한다. 테스트용 헬퍼.
+//
+// CLAUDE_ENV_FILE 슬롯만 string으로 디코딩하고, 다른 env 키는 무시한다.
+// (env 전체를 map[string]string으로 디코딩하면 외부 도구가 추가한 비-문자열
+// 값에 대해 fail하므로 슬롯 단위 디코딩이 필요하다.)
 func claudeEnvFilePath(projectRoot string) string {
 	settingsPath := filepath.Join(projectRoot, ".claude", "settings.local.json")
 	raw, err := os.ReadFile(settingsPath)
@@ -135,9 +150,18 @@ func claudeEnvFilePath(projectRoot string) string {
 	if !ok {
 		return ""
 	}
-	var envMap map[string]string
+	envMap := make(map[string]json.RawMessage)
 	if err := json.Unmarshal(envRaw, &envMap); err != nil {
 		return ""
 	}
-	return strings.TrimSpace(envMap["CLAUDE_ENV_FILE"])
+	target, ok := envMap["CLAUDE_ENV_FILE"]
+	if !ok {
+		return ""
+	}
+	var value string
+	if err := json.Unmarshal(target, &value); err != nil {
+		// 비-문자열 값이면 빈 문자열을 반환한다.
+		return ""
+	}
+	return strings.TrimSpace(value)
 }

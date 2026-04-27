@@ -109,17 +109,24 @@ func ApplyEffortPolicy(projectRoot string, manifestMgr manifest.Manager) error {
 			return fmt.Errorf("effort policy: write %s: %w", agentName, err)
 		}
 
-		// 매니페스트 해시 갱신
+		// 매니페스트 해시 갱신 — 실패해도 effort 주입 자체는 성공이므로
+		// 비차단 경고로 처리한다. 단, 무음 처리는 진단 가능성을 해치므로
+		// 반드시 slog.Warn으로 기록한다.
 		relPath := filepath.Join(".claude", "agents", "ae", agentName+".md")
 		if err := manifestMgr.Track(relPath, manifest.TemplateManaged, ""); err != nil {
-			// 매니페스트 갱신 실패는 경고로만 처리 (비필수)
-			_ = err
+			slog.Warn("effort policy: manifest track failed (non-fatal)",
+				"agent", agentName,
+				"path", relPath,
+				"error", err.Error(),
+			)
 		}
 
 		modifiedCount++
 	}
 
-	_ = modifiedCount
+	if modifiedCount > 0 {
+		slog.Info("effort policy applied", "modified_agents", modifiedCount)
+	}
 	return nil
 }
 
@@ -153,7 +160,12 @@ func injectEffortIntoFrontmatter(content string, level EffortLevel) (updated str
 	// 이미 effort: 필드가 있는지 확인
 	var fm agentFrontmatter
 	if err := yaml.Unmarshal([]byte(frontmatterContent), &fm); err != nil {
-		// 파싱 실패 시 원본 유지
+		// 파싱 실패 시 원본 유지 — 사용자 의도를 침해하지 않기 위해 보수적으로 동작.
+		// 단, 정책 주입이 silent하게 스킵되면 운영 진단이 어려우므로 경고를 남긴다.
+		slog.Warn("agent frontmatter YAML parse failed; effort policy skipped (file preserved)",
+			"error", err.Error(),
+			"policy_default", level.String(),
+		)
 		return content, false, nil
 	}
 
