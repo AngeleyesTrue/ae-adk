@@ -137,3 +137,34 @@ Skills that complement this skill include ae-docs-generation for comprehensive d
 Commands that utilize this skill include ae:3-sync for documentation with embedded diagrams and ae:1-plan for SPEC creation with visual architecture diagrams.
 
 Focus: Pure skill-based Mermaid rendering with MCP Playwright integration
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "ASCII diagrams are good enough, no need for Mermaid" | ASCII breaks in PR comments and renders inconsistently. Mermaid renders natively in GitHub, GitLab, and most doc sites. |
+| "I'll just hand-draw the diagram in Figma" | Hand-drawn diagrams drift the moment the architecture changes. Mermaid is text and lives next to the code. |
+| "Sequence diagrams are too detailed for high-level docs" | Sequence diagrams clarify call ordering and async boundaries that prose cannot. Use them where it matters. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Architecture diagram embedded as a PNG with no source
+- Mermaid syntax that fails to parse (verify by rendering)
+- Diagram with 20+ nodes that should be split into multiple smaller diagrams
+- Diagram type mismatched to content (flowchart for a sequence, ER for a class hierarchy)
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Mermaid source committed alongside the rendered diagram
+- [ ] Diagram renders successfully in the target platform (GitHub, MkDocs, Nextra)
+- [ ] Diagram type matches the content (flowchart, sequence, class, ER, state, gantt)
+- [ ] Each diagram has fewer than 20 nodes, or is split into focused sub-diagrams
+
+<!-- ae:evolvable-end -->

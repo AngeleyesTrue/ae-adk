@@ -191,3 +191,36 @@ Generated with: AE-ADK Skill Factory v2.0
 Last Updated: 2026-02-09
 Version: 2.0.0 (Consolidated)
 Platforms: Neon, Supabase, Firestore
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "Neon, Supabase, Firestore - all do the same job" | Neon: serverless Postgres with branching. Supabase: Postgres + realtime. Firestore: NoSQL + offline. Pick by access pattern, not popularity. |
+| "Database branching is a gimmick, I'll just use staging" | Per-PR ephemeral databases let CI verify migrations against production-shaped data. Worth the setup. |
+| "Realtime subscriptions scale fine, no need to test" | Realtime fan-out has hard limits. Load-test subscription count and message rate before launch. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Cloud database chosen without comparison of alternatives
+- No backup or point-in-time recovery configured
+- Connection string committed to source
+- Realtime subscriptions used without considering fan-out cost
+- Migrations applied directly to production without staging verification
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Database choice documented with access pattern justification
+- [ ] Backups and PITR configured and tested
+- [ ] Connection strings managed via environment variables or secret manager
+- [ ] Realtime usage load-tested where applicable
+- [ ] Migration pipeline verified on staging or branched database before production apply
+
+<!-- ae:evolvable-end -->

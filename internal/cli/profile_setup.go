@@ -5,11 +5,48 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
+	"github.com/AngeleyesTrue/ae-adk/internal/foundation"
 	"github.com/AngeleyesTrue/ae-adk/internal/profile"
 	"github.com/charmbracelet/huh"
 	"github.com/spf13/cobra"
 )
+
+// modelAliases는 구 모델 ID를 현재 정식 ID로 매핑한다 (REQ-09, normalizeModel).
+// 알 수 없는 입력은 원본 그대로 반환한다 (silent drop 금지).
+var modelAliases = map[string]string{
+	"claude-opus-4":   foundation.ModelIDOpus47,
+	"claude-opus-4-5": "claude-opus-4-6",
+	"claude-opus-4-6": "claude-opus-4-6",
+}
+
+// normalizeModel은 모델 ID 문자열을 정규화한다 (REQ-09):
+//   - 제어 문자 제거 (CWE-20 defense-in-depth)
+//   - 128자 초과 시 빈 문자열 반환
+//   - 소문자 변환
+//   - 앞뒤 따옴표/공백 제거
+//   - 구 ID를 최신 정식 ID로 매핑
+//   - 알 수 없는 입력은 원본 반환 (silent drop 없음)
+func normalizeModel(m string) string {
+	// 제어 문자 제거 (U+0000-U+001F, U+007F)
+	m = strings.Map(func(r rune) rune {
+		if r < 0x20 || r == 0x7f {
+			return -1
+		}
+		return r
+	}, m)
+	// 길이 제한 (모델 ID는 128자를 초과하지 않는다)
+	if len(m) > 128 {
+		return ""
+	}
+	m = strings.ToLower(strings.TrimSpace(m))
+	m = strings.Trim(m, `"'`)
+	if canonical, ok := modelAliases[m]; ok {
+		return canonical
+	}
+	return m
+}
 
 var profileSetupCmd = &cobra.Command{
 	Use:   "setup [name]",
@@ -69,8 +106,24 @@ func runProfileSetup(cmd *cobra.Command, args []string) error {
 	if modelPolicy == "" {
 		modelPolicy = "high"
 	}
-	model := existingPrefs.Model
+	// normalizeModel 적용: 기존 저장값이 구 ID이면 최신 ID로 보정한다 (REQ-09).
+	model := normalizeModel(existingPrefs.Model)
 	bypass := existingPrefs.Bypass
+
+	// 권한 모드 (REQ-22: "auto" 옵션 추가)
+	// 기존 PermissionMode 값을 유지하고, 미설정 시에만 "default"로 시작한다.
+	// 이전에는 TeammateDisplay 필드를 재활용하지 않으면서 항상 "default"로
+	// 초기화하여 위저드 재실행 시 기존 설정이 손실되는 결함이 있었다.
+	permMode := existingPrefs.PermissionMode
+	if permMode == "" {
+		permMode = "default"
+	}
+
+	// Effort level (REQ-09: 5단계 선택)
+	effortLevel := existingPrefs.EffortLevel
+	if effortLevel == "" {
+		effortLevel = string(foundation.EffortHigh)
+	}
 
 	statuslineMode := existingPrefs.StatuslineMode
 	if statuslineMode == "" {
@@ -139,7 +192,7 @@ func runProfileSetup(cmd *cobra.Command, args []string) error {
 				Value(&docLang),
 		).Title(t.LanguagesTitle),
 
-		// Section 3: Model Settings (policy + model override)
+		// Section 3: Model Settings (policy + model override + effort level)
 		huh.NewGroup(
 			huh.NewSelect[string]().
 				Title(t.ModelPolicyTitle).
@@ -155,17 +208,43 @@ func runProfileSetup(cmd *cobra.Command, args []string) error {
 				Description(t.ModelOverrideDesc).
 				Options(
 					huh.NewOption(t.ModelDefault, ""),
+					huh.NewOption(t.ModelOpus47, foundation.ModelIDOpus47),
 					huh.NewOption(t.ModelOpus, "claude-opus-4-6"),
 					huh.NewOption(t.ModelSonnet, "claude-sonnet-4-6"),
 					huh.NewOption(t.ModelHaiku, "claude-haiku-4-5-20251001"),
 					huh.NewOption(t.ModelOpusPlan, "opusplan"),
 				).
 				Value(&model),
+			// Effort level selector (REQ-09)
+			huh.NewSelect[string]().
+				Title(t.EffortLevelTitle).
+				Description(t.EffortLevelDesc).
+				Options(
+					huh.NewOption(t.EffortLow, string(foundation.EffortLow)),
+					huh.NewOption(t.EffortMedium, string(foundation.EffortMedium)),
+					huh.NewOption(t.EffortHigh, string(foundation.EffortHigh)),
+					huh.NewOption(t.EffortXHigh, string(foundation.EffortXHigh)),
+					huh.NewOption(t.EffortMax, string(foundation.EffortMax)),
+				).
+				Value(&effortLevel),
 			huh.NewConfirm().
 				Title(t.BypassTitle).
 				Description(t.BypassDesc).
 				Value(&bypass),
 		).Title(t.ModelSettingsTitle),
+
+		// Section 4: Permission Mode (REQ-22: "auto" 옵션 추가)
+		huh.NewGroup(
+			huh.NewSelect[string]().
+				Title(t.PermissionModeTitle).
+				Description(t.PermissionModeDesc).
+				Options(
+					huh.NewOption(t.PermModeDefault, "default"),
+					huh.NewOption(t.PermModeAuto, "auto"),
+					huh.NewOption(t.PermModeAcceptEdits, "acceptEdits"),
+				).
+				Value(&permMode),
+		).Title(t.PermissionModeTitle),
 
 		// Section 5: Display — Mode, Theme, and Preset in one screen
 		huh.NewGroup(
@@ -197,6 +276,9 @@ func runProfileSetup(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("wizard error: %w", err)
 	}
 
+	// normalizeModel 재적용: 위저드 입력값도 정규화 (REQ-09)
+	model = normalizeModel(model)
+
 	// Build and save preferences
 	prefs := profile.ProfilePreferences{
 		UserName:         userName,
@@ -207,9 +289,13 @@ func runProfileSetup(cmd *cobra.Command, args []string) error {
 		ModelPolicy:      modelPolicy,
 		Model:            model,
 		Bypass:           bypass,
+		EffortLevel:      effortLevel,
 		StatuslineMode:   statuslineMode,
 		StatuslineTheme:  statuslineTheme,
-		TeammateDisplay:  "auto",
+		// TeammateDisplay는 위저드에서 묻지 않으므로 기존 값을 보존한다.
+		// 권한 모드는 별도 PermissionMode 필드로 분리 저장한다(REQ-22).
+		TeammateDisplay: existingPrefs.TeammateDisplay,
+		PermissionMode:  permMode,
 	}
 
 	if err := profile.WritePreferences(profileName, prefs); err != nil {

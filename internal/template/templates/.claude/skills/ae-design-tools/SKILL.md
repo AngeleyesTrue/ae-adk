@@ -351,3 +351,34 @@ Last Updated: 2026-04-05
 Tools: Figma MCP (16 tools, Official Remote Server), Pencil MCP (14 tools + export_nodes CLI-only), Pencil-to-Code Export
 Default Style: shadcn/ui Nova (neutral, noto-sans, small radius)
 UI Kits: Shadcn UI (default), Halo (glassmorphic), Lunaris (dark-mode), Nitro (minimal)
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "I'll just sketch components in code, no need to fetch from Figma" | Figma MCP provides authoritative design specs. Skipping it leads to drift between design and implementation. |
+| "Pencil renders fine, I don't need the screenshot for verification" | Layout regressions are silent without visual diff. Always capture and inspect rendered output. |
+| "The .pen file structure is internal, I can hand-edit it" | Hand-editing breaks Pencil's invariants. Use mcp__pencil__* tools or regenerate from source. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Component code that doesn't match a Figma spec when one exists
+- Pencil-to-React export skipped in favor of "manual translation"
+- Missing screenshot evidence for any Pencil rendering operation
+- Direct edits to .pen files without using Pencil MCP tools
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Figma MCP successfully resolved the design URL or file ID
+- [ ] Pencil-rendered screenshot archived to .moai/design/assets/ for review
+- [ ] Generated React/Tailwind code matches Pencil layout pixel-for-pixel
+- [ ] Design tokens extracted from Figma match those declared in visual-identity.md
+
+<!-- ae:evolvable-end -->

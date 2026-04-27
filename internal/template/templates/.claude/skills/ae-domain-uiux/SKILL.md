@@ -236,3 +236,36 @@ Official Resources:
 Last Updated: 2026-03-11
 Status: Production Ready
 Version: 3.0.0
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "WCAG AA is enough, AAA is overkill" | AA is the floor, not the ceiling. For text-heavy interfaces, AAA contrast significantly improves usability. |
+| "Dark mode just inverts the palette" | Inverted palettes break visual hierarchy. Design dark mode tokens semantically (surface, on-surface) rather than via inversion. |
+| "Icons are decorative, no aria-label needed" | Icon-only buttons MUST have aria-label or visually-hidden text. Screen reader users see nothing otherwise. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Color contrast ratio below 4.5:1 for body text or 3:1 for large text
+- Interactive elements smaller than 44x44 CSS px (touch targets)
+- Focus indicators removed or invisible against the background
+- Color used as the sole signal for state (e.g., red for error without an icon or text)
+- Animations without prefers-reduced-motion fallback
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] WCAG 2.1 AA contrast verified for all text/background pairs (axe-core or Lighthouse)
+- [ ] Keyboard-only navigation reaches every interactive element
+- [ ] Screen reader smoke test passes for primary user flow
+- [ ] Dark mode tokens defined semantically and verified independently
+- [ ] All animations respect prefers-reduced-motion
+
+<!-- ae:evolvable-end -->

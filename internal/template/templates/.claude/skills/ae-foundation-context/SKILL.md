@@ -236,3 +236,34 @@ Status: Production Ready (Enterprise)
 Modular Architecture: SKILL.md + 6 modules
 Integration: Plan-Run-Sync workflow optimized
 Generated with: AE-ADK Skill Factory
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "I'll just keep loading more files, the context window is huge" | 200K tokens fills faster than expected. Use targeted reads with offset/limit and Grep before Read. |
+| "Session state can be reconstructed from chat history each time" | Reconstruction wastes tokens. Persist SPEC, progress, and decisions to .moai/specs/ for cheap reload. |
+| "/clear is disruptive, I'll just keep going" | Past 150K tokens, every operation degrades. /clear at phase boundaries restores throughput. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Reading entire files when only a section is needed
+- Context exceeding 150K tokens without /clear at phase boundaries
+- SPEC progress not persisted to disk, requiring chat-history reconstruction
+- Same file re-read multiple times in one session without caching the relevant section
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Token budget per phase tracked against allocations (Plan 30K, Run 180K, Sync 40K)
+- [ ] Read calls use offset/limit when file > 200 lines
+- [ ] Session state persisted to .moai/specs/SPEC-XXX/ for cross-session continuity
+- [ ] /clear executed at phase transitions and after context exceeds 150K
+
+<!-- ae:evolvable-end -->

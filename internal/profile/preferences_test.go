@@ -403,3 +403,108 @@ func TestPreferences_StatuslineThemePersistsWithOtherFields(t *testing.T) {
 		t.Errorf("StatuslineTheme = %q, want %q", got.StatuslineTheme, "catppuccin-mocha")
 	}
 }
+
+// TestValidatePermissionMode verifies the whitelist guard for PermissionMode (REQ-22 보강).
+// The whitelist must accept the empty string and the three legitimate values, and must
+// reject anything else — most importantly the privilege-escalating "bypassPermissions"
+// which is reserved for the --dangerously-skip-permissions CLI flag (the Bypass field).
+func TestValidatePermissionMode(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		in   string
+		want bool
+	}{
+		// Allowed
+		{"empty (unset)", "", true},
+		{"default", "default", true},
+		{"auto", "auto", true},
+		{"acceptEdits", "acceptEdits", true},
+		// Rejected — case-sensitive whitelist
+		{"bypassPermissions explicitly rejected", "bypassPermissions", false},
+		{"random unknown value", "yolo", false},
+		{"uppercase variant of allowed", "DEFAULT", false},
+		{"camel-case mismatch", "AcceptEdits", false},
+		{"whitespace not stripped", " auto ", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			if got := ValidatePermissionMode(tt.in); got != tt.want {
+				t.Errorf("ValidatePermissionMode(%q) = %v, want %v", tt.in, got, tt.want)
+			}
+		})
+	}
+}
+
+// TestReadPreferences_NormalizesInvalidPermissionMode verifies that reading a
+// preferences.yaml with a value outside the whitelist (e.g. user-edited
+// "bypassPermissions") logs a warning and resets the field to the safe empty
+// default — never propagating a privilege-escalating value to downstream
+// consumers like SyncToProjectConfig.
+func TestReadPreferences_NormalizesInvalidPermissionMode(t *testing.T) {
+	tmpDir := t.TempDir()
+	orig := BaseDirOverride
+	defer func() { BaseDirOverride = orig }()
+	BaseDirOverride = tmpDir
+
+	prefsPath := filepath.Join(tmpDir, "preferences.yaml")
+	content := []byte("user_name: testuser\npermission_mode: bypassPermissions\n")
+	if err := os.WriteFile(prefsPath, content, 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := ReadPreferences("default")
+	if err != nil {
+		t.Fatalf("ReadPreferences should not error on invalid permission_mode: %v", err)
+	}
+	if got.PermissionMode != "" {
+		t.Errorf("invalid permission_mode should be reset to empty, got %q", got.PermissionMode)
+	}
+	if got.UserName != "testuser" {
+		t.Errorf("other fields should be preserved; UserName = %q, want %q", got.UserName, "testuser")
+	}
+}
+
+// TestWritePreferences_RejectsInvalidPermissionMode verifies that the write
+// path is also guarded — even if a future caller bypasses the wizard's huh.Select
+// and constructs the struct directly with a bad value, the persistence layer
+// must refuse to commit it to disk AND must NOT have written any file before
+// the rejection (regression guard for "validate after write" mistakes).
+func TestWritePreferences_RejectsInvalidPermissionMode(t *testing.T) {
+	tmpDir := t.TempDir()
+	orig := BaseDirOverride
+	defer func() { BaseDirOverride = orig }()
+	BaseDirOverride = tmpDir
+
+	prefsPath := GetPreferencesPath("default")
+
+	prefs := ProfilePreferences{
+		UserName:       "x",
+		PermissionMode: "bypassPermissions", // forbidden
+	}
+	err := WritePreferences("default", prefs)
+	if err == nil {
+		t.Fatal("WritePreferences must reject bypassPermissions, got nil error")
+	}
+
+	// File must NOT exist on disk after rejection. If a future change moves the
+	// validation to AFTER WriteFile, this assertion catches it.
+	if _, statErr := os.Stat(prefsPath); !os.IsNotExist(statErr) {
+		t.Errorf("preferences file must not exist after rejection (statErr=%v)", statErr)
+	}
+
+	// Confirm that the well-known acceptable values do round-trip and produce
+	// a file on disk.
+	for _, ok := range []string{"", "default", "auto", "acceptEdits"} {
+		prefs.PermissionMode = ok
+		if err := WritePreferences("default", prefs); err != nil {
+			t.Errorf("WritePreferences must accept %q, got error: %v", ok, err)
+		}
+	}
+	if _, statErr := os.Stat(prefsPath); statErr != nil {
+		t.Errorf("preferences file must exist after a successful write, got: %v", statErr)
+	}
+}

@@ -191,3 +191,34 @@ For working code examples, see [examples.md](examples.md).
 Status: Production Ready
 Last Updated: 2026-01-11
 Maintained by: AE-ADK Data Team
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "JSON is fine for everything, no need for TOON" | TOON reduces token count by 30-50% for LLM input. For agent-to-agent transfer, JSON wastes tokens. |
+| "Schema validation slows things down" | Validation catches bugs at the boundary, before they propagate. Pay the validation cost; skip the debugging cost. |
+| "YAML is more readable than JSON, I'll use it for everything" | YAML's whitespace sensitivity and type coercion bite in production. Use YAML for human config; JSON or TOON for machine data. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Large JSON payloads passed to LLMs without TOON encoding consideration
+- Data structures sent to or received from external systems without schema validation
+- YAML used for high-frequency machine-to-machine data exchange
+- Custom serialization rolled instead of using Protobuf, MessagePack, or established standards
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Token-budget-sensitive payloads benchmarked in JSON vs TOON encoding
+- [ ] All inbound data validated by JSON Schema, zod, or equivalent at the boundary
+- [ ] Encoding choice (JSON / TOON / YAML / Protobuf) justified by access pattern, not preference
+- [ ] Schema changes versioned and backward-compatible where consumers cannot upgrade in lockstep
+
+<!-- ae:evolvable-end -->

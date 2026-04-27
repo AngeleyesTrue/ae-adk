@@ -294,3 +294,36 @@ Status: Production Ready
 Last Updated: 2026-01-21
 Maintained by: AE-ADK Development Workflow Team
 Version: 2.4.0 (DDD Testing Methodology)
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "Coverage > 85% means the code is well tested" | Coverage measures execution. Mutation testing, property-based testing, and review of assertion quality matter more. |
+| "Performance tests are for production, not dev" | Performance regressions ship silently without baseline tests. Add them for hot paths early. |
+| "Code review covers what tests don't" | Reviewers miss things, especially under time pressure. Tests catch regressions every CI run. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Test files without assertions, or with weak assertions (.toBeTruthy on a number)
+- Coverage > 85% but production bugs frequently slip through
+- No characterization tests when modifying legacy code
+- Performance-critical code without a benchmark or baseline
+- Test names that describe "what" instead of "why" ("test_function_1")
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Coverage >= 85% for changed packages, with assertion quality reviewed
+- [ ] Test names describe behavior ("returns_404_when_user_not_found")
+- [ ] Characterization tests added when touching legacy code
+- [ ] Hot paths have benchmarks, with regression detection in CI
+- [ ] Mutation testing or property-based testing applied where it adds value
+
+<!-- ae:evolvable-end -->

@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -127,6 +128,7 @@ func runDiagnosticChecks(verbose bool, filterCheck string) []DiagnosticCheck {
 		{"AE Config", checkAEConfig},
 		{"Claude Config", checkClaudeConfig},
 		{"AE Version", checkAEVersion},
+		{"MCP Scope Duplicates", checkMCPScopeDuplicates},
 	}
 
 	var results []DiagnosticCheck
@@ -271,6 +273,92 @@ func statusIcon(s CheckStatus) string {
 	default:
 		return "?"
 	}
+}
+
+// checkMCPScopeDuplicates compares project .mcp.json and global ~/.claude/.mcp.json
+// for duplicate mcpServers keys and emits a warning per duplicate (REQ-15, v2.12.0).
+// Exit code remains 0 (non-blocking check).
+//
+// 첫 번째 인자(verbose bool)는 다른 doctor 체크 함수와 시그니처 일관성을 위해
+// 받지만 본 체크는 메시지/디테일이 단순하여 verbose 분기가 불필요하다. 향후 다국어
+// 디테일이 추가되면 이곳에서 분기 가능 (`_` 식별자 유지로 잘못된 사용을 방지).
+func checkMCPScopeDuplicates(_ bool) DiagnosticCheck {
+	check := DiagnosticCheck{Name: "MCP Scope Duplicates"}
+
+	// Load project .mcp.json
+	cwd, err := os.Getwd()
+	if err != nil {
+		check.Status = CheckOK
+		check.Message = "skipped (cannot determine working directory)"
+		return check
+	}
+
+	// Load global ~/.claude/.mcp.json
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		check.Status = CheckOK
+		check.Message = "skipped (cannot determine home directory)"
+		return check
+	}
+
+	globalMCPPath := filepath.Join(homeDir, ".claude", ".mcp.json")
+	return checkMCPScopeDuplicatesWithPaths(filepath.Join(cwd, ".mcp.json"), globalMCPPath)
+}
+
+// checkMCPScopeDuplicatesWithPaths is the testable implementation.
+// It accepts explicit file paths for both the project and global .mcp.json files,
+// allowing tests to supply temporary paths without polluting the real home directory.
+func checkMCPScopeDuplicatesWithPaths(projectMCPPath, globalMCPPath string) DiagnosticCheck {
+	check := DiagnosticCheck{Name: "MCP Scope Duplicates"}
+
+	projectMCP := loadMCPServerKeys(projectMCPPath)
+	globalMCP := loadMCPServerKeys(globalMCPPath)
+
+	// Find duplicates
+	var duplicates []string
+	for key := range projectMCP {
+		if _, exists := globalMCP[key]; exists {
+			duplicates = append(duplicates, key)
+		}
+	}
+
+	if len(duplicates) == 0 {
+		check.Status = CheckOK
+		check.Message = "no duplicate MCP server keys found"
+		return check
+	}
+
+	// Map iteration is non-deterministic in Go. Sort to produce stable, reproducible
+	// output independent of map traversal order.
+	sort.Strings(duplicates)
+
+	check.Status = CheckWarn
+	check.Message = fmt.Sprintf("%d duplicate MCP server key(s): %s", len(duplicates), strings.Join(duplicates, ", "))
+	check.Detail = "Duplicate MCP servers in project .mcp.json and global ~/.claude/.mcp.json may cause unexpected behavior."
+	return check
+}
+
+// loadMCPServerKeys parses an .mcp.json file and returns a set of mcpServers keys.
+// Returns an empty map if the file does not exist or cannot be parsed.
+func loadMCPServerKeys(path string) map[string]struct{} {
+	result := make(map[string]struct{})
+
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return result // file not found or unreadable — silently skip
+	}
+
+	var raw struct {
+		MCPServers map[string]any `json:"mcpServers"`
+	}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return result // malformed JSON — silently skip
+	}
+
+	for key := range raw.MCPServers {
+		result[key] = struct{}{}
+	}
+	return result
 }
 
 // exportDiagnostics writes check results to a JSON file.

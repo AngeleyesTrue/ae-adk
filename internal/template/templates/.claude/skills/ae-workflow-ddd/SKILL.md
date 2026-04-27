@@ -395,3 +395,36 @@ When DDD session encounters issues:
 Version: 1.0.0
 Status: Active
 Last Updated: 2026-01-16
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "DDD is overkill for small features" | DDD scales down. Even small features benefit from explicit domain boundaries and characterization tests on changed code. |
+| "Characterization tests are tedious, I'll just refactor and run E2E" | E2E catches some regressions; characterization tests pin behavior at the unit level where bugs are introduced. |
+| "ANALYZE phase is just reading code, I'll skip the writeup" | Without an explicit ANALYZE artifact, future maintainers re-derive the same understanding. Persist it in research.md. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Refactor without characterization tests on the changed code
+- ANALYZE phase findings not persisted to research.md or progress.md
+- Domain boundaries violated (e.g., direct DB access from UI layer)
+- Behavior change introduced during a refactor labeled as "refactor"
+- PRESERVE phase skipped because tests "already exist"
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Characterization tests cover the function or class being modified
+- [ ] ANALYZE artifact saved (research.md) before any code change
+- [ ] Domain boundaries verified: no cross-layer leaks introduced
+- [ ] Refactor commit verified to be behavior-preserving (test diff is zero)
+- [ ] Coverage on changed packages remained >= baseline
+
+<!-- ae:evolvable-end -->

@@ -182,28 +182,51 @@ Resume commands:
 - /ae:loop --resume iteration-002
 - /ae:loop --resume memory-pressure
 
+## Language Neutrality
+
+ae-adk supports 16 programming languages on equal footing. No language receives PRIMARY or SECONDARY classification — toolchain selection is driven by detected project markers, not by hardcoded language preference.
+
+| Language | File Extensions | LSP Server | Test Framework | Lint Tool |
+|----------|----------------|------------|----------------|-----------|
+| go | `.go` | `gopls` | `go test` | `golangci-lint` |
+| python | `.py`, `.pyi` | `pyright` or `pylsp` | `pytest` | `ruff` |
+| typescript | `.ts`, `.tsx`, `.mts`, `.cts` | `typescript-language-server` | `jest` or `vitest` | `eslint` |
+| javascript | `.js`, `.jsx`, `.mjs`, `.cjs` | `typescript-language-server` | `jest` or `vitest` | `eslint` |
+| rust | `.rs` | `rust-analyzer` | `cargo test` | `cargo clippy` |
+| java | `.java` | `jdtls` | `junit` (Maven/Gradle) | `checkstyle` or `spotbugs` |
+| kotlin | `.kt`, `.kts` | `kotlin-language-server` | `junit` (Gradle) | `ktlint` or `detekt` |
+| swift | `.swift` | `sourcekit-lsp` | `swift test` | `swiftlint` |
+| ruby | `.rb`, `.rake`, `.gemspec` | `solargraph` or `ruby-lsp` | `rspec` or `minitest` | `rubocop` |
+| php | `.php`, `.phtml` | `intelephense` | `phpunit` | `phpstan` or `php-cs-fixer` |
+| cpp | `.cpp`, `.cc`, `.cxx`, `.hpp`, `.h` | `clangd` | `gtest` (CTest) | `clang-tidy` |
+| csharp | `.cs` | `omnisharp` | `dotnet test` (xUnit/NUnit) | `dotnet format` / `roslynator` |
+| scala | `.scala`, `.sc` | `metals` | `scalatest` (sbt) | `scalafmt` / `scalafix` |
+| elixir | `.ex`, `.exs` | `elixir-ls` | `mix test` (ExUnit) | `credo` |
+| r | `.r`, `.R` | `languageserver` | `testthat` | `lintr` |
+| dart | `.dart` | `dart language-server` (Dart SDK) | `dart test` / `flutter test` | `dart analyze` |
+
 ## Language-Specific Commands
 
 Test runner and coverage tool selection is based on auto-detected project language:
 
 | Language | Indicator File | Test Command | Coverage Command |
 |----------|---------------|--------------|--------------------|
-| Go | go.mod | `go test ./...` | `go test -cover ./...` |
-| Python | pyproject.toml / setup.py | `pytest --tb=short` | `coverage run -m pytest` |
-| TypeScript/JavaScript | package.json | `npm test` or `jest` | `npm run coverage` or `c8` |
-| Rust | Cargo.toml | `cargo test` | `cargo tarpaulin` |
-| Java (Maven) | pom.xml | `mvn test -q` | `mvn jacoco:report` |
-| Java (Gradle) | build.gradle | `gradle test -q` | `gradle jacocoTestReport` |
-| Kotlin | build.gradle.kts | `gradle test -q` | `gradle jacocoTestReport` |
-| C# | *.csproj | `dotnet test` | `dotnet test --collect:"XPlat Code Coverage"` |
-| Ruby | Gemfile | `bundle exec rspec` or `bundle exec rake test` | `simplecov` (via .simplecov config) |
-| PHP | composer.json | `vendor/bin/phpunit` | `vendor/bin/phpunit --coverage-text` |
-| Scala | build.sbt | `sbt test` | `sbt coverage test coverageReport` |
-| Elixir | mix.exs | `mix test` | `mix test --cover` |
-| Swift | Package.swift | `swift test` | `swift test --enable-code-coverage` |
-| Flutter/Dart | pubspec.yaml | `flutter test` or `dart test` | `flutter test --coverage` |
-| R | DESCRIPTION | `Rscript -e 'testthat::test_package(".")'` | `covr::package_coverage()` |
-| C++ | CMakeLists.txt | `ctest --test-dir build` | `gcov`/`lcov` (if configured) |
+| go | go.mod | `go test ./...` | `go test -cover ./...` |
+| python | pyproject.toml / setup.py | `pytest --tb=short` | `coverage run -m pytest` |
+| typescript | tsconfig.json / package.json | `npm test` or `jest` | `npm run coverage` or `c8` |
+| javascript | package.json | `npm test` or `jest` | `npm run coverage` or `c8` |
+| rust | Cargo.toml | `cargo test` | `cargo tarpaulin` |
+| java | pom.xml or build.gradle | `mvn test -q` or `gradle test -q` | `mvn jacoco:report` or `gradle jacocoTestReport` |
+| kotlin | build.gradle.kts | `gradle test -q` | `gradle jacocoTestReport` |
+| swift | Package.swift | `swift test` | `swift test --enable-code-coverage` |
+| ruby | Gemfile | `bundle exec rspec` or `bundle exec rake test` | `simplecov` (via .simplecov config) |
+| php | composer.json | `vendor/bin/phpunit` | `vendor/bin/phpunit --coverage-text` |
+| cpp | CMakeLists.txt | `ctest --test-dir build` | `gcov`/`lcov` (if configured) |
+| csharp | *.csproj | `dotnet test` | `dotnet test --collect:"XPlat Code Coverage"` |
+| scala | build.sbt | `sbt test` | `sbt coverage test coverageReport` |
+| elixir | mix.exs | `mix test` | `mix test --cover` |
+| r | DESCRIPTION | `Rscript -e 'testthat::test_package(".")'` | `covr::package_coverage()` |
+| dart | pubspec.yaml | `dart test` or `flutter test` | `flutter test --coverage` |
 
 Language detection priority: Check for indicator files in project root. If multiple present, prefer the one with the most associated source files. If detection fails, prompt user to specify language.
 

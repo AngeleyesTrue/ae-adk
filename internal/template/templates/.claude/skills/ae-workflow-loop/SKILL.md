@@ -193,3 +193,36 @@ Last Updated: 2026-01-11
 Status: Active
 Integration: Claude Code Hooks, LSP Protocol, AST-grep
 Skill Name: ae-workflow-loop (formerly ae-ralph)
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "--max 100 because more iterations is better" | Stagnation is real. Set --max to a sensible bound and watch for diminishing returns. |
+| "--auto-fix everything, save me time" | Auto-fix without review can mask deeper issues. Use it for trivial fixes; review the rest. |
+| "Memory checkpoints are paranoid, I won't get interrupted" | Sessions get interrupted. Checkpoints let you resume cleanly without re-running the whole loop. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Loop with --max significantly higher than typical convergence count
+- Loop running --auto-fix on a change set without human review
+- Loop with no exit criteria other than max iterations
+- Loop modifying files outside the declared scope
+- Memory checkpoint not created for long-running loops
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Loop --max bounded by typical convergence (typically 5-10)
+- [ ] Auto-fix scope limited to LSP errors and trivial lint issues
+- [ ] Exit criteria explicit (zero LSP errors AND tests pass)
+- [ ] Memory checkpoint enabled for loops > 5 iterations
+- [ ] Final state verified manually before commit
+
+<!-- ae:evolvable-end -->

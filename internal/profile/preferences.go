@@ -2,6 +2,7 @@ package profile
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 
@@ -26,7 +27,8 @@ type ProfilePreferences struct {
 	Model       string `yaml:"model,omitempty"`        // e.g. "claude-opus-4-6"
 
 	// Launch settings
-	Bypass bool `yaml:"bypass,omitempty"` // --dangerously-skip-permissions
+	Bypass      bool   `yaml:"bypass,omitempty"`       // --dangerously-skip-permissions
+	EffortLevel string `yaml:"effort_level,omitempty"` // "low", "medium", "high", "xhigh", "max"
 
 	// Display settings
 	StatuslineMode     string          `yaml:"statusline_mode,omitempty"`     // "minimal", "default", "verbose"
@@ -34,6 +36,28 @@ type ProfilePreferences struct {
 	StatuslineSegments map[string]bool `yaml:"statusline_segments,omitempty"` // segment toggles for custom preset
 	StatuslineTheme    string          `yaml:"statusline_theme,omitempty"`    // "default", "catppuccin-mocha", "catppuccin-latte"
 	TeammateDisplay    string          `yaml:"teammate_display,omitempty"`    // "auto", "in-process", "tmux"
+
+	// Permission mode (REQ-22)
+	// 위저드에서 선택한 권한 모드. TeammateDisplay와는 별개의 의미를 가지므로
+	// 전용 필드로 분리한다. 가능한 값: "default", "auto", "acceptEdits".
+	// 보안 정책: "bypassPermissions"는 settings.json의 disableBypassPermissionsMode
+	// 정책과 충돌하므로 절대 허용하지 않는다. ValidatePermissionMode 참조.
+	PermissionMode string `yaml:"permission_mode,omitempty"`
+}
+
+// ValidatePermissionMode reports whether the given value is an acceptable
+// preferences-level permission_mode. Empty string ("" = unset) is also valid.
+//
+// Rejected values include "bypassPermissions" — that mode is reserved for
+// Claude Code CLI's `--dangerously-skip-permissions` flag (modeled by the
+// Bypass field above) and must not be settable via the preferences YAML to
+// keep the disableBypassPermissionsMode policy meaningful.
+func ValidatePermissionMode(mode string) bool {
+	switch mode {
+	case "", "default", "auto", "acceptEdits":
+		return true
+	}
+	return false
 }
 
 const (
@@ -84,6 +108,15 @@ func ReadPreferences(profileName string) (ProfilePreferences, error) {
 	if err := yaml.Unmarshal(data, &prefs); err != nil {
 		return ProfilePreferences{}, fmt.Errorf("parse preferences: %w", err)
 	}
+	// 화이트리스트에 없는 PermissionMode 값은 안전한 기본(빈 문자열)으로 정규화한다.
+	// 직접 YAML을 편집하여 "bypassPermissions" 같은 위험 값을 주입하는 경로를 차단한다.
+	if !ValidatePermissionMode(prefs.PermissionMode) {
+		slog.Warn("invalid permission_mode in preferences; resetting to empty (allowed: default/auto/acceptEdits)",
+			"path", path,
+			"value", prefs.PermissionMode,
+		)
+		prefs.PermissionMode = ""
+	}
 	return prefs, nil
 }
 
@@ -105,7 +138,14 @@ func migrateOldFile(dir, oldName, newName string) {
 
 // WritePreferences saves the preferences for a profile.
 // Creates the profile directory if it does not exist.
+//
+// 쓰기 시점에도 PermissionMode 화이트리스트를 강제한다. 위저드는
+// huh.Select로 이미 옵션을 제한하지만, 다른 호출 경로(테스트 픽스처 등)가
+// 우회 값을 저장하는 것을 막는다.
 func WritePreferences(profileName string, prefs ProfilePreferences) error {
+	if !ValidatePermissionMode(prefs.PermissionMode) {
+		return fmt.Errorf("invalid permission_mode %q (allowed: default/auto/acceptEdits)", prefs.PermissionMode)
+	}
 	path := GetPreferencesPath(profileName)
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return fmt.Errorf("create directory: %w", err)

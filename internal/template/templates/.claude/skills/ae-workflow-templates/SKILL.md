@@ -274,3 +274,34 @@ Status: Production Ready (Enterprise)
 Modular Architecture: SKILL.md + 3 core modules
 Integration: Plan-Run-Sync workflow optimized
 Generated with: AE-ADK Skill Factory
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "I'll just copy a similar feature and modify" | Copy-paste drift creates inconsistencies. Use templates so all instances stay aligned. |
+| "Boilerplate is a smell, avoid it" | Boilerplate that aligns with conventions is the price of consistency. Templates make it cheap to produce. |
+| "Feedback templates are forms, I'll write free-form bug reports" | Free-form bug reports lose information. Templates ensure repro steps, environment, and expected vs actual are captured. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Repeated structures created by copy-paste rather than templating
+- Bug report missing repro steps, environment, or expected vs actual
+- Template diverging from project conventions without updating the template
+- Generated files committed without verifying they match the current template
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Repeated structures generated from a template, not copy-paste
+- [ ] Bug reports use the project's feedback template
+- [ ] Templates kept in sync with conventions; updates regenerate consumers
+- [ ] Generated files reviewed for template drift before commit
+
+<!-- ae:evolvable-end -->

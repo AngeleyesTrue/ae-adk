@@ -620,12 +620,53 @@ For detailed team orchestration steps, see ${CLAUDE_SKILL_DIR}/team/plan.md.
 
 ---
 
+## HUMAN GATE: SPEC Approval Checkpoint
+
+**WHEN** Phase 2 finishes generating the draft SPEC files (spec.md, plan.md, acceptance.md) **THEN** AE MUST pause and request explicit user approval via AskUserQuestion before any of the following irreversible actions occur:
+
+- Phase 2.5: GitHub Issue creation (`gh issue create`)
+- Phase 3: Branch / worktree creation
+- Any commit of `.ae/specs/SPEC-{ID}/`
+
+Why this gate exists:
+- The SPEC document is the contract that drives `/ae run`. Once it is committed and an issue is filed, downstream pipelines treat it as ground truth — fixing requirement defects after this point is significantly more expensive.
+- Interactive plan flow gives the user one final review window. Auto pipelines (`auto.md`, `auto-sync.md`) deliberately do NOT carry this gate; they rely on SPEC-PIPELINE-002 cascade prevention instead.
+
+Required AskUserQuestion shape (4 options, recommended marked):
+
+1. (권장) Approve SPEC as-is and proceed to Phase 2.5 / Phase 3 — apply selected git action
+2. Request edits — return to manager-spec annotation cycle with specific change list
+3. Pause — keep generated files on disk, exit without issue creation or branching
+4. Abort — discard generated SPEC files and return to a clean state
+
+If the user picks option 2, run another annotation iteration; if option 3 or 4, terminate the workflow without invoking Phase 2.5 or Phase 3.
+
+## HUMAN GATE: Destructive Git Action Confirmation
+
+**WHEN** the chosen git action in Phase 3 is destructive (force-push to existing remote branch, reset of an existing feature branch, deletion of a worktree that contains uncommitted work) **THEN** AE MUST issue a second AskUserQuestion call before executing the action.
+
+Triggers that require this gate:
+- `--worktree` requested but a worktree at the same path already exists
+- `--branch` requested but the local branch already exists with diverging commits
+- Any flag combination that would overwrite existing artifacts under `.ae/specs/SPEC-{ID}/`
+
+Required AskUserQuestion shape:
+
+1. (권장) Cancel destructive action and report the conflict — preserves existing work
+2. Proceed with the destructive action — user accepts overwrite explicitly
+3. Switch strategy (use a fresh SPEC-ID, or a different branch name)
+4. Pause and let me investigate manually
+
+This gate is interactive-only by design. `auto.md` and `auto-sync.md` resolve the same conflict class via SPEC-PIPELINE-002 cascade prevention (Phase 4 removal, no merge capability) and MUST NOT replicate this header.
+
 ## Completion Criteria
 
 All of the following must be verified:
 
 - Phase 1: manager-spec analyzed project and proposed SPEC candidates
 - User approval obtained via AskUserQuestion before SPEC creation
+- HUMAN GATE: SPEC Approval Checkpoint cleared before Phase 2.5 / Phase 3
+- HUMAN GATE: Destructive Git Action Confirmation cleared whenever a destructive flag combination is detected
 - Phase 2: All SPEC files created (spec.md, plan.md, acceptance.md, spec-compact.md)
 - Directory naming follows .ae/specs/SPEC-{ID}/ format
 - YAML frontmatter contains all 8 required fields (including issue_number)

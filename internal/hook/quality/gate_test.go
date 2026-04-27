@@ -317,6 +317,124 @@ func TestQualityGate_Run_UnknownProjectPasses(t *testing.T) {
 	}
 }
 
+// TestQualityGate_hasJavaScriptFiles verifies REQ-03: ESLint gate skips Python-only projects.
+func TestQualityGate_hasJavaScriptFiles(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name      string
+		files     []string // relative paths to create in temp dir
+		wantFound bool
+	}{
+		{
+			name:      "empty directory returns false",
+			files:     nil,
+			wantFound: false,
+		},
+		{
+			name:      "Python-only project returns false",
+			files:     []string{"main.py", "requirements.txt", "tests/test_main.py"},
+			wantFound: false,
+		},
+		{
+			name:      "Go-only project returns false",
+			files:     []string{"main.go", "go.mod"},
+			wantFound: false,
+		},
+		{
+			name:      "project with .js file returns true",
+			files:     []string{"index.js"},
+			wantFound: true,
+		},
+		{
+			name:      "project with .ts file returns true",
+			files:     []string{"app.ts"},
+			wantFound: true,
+		},
+		{
+			name:      "project with .tsx file returns true",
+			files:     []string{"src/App.tsx"},
+			wantFound: true,
+		},
+		{
+			name:      "project with .jsx file returns true",
+			files:     []string{"src/index.jsx"},
+			wantFound: true,
+		},
+		{
+			name:      "project with .mjs file returns true",
+			files:     []string{"module.mjs"},
+			wantFound: true,
+		},
+		{
+			name:      "project with .cjs file returns true",
+			files:     []string{"config.cjs"},
+			wantFound: true,
+		},
+		{
+			name:      "mixed Python and JS returns true",
+			files:     []string{"main.py", "webpack.config.js"},
+			wantFound: true,
+		},
+		{
+			name:      "node_modules is skipped",
+			files:     []string{"requirements.txt", "node_modules/lodash/index.js"},
+			wantFound: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			dir := t.TempDir()
+			for _, f := range tt.files {
+				full := filepath.Join(dir, f)
+				if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil {
+					t.Fatalf("mkdir: %v", err)
+				}
+				if err := os.WriteFile(full, []byte(""), 0o644); err != nil {
+					t.Fatalf("write file %q: %v", f, err)
+				}
+			}
+
+			g := NewQualityGate(&GateConfig{ProjectDir: dir})
+			got := g.hasJavaScriptFiles()
+
+			if got != tt.wantFound {
+				t.Errorf("hasJavaScriptFiles() = %v, want %v", got, tt.wantFound)
+			}
+		})
+	}
+}
+
+// TestQualityGate_ESLintSkippedForPythonProject verifies that the ESLint gate step
+// is skipped entirely when the project contains no JS/TS files (REQ-03).
+func TestQualityGate_ESLintSkippedForPythonProject(t *testing.T) {
+	t.Parallel()
+
+	dir := t.TempDir()
+	// Create a Python-only project fixture.
+	if err := os.WriteFile(filepath.Join(dir, "main.py"), []byte("print('hello')"), 0o644); err != nil {
+		t.Fatalf("create main.py: %v", err)
+	}
+
+	cfg := DefaultGateConfig()
+	cfg.ProjectDir = dir
+	g := NewQualityGate(cfg)
+
+	// eslint step pointing to a non-existent binary; if not skipped, executeStep would fail.
+	step := gateStep{name: "eslint", binary: "eslint-does-not-exist-12345", optional: false}
+	passed, output := g.executeStep(context.Background(), step, 5*time.Second)
+
+	if !passed {
+		t.Errorf("ESLint step should be skipped for Python-only project, got output: %q", output)
+	}
+	if output != "" {
+		t.Errorf("output should be empty when ESLint is skipped, got: %q", output)
+	}
+}
+
 // TestIsGitCommit covers various command patterns.
 func TestIsGitCommit(t *testing.T) {
 	t.Parallel()

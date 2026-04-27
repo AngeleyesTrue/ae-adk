@@ -330,3 +330,36 @@ When TDD discipline breaks down:
 Version: 1.0.0
 Status: Active
 Last Updated: 2026-02-03
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "I'll write the test after I see the code working" | Test-after misses cases the code happens to handle correctly. Test-first surfaces edge cases up front. |
+| "REFACTOR is optional, the code already works" | Without REFACTOR, technical debt accumulates one feature at a time. Always do the third step. |
+| "One test per behavior is too granular" | Granular tests pinpoint failures. Bundled tests obscure which assertion failed. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Implementation committed before its test (RED phase skipped)
+- Test that passes immediately after writing (likely tests something that already works)
+- Multiple unrelated assertions bundled in one test
+- REFACTOR step skipped, leaving duplication or dead code
+- Tests testing the implementation rather than the behavior
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Each new feature follows RED -> GREEN -> REFACTOR strictly
+- [ ] Failing test confirmed to fail BEFORE implementation
+- [ ] Tests assert behavior, not implementation details
+- [ ] REFACTOR phase produces simpler code with all tests still green
+- [ ] Coverage of new code >= 85%
+
+<!-- ae:evolvable-end -->

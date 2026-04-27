@@ -241,3 +241,36 @@ Module Deep Dives:
 
 Full Examples: Refer to examples.md
 External Resources: Refer to reference.md
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "Worktrees are complex, I'll just branch and switch" | Branch switching dirties working dir; worktrees isolate. For parallel SPEC work, worktrees are simpler. |
+| "Native Claude worktree is enough, no need for /ae worktree" | Claude native is ephemeral. /ae worktree persists across sessions and integrates with SPEC tracking. |
+| "Worktree cleanup is manual, I'll do it later" | Stale worktrees accumulate disk and confuse git. Run git worktree prune at SPEC completion. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Multiple SPECs being worked in the same working directory simultaneously
+- Worktree created without registering against a SPEC
+- Stale worktree branches not pruned after SPEC completion
+- Implementation teammate spawned without isolation: worktree (team mode)
+- Worktree path used in agent prompts when CWD is already correct
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Each SPEC has its own worktree (or session) when multiple are active
+- [ ] Worktree registered via /ae worktree new SPEC-XXX
+- [ ] git worktree prune run after SPEC completion
+- [ ] Team-mode implementation teammates use isolation: worktree
+- [ ] Agent prompts use relative paths; CWD set by worktree, not the prompt
+
+<!-- ae:evolvable-end -->

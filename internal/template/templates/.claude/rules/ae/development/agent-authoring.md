@@ -35,7 +35,7 @@ All agent definitions use YAML frontmatter. The following fields are available:
 | memory | No | None | Persistent memory scope for cross-session learning |
 | background | No | false | Run agent in background without blocking conversation (v2.1.46+) |
 | color | No | None | Display color in UI: red, blue, green, yellow, purple, orange, pink, cyan |
-| effort | No | inherit | Session effort override: low, medium, high, max (max is Opus 4.6 only) |
+| effort | No | inherit | Session effort override: low, medium, high, xhigh, max (xhigh/max require Opus 4.7+) |
 | initialPrompt | No | None | Auto-submitted first user turn when agent runs as main session agent via --agent flag (v2.1.83+) |
 | isolation | No | none | Isolation mode: "worktree" creates isolated git worktree (v2.1.49+) |
 
@@ -55,7 +55,7 @@ All agent definitions use YAML frontmatter. The following fields are available:
 
 **isolation**: Controls agent execution isolation. When set to "worktree", the agent runs in an isolated git worktree, preventing conflicts with the main working directory. Available since Claude Code v2.1.49.
 
-**effort**: Overrides session effort level for this agent. Valid values: `low`, `medium`, `high`, `max`. The `max` value is only supported on Opus 4.6 models.
+**effort**: Overrides session effort level for this agent. Valid values: `low`, `medium`, `high`, `xhigh`, `max`. The `xhigh` and `max` values require Claude Opus 4.7 or later. On Opus 4.6, the highest supported effort level is `high`; older models silently fall back when `xhigh`/`max` is requested.
 
 **color**: Display color for the agent in the task list and transcript UI. Valid values: `red`, `blue`, `green`, `yellow`, `purple`, `orange`, `pink`, `cyan`.
 
@@ -206,3 +206,23 @@ Agents defined in plugins have restricted frontmatter support. The following fie
 - permissionMode
 
 These fields only work for project-level and personal-level agent definitions.
+
+## Bash Tool Timeout Ceiling
+
+Agents that invoke the Bash tool can specify a `timeout` parameter (milliseconds) per command.
+
+| Property | Value |
+|----------|-------|
+| Default timeout | 120,000 ms (2 minutes) |
+| Maximum timeout | 600,000 ms (10 minutes) |
+| Enforcement | Claude Code v2.1.110+ runtime |
+
+Rules:
+- Use the default 120,000 ms for typical commands (lint, short tests, single-file builds)
+- Specify a higher timeout (up to 600,000 ms) for long-running commands such as full test suites, dependency installation, or full project builds
+- Values exceeding 600,000 ms are clamped to 600,000 ms by the runtime starting from v2.1.110
+- Long-running commands that need more than 10 minutes must be split into smaller stages or moved to a dedicated job script invoked outside the agent
+
+Rationale:
+- Hard ceiling prevents runaway agent executions from blocking the main session indefinitely
+- Per-command override allows agents to opt into longer waits only when justified, rather than raising the global default

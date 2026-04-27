@@ -145,3 +145,37 @@ For working code examples, see [examples.md](examples.md).
 Status: Production Ready
 Last Updated: 2026-01-11
 Maintained by: AE-ADK Backend Team
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "REST is fine, I don't need to design contracts upfront" | Endpoints without explicit request/response contracts cause integration breakage. Use OpenAPI or GraphQL SDL. |
+| "Authentication can be added later, the prototype just needs the endpoints" | Retrofitting auth is far more expensive than baking it in. Add JWT or session middleware before the first endpoint. |
+| "Microservices for everything, monoliths are old-fashioned" | Microservices add operational complexity. Start with a modular monolith; extract services only when scale or team boundaries justify it. |
+| "Validation in the controller is sufficient" | Input validation must occur at the API boundary AND in the domain layer. Defense in depth is mandatory. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Endpoint without explicit request/response schema (OpenAPI, GraphQL SDL, or zod schema)
+- Authentication middleware not applied to a non-public endpoint
+- SQL queries built via string concatenation instead of parameterized queries
+- 5xx errors returned without structured error body or correlation ID
+- Synchronous external API calls without timeout or circuit breaker
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] All endpoints have schemas verified by contract tests
+- [ ] Authentication and authorization checks are present and tested for protected routes
+- [ ] OWASP Top 10 checklist passes (see ae-ref-owasp-checklist)
+- [ ] Database queries use parameterized statements or ORM bindings exclusively
+- [ ] Error responses include status code, error code, message, and correlation ID
+
+<!-- ae:evolvable-end -->

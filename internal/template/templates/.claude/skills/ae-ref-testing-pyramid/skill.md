@@ -147,3 +147,36 @@ Rules:
 - Write the simplest code that passes
 - Refactor only when all tests are green
 - One assertion per test (when practical)
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "E2E tests cover everything, unit tests are redundant" | E2E is slow and flaky. The pyramid (many unit, some integration, few E2E) is shaped by feedback speed and stability. |
+| "100% coverage means the code works" | Coverage measures execution, not assertion quality. Tests that execute without asserting anything still hit 100%. |
+| "Mocking everything makes tests fast" | Over-mocking makes tests reflect the mocks, not the system. Mock at boundaries (HTTP, DB), test real logic. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Test pyramid inverted (many E2E, few unit) — slow and flaky CI
+- Test files without explicit assertions
+- Mocks at every layer, including pure functions
+- Coverage > 90% but bugs ship to production routinely
+- No characterization tests added when modifying legacy code
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Test pyramid shape verified: many unit, some integration, few E2E
+- [ ] Coverage >= 85% for new code, with assertion quality reviewed
+- [ ] Mocks scoped to true boundaries (network, filesystem, time)
+- [ ] Legacy code modifications gated by characterization tests
+- [ ] Flaky tests quarantined with an issue link, not silently retried
+
+<!-- ae:evolvable-end -->

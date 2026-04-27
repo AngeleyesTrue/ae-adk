@@ -320,3 +320,36 @@ Generated with: AE-ADK Skill Factory v1.0
 Last Updated: 2026-02-01
 Version: 1.0.0 (Initial Release)
 Coverage: Manifest V3, Service Workers, Content Scripts, Messaging, Chrome APIs, UI, Security, Publishing
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "Manifest V2 still works, no rush to migrate" | MV2 is end-of-life. New extensions and updates require Manifest V3. |
+| "Service workers are like background pages" | Service workers terminate. Persistent state must move to chrome.storage; do not assume background memory survives. |
+| "I'll request all permissions upfront for simplicity" | Broad permissions trigger Chrome Web Store review delays and warning prompts. Use optional permissions and declarativeNetRequest where possible. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Manifest V2 used for a new extension
+- host_permissions including <all_urls> without justification
+- Service worker holding state in module-level variables
+- Content script injecting into pages without checking the URL pattern
+- API key bundled in the extension instead of fetched from a server
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Manifest V3 verified (manifest_version: 3)
+- [ ] Permissions minimized; optional permissions used where possible
+- [ ] Service worker state persisted via chrome.storage.local or session
+- [ ] Content script matches scoped to required URL patterns
+- [ ] Chrome Web Store submission passes review without warnings
+
+<!-- ae:evolvable-end -->

@@ -156,3 +156,36 @@ RootErrorBoundary (global)
 - [ ] Color contrast 4.5:1 or above
 - [ ] Visible focus indicator
 - [ ] Semantic HTML (button, nav, main, section)
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "useState everywhere, no need for reducers or libraries" | useState fragments related state. useReducer or a state library reduces bugs once state has > 3 fields. |
+| "Context is the React way to share state" | Context re-renders all consumers. For non-trivial app state, prefer Zustand, Jotai, or Redux Toolkit. |
+| "Server components are confusing, I'll use 'use client' everywhere" | "use client" disables server rendering, hurting performance and SEO. Use it only where interactivity is needed. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Component file with > 300 lines (split into smaller components)
+- Prop drilling more than 3 levels deep without context or library
+- useEffect that synchronizes state (use derived state instead)
+- "use client" applied to layouts or pages that don't need interactivity
+- Inline object/array allocation in JSX causing unnecessary re-renders
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] Components categorized as server vs client correctly in App Router
+- [ ] State management chosen based on app complexity (useState / useReducer / library)
+- [ ] Components remain under 300 lines or split with clear boundaries
+- [ ] Memoization (useMemo, useCallback, React.memo) applied where profiling shows benefit
+- [ ] Bundle size monitored; no accidental client-side imports of server-only code
+
+<!-- ae:evolvable-end -->

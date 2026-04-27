@@ -10,6 +10,7 @@ description: |
   ZH: 创建代理, 新代理, 代理蓝图, 子代理, 代理定义
 tools: Read, Write, Edit, Grep, Glob, WebFetch, WebSearch, Bash, TodoWrite, Agent, Skill, mcp__sequential-thinking__sequentialthinking, mcp__context7__resolve-library-id, mcp__context7__get-library-docs
 model: sonnet
+effort: high
 permissionMode: bypassPermissions
 memory: user
 skills:

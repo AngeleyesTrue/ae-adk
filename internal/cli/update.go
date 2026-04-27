@@ -21,6 +21,7 @@ import (
 	"github.com/AngeleyesTrue/ae-adk/internal/cli/wizard"
 	"github.com/AngeleyesTrue/ae-adk/internal/core/project"
 	"github.com/AngeleyesTrue/ae-adk/internal/defs"
+	"github.com/AngeleyesTrue/ae-adk/internal/foundation"
 	"github.com/AngeleyesTrue/ae-adk/internal/manifest"
 	"github.com/AngeleyesTrue/ae-adk/internal/merge"
 	"github.com/AngeleyesTrue/ae-adk/internal/profile"
@@ -676,6 +677,11 @@ func runTemplateSyncWithReporter(cmd *cobra.Command, reporter project.ProgressRe
 	_, _ = fmt.Fprintln(out)
 	_, _ = fmt.Fprintln(out, "To reconfigure your project settings, run:")
 	_, _ = fmt.Fprintln(out, "   ae update -c")
+
+	// Apply effort policy to agent frontmatters (REQ-08)
+	if err := foundation.ApplyEffortPolicy(projectRoot, mgr); err != nil {
+		_, _ = fmt.Fprintf(out, "Warning: Failed to apply effort policy: %v\n", err)
+	}
 
 	// Ensure global settings.json has required env variables
 	if err := ensureGlobalSettingsEnv(); err != nil {
@@ -2204,6 +2210,29 @@ func ensureGlobalSettingsEnv() error {
 		}
 	}
 
+	// Inject CLAUDE_CODE_EFFORT_LEVEL from profile preferences (REQ-05, AC-05).
+	// When profile.yaml has effort_level set, it must be present in the global
+	// settings.json env map so Claude Code inherits it at the syscall.Exec boundary.
+	profilePrefs, _ := profile.ReadPreferences(profile.GetCurrentName())
+	if profilePrefs.EffortLevel != "" {
+		envMap := ensureEnvMap(existingSettings)
+		if envMap[foundation.EnvClaudeCodeEffortLevel] != profilePrefs.EffortLevel {
+			envMap[foundation.EnvClaudeCodeEffortLevel] = profilePrefs.EffortLevel
+			existingSettings["env"] = envMap
+			needsUpdate = true
+		}
+	} else {
+		// Remove stale effort level key if profile no longer specifies one.
+		if envVal, exists := existingSettings["env"]; exists {
+			if envMap, ok := envVal.(map[string]any); ok {
+				if _, exists := envMap[foundation.EnvClaudeCodeEffortLevel]; exists {
+					delete(envMap, foundation.EnvClaudeCodeEffortLevel)
+					needsUpdate = true
+				}
+			}
+		}
+	}
+
 	// Ensure default global settings are present.
 	// CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 enables Agent Teams mode by default.
 	defaultEnvKeys := map[string]string{
@@ -2263,6 +2292,18 @@ func ensureGlobalSettingsEnv() error {
 	}
 
 	return nil
+}
+
+// ensureEnvMap returns the env map from settings, creating it if it does not exist.
+func ensureEnvMap(settings map[string]any) map[string]any {
+	if envVal, exists := settings["env"]; exists {
+		if envMap, ok := envVal.(map[string]any); ok {
+			return envMap
+		}
+	}
+	envMap := make(map[string]any)
+	settings["env"] = envMap
+	return envMap
 }
 
 // cleanLegacyHooks removes legacy hook patterns from global settings.

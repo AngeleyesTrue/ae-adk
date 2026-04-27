@@ -281,3 +281,36 @@ For latest documentation, use Context7 to query:
 Version: 2.0.0
 Last Updated: 2026-01-10
 Changes: Restructured to comply with CLAUDE.md Documentation Standards - removed all code examples, converted to narrative text format
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "Renderer can use Node.js APIs directly, contextIsolation is paranoid" | Node integration in renderer is the #1 Electron RCE vector. Use contextBridge with a typed preload script. |
+| "Auto-update will work out of the box, no need to test it" | Auto-update bugs ship to all users at once. Stage updates with a canary channel and rollback plan. |
+| "electron-forge or electron-builder, doesn't matter" | Tooling choice affects packaging, signing, and update flow. Pick one and align CI around it from day one. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- BrowserWindow with nodeIntegration: true or contextIsolation: false
+- IPC handler that does not validate channel names or input shapes
+- Renderer loading remote URLs without sandbox: true
+- App not code-signed for macOS / Windows distribution
+- No CSP defined or CSP allows unsafe-inline / unsafe-eval
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] All BrowserWindows use contextIsolation: true and sandbox: true
+- [ ] Preload script exposes a typed, minimal API via contextBridge
+- [ ] IPC handlers validate every input with a schema
+- [ ] App is code-signed and notarized (macOS) before distribution
+- [ ] Auto-update tested on a canary channel with rollback verified
+
+<!-- ae:evolvable-end -->

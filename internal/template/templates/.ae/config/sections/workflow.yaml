@@ -16,6 +16,12 @@ workflow:
         max_retries_per_operation: 3
     team:
         role_profiles:
+            team_lead:
+                mode: acceptEdits
+                model: "opus[1m]"
+                isolation: none
+                description: "Orchestration and cross-domain coordination"
+                tools: "Read,Write,Edit,Grep,Glob,Bash,Agent,AskUserQuestion,TaskCreate,TaskUpdate,TaskList,TaskGet"
             researcher:
                 mode: plan
                 model: haiku
@@ -31,7 +37,7 @@ workflow:
                 tools: "Read,Grep,Glob,Bash"
             architect:
                 mode: plan
-                model: sonnet
+                model: opus
                 isolation: none
                 description: "Solution design and architecture decisions"
                 tools: "Read,Grep,Glob,Bash"
@@ -57,7 +63,7 @@ workflow:
                 skills: "ae-domain-uiux,ae-design-tools"
             reviewer:
                 mode: plan
-                model: haiku
+                model: sonnet
                 isolation: none
                 description: "Code review and quality validation"
                 tools: "Read,Grep,Glob,Bash"

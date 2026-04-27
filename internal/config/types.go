@@ -146,6 +146,21 @@ type GateConfig struct {
 	SkipTests bool `yaml:"skip_tests"`
 	// Timeouts holds per-step timeout values in seconds.
 	Timeouts GateTimeouts `yaml:"timeouts"`
+	// AstGrepGate configures the Self-Learning Quality Guard (v2.10.2).
+	AstGrepGate AstGrepGateConfig `yaml:"ast_grep_gate" json:"astGrepGate,omitempty"`
+}
+
+// AstGrepGateConfig represents ast-grep based quality gate configuration (v2.10.2).
+// Self-Learning Quality Guard uses ast-grep rules to detect code patterns.
+type AstGrepGateConfig struct {
+	// Enabled controls whether the ast-grep gate runs.
+	Enabled bool `yaml:"enabled" json:"enabled"`
+	// RulesDir is the directory containing ast-grep rule files (YAML).
+	RulesDir string `yaml:"rules_dir" json:"rulesDir,omitempty"`
+	// BlockOnError causes the gate to fail when ast-grep errors occur.
+	BlockOnError bool `yaml:"block_on_error" json:"blockOnError"`
+	// WarnOnlyMode reports issues as warnings instead of errors.
+	WarnOnlyMode bool `yaml:"warn_only_mode" json:"warnOnlyMode"`
 }
 
 // GateTimeouts holds per-step timeout configuration in seconds.

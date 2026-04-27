@@ -158,3 +158,36 @@ Non-breaking changes (no version bump needed):
 - Adding new optional fields
 - Adding new endpoints
 - Adding new query parameters
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "REST or GraphQL, doesn't really matter" | REST shines for resource-oriented CRUD. GraphQL shines for nested reads with varied client needs. Choose by access pattern. |
+| "Status codes are arbitrary, 200 with error in body is fine" | Clients rely on status codes for retry, caching, and error handling. Use them per RFC 7231. |
+| "Pagination can be added later" | Endpoints that return unbounded lists OOM the client. Paginate from day one (cursor or offset). |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Endpoint returning unbounded list without pagination
+- 200 OK returned for an error condition (use 4xx / 5xx)
+- Inconsistent error response shapes across endpoints
+- GraphQL N+1 query without DataLoader
+- REST endpoint that does not version the API surface
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] All list endpoints support pagination (cursor or offset/limit)
+- [ ] Status codes follow RFC 7231 (2xx success, 4xx client error, 5xx server error)
+- [ ] Error responses use a consistent shape (code, message, details, correlation_id)
+- [ ] API versioning strategy documented (URL, header, or content negotiation)
+- [ ] Rate limits documented and enforced
+
+<!-- ae:evolvable-end -->

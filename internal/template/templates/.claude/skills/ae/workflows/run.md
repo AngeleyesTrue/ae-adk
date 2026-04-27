@@ -502,12 +502,51 @@ Context flows forward through every phase:
 
 ---
 
+## HUMAN GATE: Implementation Plan Approval
+
+**WHEN** Phase 1 (manager-strategy) returns an execution plan and Phase 1.5 has decomposed tasks with requirement traceability **THEN** AE MUST pause and request explicit user approval via AskUserQuestion before invoking the implementation methodology in Phase 2.
+
+Why this gate exists:
+- Phase 2 begins writing real code under DDD (ANALYZE-PRESERVE-IMPROVE) or TDD (RED-GREEN-REFACTOR). Once a methodology cycle starts, partial state can require manual rollback.
+- The user must confirm that the strategy correctly maps SPEC acceptance criteria to file ownership, methodology choice, and task ordering before code generation begins.
+- Auto pipelines (`auto.md`, `auto-sync.md`) bypass this gate by design — SPEC-PIPELINE-002 cascade prevention removes the merge capability that would otherwise allow runaway implementation.
+
+Required AskUserQuestion shape (4 options, recommended marked):
+
+1. (권장) Approve plan and proceed to Phase 2 with selected development_mode
+2. Adjust plan — return to manager-strategy with specific change requests (file scope, methodology, task ordering)
+3. Switch methodology — re-run Phase 1 with the alternate development_mode (DDD <-> TDD)
+4. Pause — keep tasks.md / progress.md as-is, exit before any code generation
+
+If the user picks option 2 or 3, re-run the relevant Phase 1 step; if option 4, terminate without invoking Phase 2 or Phase 2.5.
+
+## HUMAN GATE: Quality Gate Override
+
+**WHEN** Phase 2.5 (manager-quality TRUST 5 validation) returns a CRITICAL status **THEN** AE MUST pause and request explicit user direction via AskUserQuestion before any further action. Phase 3 (manager-git commits) MUST NOT execute while this gate is open.
+
+Triggers that require this gate:
+- TRUST 5 status == CRITICAL (any required dimension fails)
+- LSP error count exceeds the run-phase threshold (zero errors required)
+- Coverage drops below the configured floor in `quality.yaml`
+- Drift Guard reports cumulative drift > 30% across the methodology cycle
+
+Required AskUserQuestion shape:
+
+1. (권장) Re-enter Phase 2 to fix the failing dimensions — preserves SPEC integrity
+2. Override quality gate (force-PASS) — user accepts the risk explicitly, gate logged for audit
+3. Pause and let me investigate manually before deciding
+4. Abort run — leave changes uncommitted, surface the failure report and stop
+
+Plain prose mention of "HUMAN GATE" inside `auto.md` / `auto-sync.md` is permitted (e.g., warnings explaining why the auto path skips this gate); H2/H3 section headers with this name MUST remain absent from those files to satisfy SPEC-PIPELINE-002.
+
 ## Completion Criteria
 
 All of the following must be verified:
 
 - Phase 1: manager-strategy returned execution plan with requirements and success criteria
 - User approval checkpoint blocked Phase 2 until user confirmed
+- HUMAN GATE: Implementation Plan Approval cleared before Phase 2
+- HUMAN GATE: Quality Gate Override cleared (or not triggered) before Phase 3
 - Phase 1.5: Tasks decomposed with requirement traceability
 - Phase 1.8: MX context map built for target files (skipped for greenfield)
 - Phase 2: Implementation completed according to development_mode (with MX context)

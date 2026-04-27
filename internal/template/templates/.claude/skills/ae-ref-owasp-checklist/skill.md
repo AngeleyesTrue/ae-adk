@@ -114,3 +114,37 @@ triggers:
 | P1 | HIGH | Fix before merge | Missing authorization check |
 | P2 | MEDIUM | Fix within sprint | Weak password policy |
 | P3 | LOW | Track in backlog | Missing security header |
+
+<!-- ae:evolvable-start id="rationalizations" -->
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "OWASP Top 10 is for big web apps, my service is internal" | Internal services are inside the perimeter only. The OWASP Top 10 still applies once an attacker is inside or upstream of you. |
+| "I'll add input validation if a vuln is found in pen test" | Validation is cheap upfront. Adding it after pen test is expensive and often misses cases. |
+| "HTTPS handles transport security, that's enough" | HTTPS is the floor. Add HSTS, CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy. |
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="red-flags" -->
+## Red Flags
+
+- Endpoint accepting user input without schema validation
+- SQL queries built via string concatenation
+- Authentication missing on a non-public endpoint
+- Sensitive data logged in plaintext (passwords, tokens, PII)
+- Missing security headers (CSP, HSTS, X-Frame-Options)
+
+<!-- ae:evolvable-end -->
+
+<!-- ae:evolvable-start id="verification" -->
+## Verification
+
+- [ ] All inputs validated at the boundary (zod, JSON Schema, struct tags)
+- [ ] All database queries parameterized; no string concatenation
+- [ ] Authentication and authorization tested for every protected endpoint
+- [ ] Secrets stored in env vars or secret manager, never in source
+- [ ] Security headers configured (CSP, HSTS, X-Frame-Options, X-Content-Type-Options)
+- [ ] Dependencies scanned for known CVEs (npm audit, govulncheck, pip-audit)
+
+<!-- ae:evolvable-end -->
