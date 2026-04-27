@@ -87,7 +87,8 @@ func TestCheckMCPScopeDuplicates(t *testing.T) {
 		if idxAlpha < 0 || idxMu < 0 || idxZeta < 0 {
 			t.Fatalf("expected all three keys in message, got: %s", result.Message)
 		}
-		if !(idxAlpha < idxMu && idxMu < idxZeta) {
+		// De Morgan 적용 — 단일 boolean 비교로 staticcheck QF1001 해소
+		if idxAlpha >= idxMu || idxMu >= idxZeta {
 			t.Errorf("expected alphabetical order alpha<mu<zeta in message, got: %s", result.Message)
 		}
 	})

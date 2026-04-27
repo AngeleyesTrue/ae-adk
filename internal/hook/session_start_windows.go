@@ -56,12 +56,19 @@ func injectCLAUDEEnvFile(projectRoot string) error {
 	// json.RawMessage로 디코딩하여 다른 키의 비-문자열 값(숫자/객체 등)도
 	// 원형 그대로 보존한다. map[string]string으로 디코딩하면 외부 도구가 추가한
 	// 임의 타입 값에서 unmarshal 실패가 발생하여 전체 주입이 silent하게 중단된다.
+	//
+	// env가 객체가 아닌 형태(문자열/배열 등)로 잘못 작성되어 있으면 비차단
+	// 경고 후 새 맵으로 시작한다. 외부 도구가 settings.local.json을 손상시켰을
+	// 때 세션 시작 자체가 막히지 않도록 reliability를 우선한다.
 	envMap := make(map[string]json.RawMessage)
 	if envRaw, ok := settings["env"]; ok {
-		// "null" 또는 비어있으면 빈 맵으로 초기화 (이미 위에서 초기화됨)
 		if len(envRaw) > 0 && string(envRaw) != "null" {
 			if err := json.Unmarshal(envRaw, &envMap); err != nil {
-				return fmt.Errorf("parse env section: %w", err)
+				slog.Warn("settings.local.json env section is malformed (not an object); resetting env to empty",
+					"path", settingsPath,
+					"error", err.Error(),
+				)
+				envMap = make(map[string]json.RawMessage)
 			}
 		}
 	}

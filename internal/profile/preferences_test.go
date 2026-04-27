@@ -471,14 +471,15 @@ func TestReadPreferences_NormalizesInvalidPermissionMode(t *testing.T) {
 // TestWritePreferences_RejectsInvalidPermissionMode verifies that the write
 // path is also guarded — even if a future caller bypasses the wizard's huh.Select
 // and constructs the struct directly with a bad value, the persistence layer
-// must refuse to commit it to disk.
+// must refuse to commit it to disk AND must NOT have written any file before
+// the rejection (regression guard for "validate after write" mistakes).
 func TestWritePreferences_RejectsInvalidPermissionMode(t *testing.T) {
-	t.Parallel()
-
 	tmpDir := t.TempDir()
 	orig := BaseDirOverride
 	defer func() { BaseDirOverride = orig }()
 	BaseDirOverride = tmpDir
+
+	prefsPath := GetPreferencesPath("default")
 
 	prefs := ProfilePreferences{
 		UserName:       "x",
@@ -489,11 +490,21 @@ func TestWritePreferences_RejectsInvalidPermissionMode(t *testing.T) {
 		t.Fatal("WritePreferences must reject bypassPermissions, got nil error")
 	}
 
-	// And confirm that the well-known acceptable values do round-trip.
+	// File must NOT exist on disk after rejection. If a future change moves the
+	// validation to AFTER WriteFile, this assertion catches it.
+	if _, statErr := os.Stat(prefsPath); !os.IsNotExist(statErr) {
+		t.Errorf("preferences file must not exist after rejection (statErr=%v)", statErr)
+	}
+
+	// Confirm that the well-known acceptable values do round-trip and produce
+	// a file on disk.
 	for _, ok := range []string{"", "default", "auto", "acceptEdits"} {
 		prefs.PermissionMode = ok
 		if err := WritePreferences("default", prefs); err != nil {
 			t.Errorf("WritePreferences must accept %q, got error: %v", ok, err)
 		}
+	}
+	if _, statErr := os.Stat(prefsPath); statErr != nil {
+		t.Errorf("preferences file must exist after a successful write, got: %v", statErr)
 	}
 }
